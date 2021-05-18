@@ -1,17 +1,19 @@
 {{> partials/menu}}
 <div class="col-md-9 ml-sm-auto col-lg-10 px-4">
-    <form class="form-horizontal" id="productNewForm" data-toggle="validator">
+    <form class="form-horizontal bg-light m-4" id="productNewForm" data-toggle="validator">
         <div class="col-12">
-            <div class="page-header">
-                <div class="float-right">
+            <div class="page-header mt-2">
+                <div class="float-right mt-1 mr-1">
                     <button id="frm_product_save" class="btn btn-outline-success" type="submit">Add NFT</button>
                 </div>
                 <h2>{{ @root.__ "New product" }}</h2>
             </div>
         </div>
+        <hr class="mt-0"/>
         <div class="col-12">
             <div class="form-group">
-                <input type="file" id="productImage" name="productImage" accept="image/*" required multiple=false/>
+                <label for="productImage" class="control-label">{{ @root.__ "Product image" }} *</label>
+                <input class="form-control-file" type="file" id="productImage" name="productImage" accept="image/*" required/>
             </div>
         </div>
         <div class="col-12">

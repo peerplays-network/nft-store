@@ -313,7 +313,7 @@ $(document).ready(function (){
                 }
             })
             .done(function(msg){
-                window.location = '/customer/account';
+                window.location = '/';
             })
             .fail(function(msg){
                 showNotification(msg.responseJSON.message, 'danger');
