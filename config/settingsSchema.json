@@ -1,0 +1,237 @@
+{
+    "properties": {
+        "cartTitle": {
+            "type": "string",
+            "default": "NFT Store"
+        },
+        "cartDescription": {
+            "type": "string",
+            "default": "This is my NFT Store"
+        },
+        "cartLogo": {
+            "type": "string"
+        },
+        "baseUrl": {
+            "type": "string",
+            "format": "uri-template",
+            "default": "http://localhost:1111"
+        },
+        "emailHost": {
+            "format": "uri-template",
+            "type": "string"
+        },
+        "emailPort": {
+            "type": "number",
+            "default": 587
+        },
+        "emailSecure": {
+            "type": "boolean",
+            "default": false
+        },
+        "emailUser": {
+            "type": "string"
+        },
+        "emailPassword": {
+            "type": "string"
+        },
+        "emailAddress": {
+            "type": "string",
+            "format": "email"
+        },
+        "productsPerRow": {
+            "type": "number",
+            "default": 3
+        },
+        "productsPerPage": {
+            "type": "number",
+            "default": 6
+        },
+        "footerHtml": {
+            "type": "string",
+            "default": "&lt;h4 class=&quot;text-center&quot;&gt;Powered by expressCart&lt;/h4&gt;"
+        },
+        "googleAnalytics": {
+            "type": "string"
+        },
+        "injectJs": {
+            "type": "string"
+        },
+        "customCss": {
+            "type": "string"
+        },
+        "currencySymbol": {
+            "type": "string",
+            "default": "£"
+        },
+        "currencyISO": {
+            "type": "string",
+            "enum": ["USD", "EUR", "GBP"],
+            "default": "USD"
+        },
+        "paymentGateway": {
+            "type": "array",
+            "items": {
+                "oneOf": [
+                    {
+                        "type": "string",
+                        "enum": [ "paypal"]
+                    },
+                    {
+                        "type": "string",
+                        "enum": [ "blockonomics"]
+                    },
+                    {
+                        "type": "string",
+                        "enum": [ "stripe"]
+                    },
+                    {
+                        "type": "string",
+                        "enum": [ "authorizenet"]
+                    },
+                    {
+                        "type": "string",
+                        "enum": [ "adyen"]
+                    },
+                    {
+                        "type": "string",
+                        "enum": [ "payway"]
+                    },
+                    {
+                        "type": "string",
+                        "enum": [ "instore"]
+                    },
+                    {
+                        "type": "string",
+                        "enum": [ "zip"]
+                    }
+                ]
+            }
+        },
+        "databaseConnectionString": {
+            "type": "string"
+        },
+        "theme": {
+            "type": "string"
+        },
+        "themeViews": {
+            "type": "string"
+        },
+        "env": {
+            "type": "string"
+        },
+        "trackStock": {
+            "type": "boolean",
+            "default": false
+        },
+        "orderHook": {
+            "format": "uri-template"
+        },
+        "secretCookie": {
+            "type": "string"
+        },
+        "secretSession": {
+            "type": "string"
+        },
+        "availableLanguages": {
+            "type": "array"
+        },
+        "defaultLocale": {
+            "type": "string"
+        },
+        "enableLanguages": {
+            "type": "boolean",
+            "default": true
+        },
+        "maxQuantity": {
+            "type": "number"
+        },
+        "twitterHandle": {
+            "type": "string"
+        },
+        "facebookAppId": {
+            "type": "string"
+        },
+        "productOrderBy": {
+            "type": "string",
+            "enum": ["date", "title"],
+            "default": "date"
+        },
+        "productOrder": {
+            "type": "string",
+            "enum": ["descending", "ascending"],
+            "default": "descending"
+        },
+        "modules": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "object",
+                    "properties": {
+                        "shipping": {
+                            "type": "string"
+                        }
+                    },
+                    "required": ["shipping"]
+                }
+            },
+            "required": ["enabled"],
+            "default": {
+                "enabled": {
+                    "shipping": "shipping-basic"
+                }
+            }
+        },
+        "showRelatedProducts": {
+            "type": "boolean",
+            "default": true
+        },
+        "showHomepageVariants": {
+            "type": "boolean",
+            "default": false
+        },
+        "peeridUrl": {
+          "type": "string",
+          "default": false
+        },
+        "peeridClientID": {
+          "type": "string",
+          "default": false
+        },
+        "peeridClientSecret": {
+          "type": "string",
+          "default": false
+        },
+        "peeridRedirectUri": {
+          "type": "string",
+          "default": false
+        },
+        "peerplaysAssetID": {
+          "type": "string",
+          "default": false
+        },
+        "peerplaysAccountID": {
+          "type": "string",
+          "default": false
+        },
+        "commission": {
+          "type": "number",
+          "default": false
+        },
+        "categories": {
+          "type": "array"
+        }
+    },
+    "required": [
+        "baseUrl",
+        "emailHost",
+        "emailPort",
+        "emailSecure",
+        "emailUser",
+        "emailPassword",
+        "emailAddress",
+        "paymentGateway",
+        "databaseConnectionString",
+        "modules"
+    ],
+    "additionalProperties": false
+}

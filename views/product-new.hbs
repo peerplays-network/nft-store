@@ -1,0 +1,69 @@
+{{> partials/menu}}
+<div class="col-md-9 ml-sm-auto col-lg-10 px-4">
+    <form class="form-horizontal" id="productNewForm" data-toggle="validator">
+        <div class="col-12">
+            <div class="page-header">
+                <div class="float-right">
+                    <button id="frm_product_save" class="btn btn-outline-success" type="submit">Add NFT</button>
+                </div>
+                <h2>{{ @root.__ "New product" }}</h2>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group">
+                <input type="file" id="productImage" name="productImage" accept="image/*" required multiple=false/>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group">
+                <label for="productTitle" class="control-label">{{ @root.__ "Product title" }} *</label>
+                <input type="text" id="productTitle" class="form-control" minlength="5" maxlength="200" value="{{productTitle}}" required/>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group" id="editor-wrapper">
+                <label for="editor" class="control-label">{{ @root.__ "Product description" }} *</label>
+                <textarea minlength="25" rows="10" id="productDescription" class="form-control" required>{{productDescription}}</textarea>
+            </div>
+        </div>
+        <div class="row ml-0 mr-0 justify-content-between">
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="category" class="control-label">{{ @root.__ "Product Brand" }} *</label>
+                    <select class="form-control" id="category" name="category" required>
+                        <option value="" disabled selected>Select Category</option>
+                        {{#each config.categories}}
+                        <option value="{{this}}">{{this}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <label for="productPublished" class="control-label">{{ @root.__ "Status" }}</label>
+                    <select class="form-control" id="productPublished" name="productPublished">
+                        <option value="true" selected>{{ @root.__ "Published" }}</option>
+                        <option value="false">{{ @root.__ "Draft" }}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group">
+                <label class="control-label">Permalink</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="productPermalink" placeholder="Permalink for the article" value={{productPermalink}}>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-success" id="validatePermalink" type="button">Validate</button>
+                    </div>
+                </div>
+                <p class="help-block">{{ @root.__ "This sets a readable URL for the product" }}</p>
+            </div>
+        </div>
+        {{#if config.commission}}
+        <div class="col-12">
+            <div>A commission of {{config.commission}}% will be deducted from the sale price.</div>
+        </div>
+        {{/if}}
+    </form>
+</div>
