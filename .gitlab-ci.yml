@@ -1,0 +1,25 @@
+# gitlab scanning
+include:
+  - template: Dependency-Scanning.gitlab-ci.yml
+  - template: License-Scanning.gitlab-ci.yml
+  - template: SAST.gitlab-ci.yml
+  - template: Secret-Detection.gitlab-ci.yml
+
+variables:
+ GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+
+stages:
+  - build
+  - test
+  - deploy
+  - dast
+
+# builds app
+build:
+  # node docker image on which this would be run
+  image: node:14.16.1-alpine3.13
+  stage: build
+  script:
+    - npm install
+  tags:
+    - docker
