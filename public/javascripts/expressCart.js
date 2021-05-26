@@ -91,10 +91,10 @@ $(document).ready(function (){
             processData: false
         })
         .done(function(msg){
-            showNotification(msg.message, 'success', false, '/customer/product/edit/' + msg.productId);
+            showNotification(msg.message, 'success', false, '/customer/products/1');
         })
         .fail(function(msg){
-            if(msg.responseJSON.length > 0){
+            if(msg.responseJSON && msg.responseJSON.length > 0){
                 var errorMessages = validationErrors(msg.responseJSON);
                 $('#validationModalBody').html(errorMessages);
                 $('#validationModal').modal('show');
@@ -324,6 +324,126 @@ $(document).ready(function (){
 
     $('#customerRegister').on('click', function(e){
         window.location.replace('/customer/setup');
+    });
+
+    $('#productButtons div button').on('click', function(e){
+        if($(this).text() === 'Mint') {
+            var productId = $(this).attr('data-id');
+            $('.modal-body #productId').val(productId);
+            $('#nftMintModal').modal('show');
+        } else if($(this).text() === 'Sell') {
+            var productId = $(this).attr('data-id');
+            $('.modal-body #sellProductId').val(productId);
+            $('#sellNFTModal').modal('show');
+            $('#saleEnd').datetimepicker({
+                uiLibrary: 'bootstrap4',
+                footer: true,
+                modal: true,
+                showOtherMonths: true
+            });
+        }
+    });
+
+    // Mint NFT
+    $(document).on('click', '#buttonMint', function(e){
+        $.ajax({
+            method: 'POST',
+            url: '/customer/product/mint',
+            data: {
+                productId: $('#productId').val(),
+                quantity: $('#productQuantity').val()
+            }
+        })
+        .done(function(msg){
+            showNotification(msg.message, 'success', true);
+        })
+        .fail(function(msg){
+            if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
+                showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
+            }
+
+            if(msg.responseJSON.message === 'Product not found'){
+                showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
+            }
+
+            showNotification(msg.responseJSON.message, 'danger');
+        });
+    });
+
+    $(document).on('click','#productSellTypeCheckbox', function(e) {
+        var assetSymbol = $('#assetSymbol').val();
+        if($('#productSellTypeCheckbox').prop('checked')){
+            const bidHtml = `<div class="form-group">
+                                <label for="productMinPrice" class="control-label">Min. Price (${assetSymbol}) *</label>
+                                <input type="number" id="productMinPrice" class="form-control" min="0" step="any" required/>
+                            </div>
+                            <div class="form-group">
+                                <label for="productMaxPrice" class="control-label">Max. Price (${assetSymbol}) *</label>
+                                <input type="number" id="productMaxPrice" class="form-control" min="0" step="any" required/>
+                            </div>
+                            <div class="form-group">
+                                <label for="saleEnd" class="control-label">Sale end date *</label>
+                                <input id="saleEnd" />
+                            </div>`;
+            $('#sellNFTFormWrapper').html(bidHtml);
+            $('#saleEnd').datetimepicker({
+                uiLibrary: 'bootstrap4',
+                footer: true,
+                modal: true,
+                showOtherMonths: true
+            });
+        } else {
+            const fixedPriceHtml = `<div class="form-group">
+                                        <label for="productSellQuantity" class="control-label">Quantity *</label>
+                                        <input type="number" id="productSellQuantity" class="form-control" min="0" step="1" onkeypress="return isNumberKey(event)" required/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="productPrice" class="control-label">NFT Price (${assetSymbol}) *</label>
+                                        <input type="number" id="productPrice" class="form-control" min="0" step="any" required/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="saleEnd" class="control-label">Sale end date *</label>
+                                        <input id="saleEnd" />
+                                    </div>`;
+            $('#sellNFTFormWrapper').html(fixedPriceHtml);
+            $('#saleEnd').datetimepicker({
+                uiLibrary: 'bootstrap4',
+                footer: true,
+                modal: true,
+                showOtherMonths: true
+            });
+        }
+    });
+
+    // Sell NFT
+    $(document).on('click', '#buttonSell', function(e){
+        const isBidding = $('#productSellTypeCheckbox').prop('checked');
+
+        $.ajax({
+            method: 'POST',
+            url: '/customer/product/sell',
+            data: {
+                productId: $('#sellProductId').val(),
+                quantity: isBidding ? 1 : $('#productSellQuantity').val(),
+                minPrice: isBidding ? $('#productMinPrice').val() : $('#productPrice').val(),
+                maxPrice: isBidding ? $('#productMaxPrice').val() : $('#productPrice').val(),
+                expirationDate: $('#saleEnd').val()
+            }
+        })
+        .done(function(msg){
+            showNotification(msg.message, 'success', true);
+        })
+        .fail(function(msg){
+            if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
+                showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
+            }
+
+            if(msg.responseJSON.message === 'Product not found'){
+                showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
+            }
+
+            showNotification(msg.responseJSON.message, 'danger');
+        });
     });
 
     // call update settings API
@@ -872,4 +992,11 @@ function validationErrors(errors){
       errorMessage += `<p>${value.dataPath.replace('/', '')} - <span class="text-danger">${value.message}<span></p>`;
   });
   return errorMessage;
+}
+
+function isNumberKey(evt){
+    var charCode = (evt.which) ? evt.which : evt.keyCode
+    if (charCode > 31 && (charCode < 48 || charCode > 57))
+        return false;
+    return true;
 }

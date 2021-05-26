@@ -556,7 +556,10 @@ router.post('/customer/login_action', async (req, res) => {
         indexCustomers(req.app)
         .then(() => {
             const returnCustomer = updatedCustomer.value;
-            delete returnCustomer.password;
+
+            if(returnCustomer) {
+                delete returnCustomer.password;
+            }
         });
         // Customer login successful
         req.session.customerPresent = true;

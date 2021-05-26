@@ -327,7 +327,7 @@ $(document).ready(function (){
     // applies an product filter
     $(document).on('click', '#btn_product_filter', function(e){
         if($('#product_filter').val() !== ''){
-            window.location.href = '/products/filter/' + $('#product_filter').val();
+            window.location.href = '/customer/products/filter/' + $('#product_filter').val();
         }else{
             showNotification('Please enter a keyword to filter', 'danger');
         }

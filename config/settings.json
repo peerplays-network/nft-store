@@ -53,6 +53,8 @@
     "peeridClientSecret": "Qv16Go2MPjBhn8P1Sdc7LgzPnr18F3JLGjC7F71nXw",
     "peeridRedirectUri": "https://nftstore.peerplays.download/peerid_auth/redirect",
     "peerplaysAssetID": "1.3.0",
+    "peerplaysAssetSymbol": "TEST",
+    "peerplaysAssetPrecision": 5,
     "peerplaysAccountID": "1.2.73",
     "commission": 10,
     "categories": ["Digital Art", "Photographs", "Oil Paintings"]

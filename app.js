@@ -323,6 +323,12 @@ handlebars = handlebars.create({
                 >
                 <use xlink:href="/dist/feather-sprite.svg#${icon}"/>
             </svg>`;
+        },
+        eqHidden: (lvalue, rvalue) => {
+            return lvalue === rvalue ? 'd-none' : 'd-flex';
+        },
+        neqHidden: (lvalue, rvalue) => {
+            return lvalue !== rvalue ? 'd-none' : 'd-flex';
         }
     }
 });
@@ -348,6 +354,7 @@ if(!config.secretSession || config.secretSession === ''){
 app.enable('trust proxy');
 app.use(helmet());
 app.set('port', process.env.PORT || 1111);
+app.use('/imgs', express.static(path.join(__dirname, 'uploads')));
 app.use(logger('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser(config.secretCookie));

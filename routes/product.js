@@ -21,6 +21,8 @@ const router = express.Router();
 const config = require('../config/settings');
 const multer = require('multer');
 
+const peerplaysService = new PeerplaysService();
+
 const randomizeLottoName = () => {
   let text = '';
   const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -58,19 +60,106 @@ const upload = multer({
   }
 });
 
+const getSellOffers = async (start = 0, k = 0) => {
+    let sellOffers = [];
+    const {result} = await peerplaysService.getBlockchainData({
+        api: "database",
+        method: "list_sell_offers",
+        params: [`1.29.${start}`, 100]
+    });
+
+    let params = {};
+
+    for(let i = 0; i < result.length; i++) {
+        for(let j = 0; j < result[i].item_ids.length; j++, k++) {
+            params[`params[0][${k}]`] = result[i].item_ids[j];
+        }
+    }
+
+    const nfts = await peerplaysService.getBlockchainData({
+        api: "database",
+        method: "get_objects",
+        ...params
+    });
+
+    if(nfts) {
+        for(let i = 0; i < result.length; i++) {
+            result[i].nft_metadata_ids = nfts.result.map((nft) => {
+                if(result[i].item_ids.includes(nft.id)) return nft.nft_metadata_id;
+            });
+
+            result[i].minimum_price.amount = result[i].minimum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
+            result[i].maximum_price.amount = result[i].maximum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
+        }
+    }
+
+    sellOffers.push(...result);
+
+    if(result.length < 100) {
+        return sellOffers;
+    } else {
+        sellOffers.push(await getSellOffers(start+100, k));
+        return sellOffers;
+    }
+}
+
 router.get('/customer/products/:page?', async (req, res, next) => {
+    if(!req.session.peerplaysAccountId) {
+        res.redirect('/customer/login');
+        return;
+    }
+
     let pageNum = 1;
     if(req.params.page){
         pageNum = req.params.page;
     }
 
     // Get our paginated data
-    const products = await paginateData(false, req, pageNum, 'products', {}, { productAddedDate: -1 });
+    const products = await paginateData(false, req, pageNum, 'products', { owner: req.session.peerplaysAccountId }, { orderDate: -1 });
+
+    const allSellOffers = await getSellOffers();
+
+    if(products && products.data) {
+        await Promise.all(products.data.map(async (nft) => {
+            let metadata, minted, sellOffers;
+            try {
+                metadata = await peerplaysService.getBlockchainData({
+                    api: "database",
+                    method: "get_objects",
+                    "params[0][]": nft.nftMetadataID
+                });
+
+                minted = await peerplaysService.getBlockchainData({
+                    api: "database",
+                    method: "nft_get_all_tokens",
+                    "params[0]": nft.owner
+                });
+
+                sellOffers = allSellOffers ? allSellOffers.filter((s) => s.nft_metadata_ids.includes(nft.nftMetadataID)) : [];
+                sellOffersCount = sellOffers.reduce((sum, s) => sum + s.item_ids.length, 0);
+
+                minted = minted ? minted.result.filter((m) => m.nft_metadata_id === nft.nftMetadataID) : [];
+                nft.minted = minted;
+                nft.mintedCount = minted.length;
+                nft.sellOffers = sellOffers;
+                nft.sellOffersCount = sellOffersCount;
+            } catch(ex) {
+                console.error(ex);
+            }
+
+            if(metadata && metadata.result[0] && metadata.result[0].base_uri.includes('/uploads/')) {
+                nft.base_uri = req.protocol + '://' + req.get('host') + '/imgs' + metadata.result[0].base_uri.split('/uploads')[1];
+            } else {
+                nft.base_uri = metadata.result[0].base_uri;
+            }
+        }));
+    }
 
     res.render('products', {
-        title: 'Cart - Products',
+        title: 'My NFTs',
         results: products.data,
         totalItemCount: products.totalItems,
+        allSellOffers,
         pageNum,
         paginateUrl: 'customer/products',
         resultType: 'top',
@@ -86,15 +175,9 @@ router.get('/customer/products/:page?', async (req, res, next) => {
 router.get('/customer/products/filter/:search', async (req, res, next) => {
     const db = req.app.db;
     const searchTerm = req.params.search;
-    const productsIndex = req.app.productsIndex;
-
-    const lunrIdArray = [];
-    productsIndex.search(searchTerm).forEach((id) => {
-        lunrIdArray.push(getId(id.ref));
-    });
 
     // we search on the lunr indexes
-    const results = await db.products.find({ _id: { $in: lunrIdArray } }).toArray();
+    const results = await db.products.find({$or: [{ "productTitle": {$regex: searchTerm, $options: 'i'}}, {"productDescription": {$regex: searchTerm, $options: 'i'}}]}).toArray();
 
     if(req.apiAuthenticated){
         res.status(200).json(results);
@@ -143,10 +226,12 @@ router.post('/customer/product/insert', upload.single("productImage"), async (re
 
     const doc = {
         nftMetadataID: "1.26.0",
+        productTitle: req.body.title,
         productDescription: req.body.productDescription,
         productCategory: req.body.productCategory,
         productPublished: req.body.productPublished == 'true',
-        productPermalink: req.body.productPermalink
+        productPermalink: req.body.productPermalink,
+        owner: req.session.peerplaysAccountId
     };
 
     if(req.file) {
@@ -180,7 +265,7 @@ router.post('/customer/product/insert', upload.single("productImage"), async (re
 
     let peerplaysResult = null;
     try{
-        peerplaysResult = await new PeerplaysService().sendOperations(body, req.session.peerIDAccessToken);
+        peerplaysResult = await peerplaysService.sendOperations(body, req.session.peerIDAccessToken);
     } catch(ex) {
         res.status(400).json({ message: ex.message });
         return;
@@ -204,6 +289,151 @@ router.post('/customer/product/insert', upload.single("productImage"), async (re
     }catch(ex){
         console.log(colors.red(`Error inserting document: ${ex}`));
         res.status(400).json({ message: 'Error inserting document' });
+    }
+});
+
+// mint new product form action
+router.post('/customer/product/mint', async (req, res) => {
+    if(!req.session.peerplaysAccountId){
+        return res.status(400).json({
+            message: 'You need to be logged in to Mint NFT'
+        });
+    }
+
+    const db = req.app.db;
+
+    const product = await db.products.findOne({ _id: getId(req.body.productId) });
+
+    if(!product) {
+        return res.status(400).json({
+            message: 'Product not found'
+        });
+    }
+
+    const operations = [];
+
+    for(let i = 0; i < req.body.quantity; i++) {
+        operations.push({
+            op_name: 'nft_mint',
+            fee_asset: config.peerplaysAssetID,
+            payer: req.session.peerplaysAccountId,
+            nft_metadata_id: product.nftMetadataID,
+            owner: req.session.peerplaysAccountId,
+            approved: req.session.peerplaysAccountId,
+            approved_operators: [],
+            token_uri: '/'
+        });
+    }
+
+    const body = {operations};
+
+    try{
+        const peerplaysResult = await peerplaysService.sendOperations(body, req.session.peerIDAccessToken);
+        res.status(200).json({
+            message: 'NFT Minted Successfully',
+            NFTId: peerplaysResult.result.trx.operation_results[0][1]
+        });
+    } catch(ex) {
+        console.error(ex);
+        res.status(400).json({ message: 'Error minting NFT' });
+        return;
+    }
+});
+
+// sell new product form action
+router.post('/customer/product/sell', async (req, res) => {
+    if(!req.session.peerplaysAccountId){
+        return res.status(400).json({
+            message: 'You need to be logged in to Sell NFT'
+        });
+    }
+
+    const db = req.app.db;
+
+    const product = await db.products.findOne({ _id: getId(req.body.productId) });
+
+    if(!product) {
+        return res.status(400).json({
+            message: 'Product not found'
+        });
+    }
+
+    let minted = [], sellOffers = [], availableNFTs = [];
+
+    try {
+        minted = await peerplaysService.getBlockchainData({
+            api: "database",
+            method: "nft_get_all_tokens",
+            "params[0]": product.owner
+        });
+
+        sellOffers = await getSellOffers();
+        sellOffers = sellOffers ? sellOffers.filter((s) => s.nft_metadata_ids.includes(product.nftMetadataID)) : [];
+        const sellOffersCount = sellOffers.reduce((sum, s) => sum + s.item_ids.length, 0);
+
+        minted = minted ? minted.result.filter((m) => m.nft_metadata_id === product.nftMetadataID) : [];
+
+        if(Number(req.body.quantity) === 0) {
+            return res.status(400).json({
+                message: 'Quantity cannot be zero'
+            });
+        }
+
+        if(Number(req.body.minPrice) <= 0 && Number(req.body.maxPrice) <= 0) {
+            return res.status(400).json({
+                message: 'Price cannot be zero'
+            });
+        }
+
+        if(Number(req.body.quantity) > minted.length - sellOffersCount) {
+            return res.status(400).json({
+                message: `Trying to sell ${req.body.quantity} NFTs out of ${minted.length - sellOffersCount} minted NFTs. Please mint more NFTs.`
+            });
+        }
+
+        if(Date.parse(req.body.expirationDate) <= Date.now()) {
+            return res.status(400).json({
+                message: 'Sale end date cannot be less than current date and time'
+            });
+        }
+
+        const sellOfferNFTIds = sellOffers.reduce((arr,offer) => arr.concat(offer.item_ids), []);
+
+        availableNFTs = minted.filter((m) => !sellOfferNFTIds.includes(m.id));
+    } catch(ex) {
+        console.error(ex);
+        return res.status(400).json({
+            message: 'Error fetching data from Blockchain. Please try again later.'
+        });
+    }
+
+    let operations = [];
+
+    for(let i = 0; i < Number(req.body.quantity); i++) {
+        operations.push({
+            op_name: 'offer',
+            fee_asset: config.peerplaysAssetID,
+            item_ids: [availableNFTs[i].id],
+            issuer: req.session.peerplaysAccountId,
+            minimum_price: {amount: req.body.minPrice * Math.pow(10,config.peerplaysAssetPrecision), asset_id: config.peerplaysAssetID},
+            maximum_price: {amount: req.body.maxPrice * Math.pow(10,config.peerplaysAssetPrecision), asset_id: config.peerplaysAssetID},
+            buying_item: false,
+            offer_expiration_date: Math.floor(Date.parse(req.body.expirationDate)/1000)
+        });
+    }
+
+    const body = {operations};
+
+    try{
+        const peerplaysResult = await peerplaysService.sendOperations(body, req.session.peerIDAccessToken);
+        res.status(200).json({
+            message: 'Sell offer created successfully',
+            NFTId: peerplaysResult.result.trx.operation_results[0][1]
+        });
+    } catch(ex) {
+        console.error(ex);
+        res.status(400).json({ message: 'Error creating sell offer for NFT' });
+        return;
     }
 });
 
