@@ -10,6 +10,11 @@
             "isNotEmpty": true,
             "minLength": 6
         },
+        "productTitle": {
+            "type": "string",
+            "isNotEmpty": true,
+            "minLength": 2
+        },
         "productDescription": {
             "type": "string",
             "isNotEmpty": true,
@@ -25,6 +30,10 @@
         "productPermalink": {
             "type": "string",
             "isNotEmpty": true
+        },
+        "owner": {
+            "type": "string",
+            "isNotEmpty": true
         }
     },
     "errorMessage": {
@@ -36,6 +45,10 @@
         }
     },
     "required": [
-        "productId"
+        "productId",
+        "nftMetadataID",
+        "productTitle",
+        "productDescription",
+        "owner"
     ]
 }

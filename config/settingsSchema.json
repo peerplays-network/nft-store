@@ -191,31 +191,39 @@
         },
         "peeridUrl": {
           "type": "string",
-          "default": false
+          "default": ""
         },
         "peeridClientID": {
           "type": "string",
-          "default": false
+          "default": ""
         },
         "peeridClientSecret": {
           "type": "string",
-          "default": false
+          "default": ""
         },
         "peeridRedirectUri": {
           "type": "string",
-          "default": false
+          "default": ""
         },
         "peerplaysAssetID": {
           "type": "string",
-          "default": false
+          "default": ""
+        },
+        "peerplaysAssetSymbol": {
+            "type": "string",
+            "default": ""
+        },
+        "peerplaysAssetPrecision": {
+            "type": "number",
+            "default": 5
         },
         "peerplaysAccountID": {
           "type": "string",
-          "default": false
+          "default": ""
         },
         "commission": {
           "type": "number",
-          "default": false
+          "default": 0
         },
         "categories": {
           "type": "array"

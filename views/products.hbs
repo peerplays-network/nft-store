@@ -8,27 +8,64 @@
             <input type="text" name="product_filter" id="product_filter" class="form-control" placeholder="Filter products">
             <div class="input-group-append">
                 <button class="btn btn-outline-success" id="btn_product_filter">Filter</button>
-                <a href="/products" class="hidden-xs btn btn-outline-warning">{{{feather 'x-octagon'}}}</a>
+                <a href="/customer/products" class="hidden-xs btn btn-outline-warning">{{{feather 'x-octagon'}}}</a>
             </div>
         </div>
         <p class="text-warning top-pad-10">{{ @root.__ "Products can be filtered by: product title or product description keywords" }}</p>
     </div>
     <div class="col-sm-12">
+        {{#ifCond resultType '==' 'filtered'}}
+        <strong>{{ @root.__ "Products" }} - <span class="text-danger">{{ @root.__ "Filtered term" }}: {{@root.searchTerm}} </span></strong>
+        {{else}}
+        <strong>{{ @root.__ "Recent products" }}</strong>
+        {{/ifCond}}
         <ul class="list-group">
             <li class="list-group-item">
-                <span class="float-right"><strong>{{ @root.__ "Published" }}</strong></span>
-                {{#ifCond resultType '==' 'filtered'}}
-                <strong>{{ @root.__ "Products" }} - <span class="text-danger">{{ @root.__ "Filtered term" }}: {{@root.searchTerm}} </span></strong>
-                {{else}}
-                <strong>{{ @root.__ "Recent products" }}</strong>
-                {{/ifCond}}
+                <div class="justify-content-between d-flex">
+                    <strong>Image</strong>
+                    <strong>Title</strong>
+                    <strong>Minted</strong>
+                    <strong>Selling</strong>
+                </div>
             </li>
             {{#each results}}
-                <li class="list-group-item">
-                    <button class="float-right btn text-danger btn-delete-product" data-id="{{this._id}}"> {{{feather 'trash-2'}}}</button>
-                    <h4 class="float-right"><input id="{{this._id}}" class="publishedState" type="checkbox" {{checkedState this.productPublished}}></h4>
-                    <div class="top-pad-8"><a href="/product/edit/{{this._id}}">{{this.productTitle}}</a></div>
-                </li>
+            <li class="list-group-item">
+                <div class="justify-content-between d-flex mb-2">
+                    <img src={{this.base_uri}} class="sidebar-addon"/>
+                    <div><a href="/product/edit/{{this._id}}">{{this.productTitle}}</a></div>
+                    <div>{{this.mintedCount}}</div>
+                    <div>{{this.sellOffersCount}}</div>
+                </div>
+                {{#if sellOffers}}
+                <ul class="list-group mb-2">
+                    <li class="list-group-item">
+                        <div class="justify-content-between d-flex">
+                            <strong>Min. Price</strong>
+                            <strong>Max. Price</strong>
+                            <strong>Sale end date</strong>
+                        </div>
+                    </li>
+                    {{#each sellOffers}}
+                    <li class="list-group-item">
+                        <div class="justify-content-between d-flex">
+                            <div>{{this.minimum_price.amount}} {{@root.config.peerplaysAssetSymbol}}</div>
+                            <div>{{this.maximum_price.amount}} {{@root.config.peerplaysAssetSymbol}}</div>
+                            <div>{{this.offer_expiration_date}}</div>
+                        </div>
+                    </li>
+                    {{/each}}
+                </ul>
+                {{/if}}
+                <div class="row justify-content-center top-pad-8" id="productButtons">
+                    <div class="col-sm-4 justify-content-between {{eqHidden this.sellOffersCount this.mintedCount}}">
+                        <button class="btn btn-outline-success" data-id="{{_id}}">Mint</button>
+                        <button class="btn btn-outline-success" data-id="{{_id}}">Sell</button>
+                    </div>
+                    <div class="col-sm-4 justify-content-center {{neqHidden this.sellOffersCount this.mintedCount}}">
+                        <button class="btn btn-outline-success" data-id="{{_id}}">Mint</button>
+                    </div>
+                </div>
+            </li>
             {{/each}}
         </ul>
     </div>

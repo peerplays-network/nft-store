@@ -1,0 +1,41 @@
+<div class="modal fade" id="sellNFTModal" tabindex="-1" role="dialog" aria-labelledby="sellNFTModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger" id="sellNFTModalLabel">Sell NFT</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal m-4" id="productSellForm" data-toggle="validator">
+                    <input type="hidden" id="sellProductId" value="">
+                    <input type="hidden" id="assetSymbol" value="{{config.peerplaysAssetSymbol}}">
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input type="checkbox" id="productSellTypeCheckbox" name="productSellTypeCheckbox" checked> {{ @root.__ "Product allow bid" }}</label>
+                        </div>
+                    </div>
+                    <div id="sellNFTFormWrapper">
+                        <div class="form-group">
+                            <label for="productMinPrice" class="control-label">{{ @root.__ "Product min price" }} ({{config.peerplaysAssetSymbol}}) *</label>
+                            <input type="number" id="productMinPrice" class="form-control" min="0" step="any" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="productMaxPrice" class="control-label">{{ @root.__ "Product max price" }} ({{config.peerplaysAssetSymbol}}) *</label>
+                            <input type="number" id="productMaxPrice" class="form-control" min="0" step="any" required/>
+                        </div>
+                        <div class="form-group">
+                            <label for="saleEnd" class="control-label">{{ @root.__ "Sale end" }} *</label>
+                            <input id="saleEnd" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary mr-auto" data-dismiss="modal">Close</button>
+                <button type="button" id="buttonSell" class="btn btn-success">Sell</button>
+            </div>
+        </div>
+    </div>
+</div>
