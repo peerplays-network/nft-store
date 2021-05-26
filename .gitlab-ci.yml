@@ -35,7 +35,7 @@ docker_build:
   script:
     - docker info
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    - docker build -f dev.Dockerfile -t $IMAGE .
+    - docker build -t $IMAGE .
     - docker push $IMAGE
 
 deployToDev:
