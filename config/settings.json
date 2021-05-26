@@ -20,7 +20,7 @@
     "paymentGateway": [
         "stripe" 
     ],
-    "databaseConnectionString": "mongodb://127.0.0.1:27017/expresscart",
+    "databaseConnectionString": "mongodb://nft-store-mongodb:27017/expresscart",
     "theme": "Cloth",
     "trackStock": false,
     "orderHook": "",

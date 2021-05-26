@@ -4,15 +4,16 @@ include:
   - template: License-Scanning.gitlab-ci.yml
   - template: SAST.gitlab-ci.yml
   - template: Secret-Detection.gitlab-ci.yml
+  - template: Container-Scanning.gitlab-ci.yml
 
 variables:
- GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+ GIT_DEPTH: "2"  # Tells git to fetch all the branches of the project, required by the analysis task
+ DOCKER_DRIVER: overlay2
 
 stages:
   - build
   - test
   - deploy
-  - dast
 
 # builds app
 build:
@@ -23,3 +24,26 @@ build:
     - npm install
   tags:
     - docker
+
+docker_build:
+  image: docker:stable
+  stage: build
+  services:
+    - docker:19.03.12-dind
+  variables:
+    IMAGE: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:$CI_COMMIT_SHA
+  script:
+    - docker info
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker build -f dev.Dockerfile -t $IMAGE .
+    - docker push $IMAGE
+
+deployToDev:
+  stage: deploy
+  script: 
+    - docker-compose down
+    - docker-compose up --build
+  when:
+    manual
+  tags:
+    - nftdev1
