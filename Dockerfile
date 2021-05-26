@@ -1,25 +1,25 @@
-FROM mhart/alpine-node:8
+FROM node:14.16.1-alpine3.13
 
-ENV NODE_VERSION 8.9.4
+RUN apk update && apk add \
+    g++ \
+    make \
+    nasm \
+    git \
+    libtool \
+    autoconf \
+    automake \
+    libpng-dev \
+    pkgconfig
 
-RUN apk add --no-cache make gcc g++ python bash
+WORKDIR /var/nftstore
 
-WORKDIR /var/expressCart
-
-COPY lib/ /var/expressCart/lib/
-COPY bin/ /var/expressCart/bin/
-COPY config/ /var/expressCart/config/
-COPY public/ /var/expressCart/public/
-COPY routes/ /var/expressCart/routes/
-COPY views/ /var/expressCart/views/
-
-COPY app.js /var/expressCart/
-COPY package.json /var/expressCart/
-COPY deploy.js /var/expressCart/
-
+COPY package*.json /var/nftstore/
 RUN npm install
 
-VOLUME /var/expressCart/data
+COPY ./ /var/nftstore/
+
+VOLUME /var/nftstore/data
 
 EXPOSE 1111
+
 ENTRYPOINT ["npm", "start"]
