@@ -84,9 +84,7 @@ const getSellOffers = async (start = 0, k = 0) => {
 
     if(nfts) {
         for(let i = 0; i < result.length; i++) {
-            result[i].nft_metadata_ids = nfts.result.map((nft) => {
-                if(result[i].item_ids.includes(nft.id)) return nft.nft_metadata_id;
-            });
+            result[i].nft_metadata_ids = nfts.result.filter((nft) => result[i].item_ids.includes(nft.id)).map(({nft_metadata_id}) => nft_metadata_id);
 
             result[i].minimum_price.amount = result[i].minimum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
             result[i].maximum_price.amount = result[i].maximum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);

@@ -22,8 +22,8 @@
                         <div class="product-wrapper">
                             <a href="/product/{{this.productPermalink}}">
                                 <div class="vertical-center img-thumbnail">
-                                    {{#if productImage}}
-                                        <img class="img-fluid" src="{{this.productImage}}" alt="...">
+                                    {{#if base_uri}}
+                                        <img class="img-fluid" src="{{this.base_uri}}" alt="...">
                                     {{else}}
                                         <img class="img-fluid" src="/uploads/placeholder.png" alt="...">
                                     {{/if}}
@@ -36,8 +36,8 @@
                     {{else}}
                         <a href="/product/{{this._id}}">
                             <div class="vertical-center img-thumbnail">
-                                {{#if productImage}}
-                                    <img class="img-fluid" src="{{this.productImage}}" alt="...">
+                                {{#if base_uri}}
+                                    <img class="img-fluid" src="{{this.base_uri}}" alt="...">
                                 {{else}}
                                     <img class="img-fluid" src="/uploads/placeholder.png" alt="...">
                                 {{/if}}
@@ -63,7 +63,7 @@
                         </div>
                     {{else}}
                         <h4 class="product-price mp-0 text-center">
-                            {{currencySymbol @root.config.currencySymbol}}{{formatAmount productPrice}}
+                            {{currencySymbol @root.config.peerplaysAssetSymbol}} {{formatAmount minimum_price.amount}}
                         </h4>
                     {{/if}}
                     <p class="text-center">
@@ -83,6 +83,3 @@
 <input type="hidden" id="totalItemCount" value="{{totalProductCount}}">
 <input type="hidden" id="paginateUrl" value="{{paginateUrl}}">
 <input type="hidden" id="searchTerm" value="{{searchTerm}}">
-<div class="col-md-12">
-    <div id="pager" class="d-flex justify-content-center"></div>
-</div>

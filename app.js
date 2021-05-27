@@ -130,7 +130,7 @@ handlebars = handlebars.create({
         },
         formatAmount: (amt) => {
             if(amt){
-                return numeral(amt).format('0.00');
+                return numeral(amt).format('0.[00000000]');
             }
             return '0.00';
         },
