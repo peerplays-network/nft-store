@@ -921,14 +921,8 @@ router.post('/product/addreview', async (req, res, next) => {
 router.get('/search/:searchTerm/:pageNum?', (req, res) => {
     const db = req.app.db;
     const searchTerm = req.params.searchTerm;
-    const productsIndex = req.app.productsIndex;
     const config = req.app.config;
     const numberProducts = config.productsPerPage ? config.productsPerPage : 6;
-
-    const lunrIdArray = [];
-    productsIndex.search(searchTerm).forEach((id) => {
-        lunrIdArray.push(getId(id.ref));
-    });
 
     let pageNum = 1;
     if(req.params.pageNum){
@@ -936,7 +930,12 @@ router.get('/search/:searchTerm/:pageNum?', (req, res) => {
     }
 
     Promise.all([
-        paginateProducts(true, db, pageNum, { _id: { $in: lunrIdArray } }, getSort()),
+        paginateProducts(true, db, pageNum, {
+            $or: [
+                { "productTitle": {$regex: searchTerm, $options: 'i'} },
+                { "productDescription": {$regex: searchTerm, $options: 'i'} }
+            ]
+        }, getSort(), req),
         getMenu(db)
     ])
     .then(([results, menu]) => {
@@ -989,7 +988,7 @@ router.get('/category/:cat/:pageNum?', (req, res) => {
     }
 
     Promise.all([
-        paginateProducts(true, db, pageNum, { _id: { $in: lunrIdArray } }, getSort()),
+        paginateProducts(true, db, pageNum, { _id: { $in: lunrIdArray } }, getSort(), req),
         getMenu(db)
     ])
         .then(([results, menu]) => {
@@ -1071,7 +1070,7 @@ router.get('/page/:pageNum', (req, res, next) => {
     const numberProducts = config.productsPerPage ? config.productsPerPage : 6;
 
     Promise.all([
-        paginateProducts(true, db, req.params.pageNum, {}, getSort()),
+        paginateProducts(true, db, req.params.pageNum, {}, getSort(), req),
         getMenu(db)
     ])
         .then(([results, menu]) => {
@@ -1112,7 +1111,7 @@ router.get('/:page?', async (req, res, next) => {
     // if no page is specified, just render page 1 of the cart
     if(!req.params.page){
         Promise.all([
-            paginateProducts(true, db, 1, {}, getSort()),
+            paginateProducts(true, db, 1, {}, getSort(), req),
             getMenu(db)
         ])
             .then(async([results, menu]) => {

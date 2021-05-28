@@ -68,25 +68,21 @@ const getSellOffers = async (start = 0, k = 0) => {
         params: [`1.29.${start}`, 100]
     });
 
-    let params = {};
+    let params = [];
 
     for(let i = 0; i < result.length; i++) {
-        for(let j = 0; j < result[i].item_ids.length; j++, k++) {
-            params[`params[0][${k}]`] = result[i].item_ids[j];
-        }
+        params.push(...result[i].item_ids);
     }
 
     const nfts = await peerplaysService.getBlockchainData({
         api: "database",
         method: "get_objects",
-        ...params
+        "params[0][]": params
     });
 
     if(nfts) {
         for(let i = 0; i < result.length; i++) {
-            result[i].nft_metadata_ids = nfts.result.map((nft) => {
-                if(result[i].item_ids.includes(nft.id)) return nft.nft_metadata_id;
-            });
+            result[i].nft_metadata_ids = nfts.result.filter((nft) => result[i].item_ids.includes(nft.id)).map(({nft_metadata_id}) => nft_metadata_id);
 
             result[i].minimum_price.amount = result[i].minimum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
             result[i].maximum_price.amount = result[i].maximum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
