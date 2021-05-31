@@ -202,47 +202,6 @@ $(document).ready(function (){
         }
     });
 
-    $('#productEditForm').validator().on('submit', function(e){
-        if(!e.isDefaultPrevented()){
-            e.preventDefault();
-            if($('#productPermalink').val() === '' && $('#productTitle').val() !== ''){
-                $('#productPermalink').val(slugify($('#productTitle').val()));
-            }
-            $.ajax({
-                method: 'POST',
-                url: '/customer/product/update',
-                data: {
-                    productId: $('#productId').val(),
-                    productTitle: $('#productTitle').val(),
-                    productPrice: $('#productPrice').val(),
-                    productPublished: $('#productPublished').val(),
-                    productStock: $('#productStock').val(),
-                    productStockDisable: $('#productStockDisable').is(':checked'),
-                    productDescription: $('#productDescription').val(),
-                    productGtin: $('#productGtin').val(),
-                    productBrand: $('#productBrand').val(),
-                    productPermalink: $('#productPermalink').val(),
-                    productSubscription: $('#productSubscription').val(),
-                    productComment: $('#productComment').is(':checked'),
-                    productTags: $('#productTags').val()
-                }
-            })
-            .done(function(msg){
-                showNotification(msg.message, 'success', true);
-            })
-            .fail(function(msg){
-                if(msg.responseJSON.length > 0){
-                    var errorMessages = validationErrors(msg.responseJSON);
-                    console.log('errorMessages', errorMessages);
-                    $('#validationModalBody').html(errorMessages);
-                    $('#validationModal').modal('show');
-                    return;
-                }
-                showNotification(msg.responseJSON.message, 'danger');
-            });
-        }
-    });
-
     $('.set-as-main-image').on('click', function(){
         $.ajax({
             method: 'POST',

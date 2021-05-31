@@ -42,19 +42,9 @@ const imgStorage = multer.diskStorage({
   }
 });
 
-// Create an image filter
-const imgfileFilter = (req, file, cb) => {
-  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
-      cb(null, true);
-  } else {
-      cb(null, false);
-  }
-}
-
 // Create an upload middleware
 const upload = multer({
   storage: imgStorage,
-  fileFilter: imgfileFilter,
   limits: {
       fieldSize: 1024 * 1024 * 2
   }
@@ -160,7 +150,7 @@ router.get('/customer/products/:page?', async (req, res, next) => {
         paginateUrl: 'customer/products',
         resultType: 'top',
         session: req.session,
-        admin: true,
+        admin: false,
         config: req.app.config,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
@@ -435,9 +425,13 @@ router.post('/customer/product/sell', async (req, res) => {
 
 // render the editor
 router.get('/customer/product/edit/:id', async (req, res) => {
+    if(!req.session.peerplaysAccountId) {
+        res.redirect('/customer/login');
+        return;
+    }
+
     const db = req.app.db;
 
-    const images = await getImages(req.params.id, req, res);
     const product = await db.products.findOne({ _id: getId(req.params.id) });
     if(!product){
         // If API request, return json
@@ -451,20 +445,34 @@ router.get('/customer/product/edit/:id', async (req, res) => {
         return;
     }
 
-    // Get variants
-    product.variants = await db.variants.find({ product: getId(req.params.id) }).toArray();
-
     // If API request, return json
     if(req.apiAuthenticated){
         res.status(200).json(product);
         return;
     }
 
+    let metadata;
+
+    try {
+        metadata = await peerplaysService.getBlockchainData({
+            api: "database",
+            method: "get_objects",
+            "params[0][]": product.nftMetadataID
+        });
+    } catch(ex) {
+        console.error(ex);
+    }
+
+    if(metadata && metadata.result[0] && metadata.result[0].base_uri.includes('/uploads/')) {
+        product.base_uri = req.protocol + '://' + req.get('host') + '/imgs' + metadata.result[0].base_uri.split('/uploads')[1];
+    } else {
+        product.base_uri = metadata.result[0].base_uri;
+    }
+
     res.render('product-edit', {
         title: 'Edit product',
         result: product,
-        images: images,
-        admin: true,
+        admin: false,
         session: req.session,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
@@ -591,36 +599,38 @@ router.get('/customer/product/edit/:id', async (req, res) => {
 // });
 
 // Update an existing product form action
-router.post('/customer/product/update', async (req, res) => {
+router.post('/customer/product/update', upload.single("productImage"), async (req, res) => {
     const db = req.app.db;
 
-    const product = await db.products.findOne({ _id: getId(req.body.productId) });
+    const product = await db.products.findOne({ _id: getId(req.body.productID) });
 
     if(!product){
         res.status(400).json({ message: 'Failed to update product' });
         return;
     }
+
     const count = await db.products.countDocuments({ productPermalink: req.body.productPermalink, _id: { $ne: getId(product._id) } });
     if(count > 0 && req.body.productPermalink !== ''){
         res.status(400).json({ message: 'Permalink already exists. Pick a new one.' });
         return;
     }
 
-    const images = await getImages(req.body.productId, req, res);
-    const productDoc = {
-        productId: req.body.productId,
+    let filePath = '';
+
+    let productDoc = {
+        productId: req.body.productID,
+        nftMetadataID: req.body.nftMetadataID,
+        productTitle: req.body.title,
+        productDescription: req.body.productDescription,
+        productCategory: req.body.productCategory,
+        productPublished: req.body.productPublished == 'true',
         productPermalink: req.body.productPermalink,
-        productTitle: cleanHtml(req.body.productTitle),
-        productPrice: req.body.productPrice,
-        productDescription: cleanHtml(req.body.productDescription),
-        productGtin: cleanHtml(req.body.productGtin),
-        productBrand: cleanHtml(req.body.productBrand),
-        productPublished: convertBool(req.body.productPublished),
-        productTags: req.body.productTags,
-        productComment: checkboxBool(req.body.productComment),
-        productStock: safeParseInt(req.body.productStock) || null,
-        productStockDisable: convertBool(req.body.productStockDisable)
+        owner: req.session.peerplaysAccountId
     };
+
+    if(req.file) {
+        filePath = req.file.path;
+    }
 
     // Validate the body again schema
     const schemaValidate = validateJson('editProduct', productDoc);
@@ -632,19 +642,37 @@ router.post('/customer/product/update', async (req, res) => {
     // Remove productId from doc
     delete productDoc.productId;
 
-    // if no featured image
-    if(!product.productImage){
-        if(images.length > 0){
-            productDoc.productImage = images[0].path;
-        }else{
-            productDoc.productImage = '/uploads/placeholder.png';
+    if(filePath !== '' || product.productTitle !== req.body.title) {
+        const op = {
+            op_name: 'nft_metadata_update',
+            fee_asset: config.peerplaysAssetID,
+            owner: req.session.peerplaysAccountId,
+            nft_metadata_id: req.body.nftMetadataID
+        };
+
+        if(filePath !== '') {
+            op.base_uri = filePath;
         }
-    }else{
-        productDoc.productImage = product.productImage;
+
+        if(product.productTitle !== req.body.title) {
+            op.name = req.body.title;
+        }
+
+        const body = {
+            operations: [op]
+        };
+
+        try{
+            await peerplaysService.sendOperations(body, req.session.peerIDAccessToken);
+        } catch(ex) {
+            console.error(ex);
+            res.status(400).json({ message: ex.message });
+            return;
+        }
     }
 
     try{
-        await db.products.updateOne({ _id: getId(req.body.productId) }, { $set: productDoc }, {});
+        await db.products.updateOne({ _id: getId(req.body.productID) }, { $set: productDoc }, {});
         // Update the index
         indexProducts(req.app)
         .then(() => {

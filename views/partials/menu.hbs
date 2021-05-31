@@ -1,16 +1,32 @@
 <nav class="col-md-2 d-none d-md-block sidebar">
     <div class="sidebar-sticky">
         <ul class="nav flex-column">
+            {{#ifCond session.isAdmin '===' true}}
             <li class="nav-item">
                 <a href="/admin"><img class="sidebar-brand" src="/images/logo-admin.png"></a>
                 <a href="#" data-toggle="modal" data-target="#globalSearchModal" class="sidebar-search text-muted">{{{feather 'search'}}}</a>
             </li>
+            {{else}}
+            <li class="nav-item">
+                <a href="/"><img class="sidebar-brand" src="/images/logo-admin.png"></a>
+                <a href="#" data-toggle="modal" data-target="#globalSearchModal" class="sidebar-search text-muted">{{{feather 'search'}}}</a>
+            </li>
+            {{/ifCond}}
+            {{#ifCond session.isAdmin '===' true}}
             <li class="nav-item">
                 <a class="nav-link" href="/admin/dashboard">
                     {{{feather 'bar-chart'}}} &nbsp;
                     {{ @root.__ "Dashboard" }}
                 </a>
             </li>
+            {{else}}
+            <li class="nav-item">
+                <a class="nav-link" href="/">
+                    {{{feather 'bar-chart'}}} &nbsp;
+                    {{ @root.__ "Dashboard" }}
+                </a>
+            </li>
+            {{/ifCond}}
             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                 <span>Manage</span>
             </h6>
@@ -97,6 +113,7 @@
             </li>
         </ul>
         {{/ifCond}}
+        {{#ifCond session.isAdmin '===' true}}
         <ul class="nav flex-column mt-5">
             <li class="nav-item">
                 <a class="nav-link" href="/admin/logout">
@@ -105,5 +122,15 @@
                 </a>
             </li>
         </ul>
+        {{else}}
+        <ul class="nav flex-column mt-5">
+            <li class="nav-item">
+                <a class="nav-link" href="/customer/logout">
+                    {{{feather 'log-out'}}} &nbsp;
+                    {{ @root.__ "Logout" }}
+                </a>
+            </li>
+        </ul>
+        {{/ifCond}}
     </div>
 </nav>
