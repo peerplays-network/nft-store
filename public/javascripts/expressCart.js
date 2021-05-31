@@ -104,6 +104,52 @@ $(document).ready(function (){
         });
     });
 
+    $('#productEditForm').validator().on('submit', function(e){
+        e.preventDefault();
+        if($('#productPermalink').val() === '' && $('#productTitle').val() !== ''){
+            $('#productPermalink').val(slugify($('#productTitle').val()));
+        }
+
+        let file;
+        if(document.getElementById("productImage").files) {
+            file = document.getElementById("productImage").files[0];
+        }
+
+        var formData = new FormData();
+        formData.append("title", $('#productTitle').val());
+        formData.append("productID", $('#productID').val());
+        formData.append("nftMetadataID", $('#nftMetadataID').val());
+        formData.append("productDescription", $('#productDescription').val());
+        formData.append("productCategory", $('#category').val());
+        formData.append("productPublished", $('#productPublished').val());
+        formData.append("productPermalink", $('#productPermalink').val());
+
+        if(file) {
+            formData.append("productImage",file);
+        }
+
+        $.ajax({
+            method: 'POST',
+            url: '/customer/product/update',
+            data: formData,
+            contentType: false,
+            processData: false
+        })
+        .done(function(msg){
+            showNotification(msg.message, 'success', true);
+        })
+        .fail(function(msg){
+            if(msg.responseJSON && msg.responseJSON.length > 0){
+                var errorMessages = validationErrors(msg.responseJSON);
+                console.log('errorMessages', errorMessages);
+                $('#validationModalBody').html(errorMessages);
+                $('#validationModal').modal('show');
+                return;
+            }
+            showNotification(msg.responseJSON.message, 'danger');
+        });
+    });
+
     $(document).on('click', '.menu-btn', function(e){
         e.preventDefault();
         $('body').addClass('pushy-open-right');
