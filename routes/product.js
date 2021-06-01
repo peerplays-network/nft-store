@@ -683,29 +683,28 @@ router.post('/customer/product/update', upload.single("productImage"), async (re
     }
 });
 
-// delete a product
+// delete a sell offer
 router.post('/customer/product/delete', async (req, res) => {
-    const db = req.app.db;
+    let operations = [{
+        op_name: 'cancel_offer',
+        fee_asset: config.peerplaysAssetID,
+        issuer: req.session.peerplaysAccountId,
+        offer_id: req.body.offerId
+    }];
 
-    // remove the product
-    await db.products.deleteOne({ _id: getId(req.body.productId) }, {});
+    const body = {operations};
 
-    // Remove the variants
-    await db.variants.deleteMany({ product: getId(req.body.productId) }, {});
-
-    // delete any images and folder
-    rimraf(`public/uploads/${req.body.productId}`, (err) => {
-        if(err){
-            console.info(err.stack);
-            res.status(400).json({ message: 'Failed to delete product' });
-        }
-
-        // re-index products
-        indexProducts(req.app)
-        .then(() => {
-            res.status(200).json({ message: 'Product successfully deleted' });
+    try{
+        const peerplaysResult = await peerplaysService.sendOperations(body, req.session.peerIDAccessToken);
+        res.status(200).json({
+            message: 'Sell offer cancelled successfully',
+            NFTId: peerplaysResult.result.trx.operation_results[0][1]
         });
-    });
+    } catch(ex) {
+        console.error(ex);
+        res.status(400).json({ message: 'Error cancelling sell offer for NFT' });
+        return;
+    }
 });
 
 // update the published state based on an ajax call from the frontend
