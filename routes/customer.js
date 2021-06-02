@@ -41,6 +41,13 @@ router.get('/customer/setup', async (req, res) => {
 router.post('/customer/create', async (req, res) => {
     const db = req.app.db;
 
+    if(req.body.password != req.body.confirmpassword) {
+        res.status(400).json({
+            message: 'Password and Confirm Password should be same.'
+        });
+        return;
+    }
+
     if(req.body.password && !req.body.password.match(/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])[a-zA-Z0-9!@#\\$%\\^&\\*]+$/)) {
         res.status(400).json({
             message: 'Password should contain an alphabet, a number and a special character (!@#$%^&*)'
@@ -49,7 +56,7 @@ router.post('/customer/create', async (req, res) => {
     }
     if(req.body.phone && !req.body.phone.match(/^[0-9]{10}$/)) {
         res.status(400).json({
-            message: 'Mobile should contain a number only.'
+            message: 'Mobile should contain a number and 10 digit only.'
         });
         return;
     }
