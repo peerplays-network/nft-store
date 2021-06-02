@@ -42,8 +42,13 @@ $(document).ready(function (){
 
     $('#createCustomer').validator().on('click', function(e){
         e.preventDefault();
+        if($('#password').val() != $('#frm_userPassword_confirm').val()) {
+            $('#customer-form').validator('validate')
+             showNotification('Password and Confirm Password should be same.', 'danger');
+            return;
+        }
         if($('#customer-form').validator('validate').has('.has-error').length === 0){
-            $.ajax({
+             $.ajax({
                 method: 'POST',
                 url: '/customer/create',
                 data: {
@@ -56,7 +61,8 @@ $(document).ready(function (){
                     state: $('#state').val(),
                     postcode: $('#postcode').val(),
                     phone: $('#phone').val(),
-                    password: $('#password').val()
+                    password: $('#password').val(),
+                    confirmpassword:$('#frm_userPassword_confirm').val()
                 }
             })
             .done(function(msg){
