@@ -47,7 +47,12 @@ router.post('/customer/create', async (req, res) => {
         });
         return;
     }
-
+    if(req.body.phone && !req.body.phone.match(/^[0-9]{10}$/)) {
+        res.status(400).json({
+            message: 'Mobile should contain a number only.'
+        });
+        return;
+    }
     const customerObj = {
         email: req.body.email,
         company: req.body.company,
