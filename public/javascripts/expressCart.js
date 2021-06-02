@@ -150,6 +150,22 @@ $(document).ready(function (){
         });
     });
 
+    $('.btn-delete-offer').on('click', function(){
+      if(confirm('Are you sure you want to delete this sell offer?')){
+          $.ajax({
+              method: 'POST',
+              url: '/customer/product/delete',
+              data: { offerId: $(this).attr('data-id') }
+          })
+          .done(function(msg){
+              showNotification(msg.message, 'success', true);
+          })
+          .fail(function(msg){
+              showNotification(msg.responseJSON.message, 'danger');
+          });
+      }
+  });
+
     $(document).on('click', '.menu-btn', function(e){
         e.preventDefault();
         $('body').addClass('pushy-open-right');
