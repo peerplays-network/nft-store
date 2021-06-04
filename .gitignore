@@ -1,0 +1,9 @@
+node_modules/
+data/
+/config/*-local.json
+.vscode
+**.DS_Store
+env.yaml
+ecosystem.config.js
+bin/googleproducts.xml
+uploads/*

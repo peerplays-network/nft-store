@@ -1,0 +1,27 @@
+version: '3'
+services:
+  nftstore:
+    image: "node:14.16.1-alpine3.13"
+    build: .
+    container_name: "nft-store"
+    volumes:
+      - nft-store-uploads-data:/uploads
+    environment:
+      NODE_ENV: development
+      NODE_PATH: /
+    ports:
+      - "1111:1111"
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+  mongodb:
+    image: mongo:4.4
+    container_name: "nft-store-mongodb"
+    volumes:
+      - nft-store-mongo-data:/data/db
+    ports:
+      - 27017:27017
+volumes:
+  nft-store-uploads-data:
+  nft-store-mongo-data:

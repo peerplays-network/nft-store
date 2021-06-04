@@ -1,0 +1,61 @@
+{
+    "cartTitle": "NFT STORE",
+    "cartDescription": "expressCart",
+    "cartLogo": "",
+    "baseUrl": "http://localhost:1111",
+    "emailHost": "smtp-mail.outlook.com",
+    "emailPort": 587,
+    "emailSecure": false,
+    "emailUser": "hi@markmoffat.com",
+    "emailPassword": "this_is_the_smtp_password",
+    "emailAddress": "hi@markmoffat.com",
+    "productsPerRow": 3,
+    "productsPerPage": 6,
+    "footerHtml": "&lt;h4 class=&quot;text-center&quot;&gt;Powered by expressCart&lt;/h4&gt;",
+    "googleAnalytics": "",
+    "injectJs": "",
+    "customCss": "",
+    "currencySymbol": "£",
+    "currencyISO": "USD",
+    "paymentGateway": [
+        "stripe" 
+    ],
+    "databaseConnectionString": "mongodb://nft-store-mongodb:27017/expresscart",
+    "theme": "Cloth",
+    "trackStock": false,
+    "orderHook": "",
+    "availableLanguages": [
+        "en",
+        "it"
+    ],
+    "defaultLocale": "en",
+    "maxQuantity": 25,
+    "twitterHandle": "",
+    "facebookAppId": "",
+    "productOrderBy": "date",
+    "productOrder": "descending",
+    "modules": {
+        "enabled": {
+            "shipping": "shipping-basic",
+            "discount": "discount-voucher",
+            "reviews": "reviews-basic"
+        },
+        "loaded": {
+            "shipping": {},
+            "discount": {},
+            "reviews": {}
+        }
+    },
+    "showRelatedProducts": true,
+    "showHomepageVariants": false,
+    "peeridUrl": "https://peerid2.peerplays.download/api/v1/",
+    "peeridClientID": "1",
+    "peeridClientSecret": "Qv16Go2MPjBhn8P1Sdc7LgzPnr18F3JLGjC7F71nXw",
+    "peeridRedirectUri": "https://nftstore.peerplays.download/peerid_auth/redirect",
+    "peerplaysAssetID": "1.3.0",
+    "peerplaysAssetSymbol": "TEST",
+    "peerplaysAssetPrecision": 5,
+    "peerplaysAccountID": "1.2.73",
+    "commission": 10,
+    "categories": ["Digital Art", "Photographs", "Oil Paintings"]
+}
