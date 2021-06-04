@@ -363,7 +363,7 @@ $(document).ready(function (){
                 window.location = '/admin';
             })
             .fail(function(msg){
-                showNotification(msg.responseJSON.message, 'danger');
+                $('login-error').show();
             });
         }
         e.preventDefault();
@@ -381,10 +381,20 @@ $(document).ready(function (){
                 }
             })
             .done(function(msg){
+                $('.danger').hide();
                 window.location = '/';
             })
             .fail(function(msg){
-                showNotification(msg.responseJSON.message, 'danger');
+                $('.danger').hide();
+                
+                if($.trim($('#email').val()) === ''){
+                    $('.login-email-error').show();
+                }
+
+                if($('#password').val() ===''){
+                    $('.login-pass-error').show();
+                }
+               
             });
         }
         e.preventDefault();

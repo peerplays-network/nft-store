@@ -636,3 +636,11 @@ a {
     min-height: 0;
   }
 }
+
+.hide {
+  display: none;;
+}
+
+.danger {
+  color: #721c24 !important;
+}
