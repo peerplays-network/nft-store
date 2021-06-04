@@ -74,6 +74,24 @@ $(document).ready(function (){
         }
     });
 
+    $('#validatePermalink').on('click',function(){
+        if($('#productPermalink').val() !== ''){
+            $.ajax({
+                method: 'POST',
+                url: '/admin/validatePermalink',
+                data: { permalink: $('#productPermalink').val(), docId: $('#productId').val() }
+            })
+            .done(function(msg){
+                showNotification(msg.message, 'success');
+            })
+            .fail(function(msg){
+                showNotification(msg.responseJSON.message, 'danger');
+            });
+        }else{
+            showNotification('Please enter a permalink to validate', 'danger');
+        }
+    })
+
     $('#productNewForm').validator().on('submit', function(e){
         e.preventDefault();
         if($('#productPermalink').val() === '' && $('#productTitle').val() !== ''){
