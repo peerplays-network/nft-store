@@ -66,10 +66,10 @@ $(document).ready(function (){
                 }
             })
             .done(function(msg){
-                showNotification(msg.message, 'success', false, '/');
+                showNotification(msg.message, 'success', true, '/');
             })
             .fail(function(msg){
-                showNotification(msg.responseJSON.message, 'danger');
+                showNotification(msg.responseJSON[0]?.message || msg.responseJSON?.message, 'danger');
             });
         }
     });
