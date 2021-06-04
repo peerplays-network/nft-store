@@ -414,6 +414,7 @@ $(document).ready(function (){
 
     // Mint NFT
     $(document).on('click', '#buttonMint', function(e){
+        $("#buttonMint").attr("disabled", true);
         $.ajax({
             method: 'POST',
             url: '/customer/product/mint',
@@ -424,6 +425,7 @@ $(document).ready(function (){
         })
         .done(function(msg){
             showNotification(msg.message, 'success', true);
+            $("#buttonMint").attr("disabled", false);
         })
         .fail(function(msg){
             if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
@@ -435,6 +437,7 @@ $(document).ready(function (){
             }
 
             showNotification(msg.responseJSON.message, 'danger');
+            $("#buttonMint").attr("disabled", false);
         });
     });
 
