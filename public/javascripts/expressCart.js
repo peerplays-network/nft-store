@@ -454,7 +454,7 @@ $(document).ready(function (){
                             </div>
                             <div class="form-group">
                                 <label for="saleEnd" class="control-label">Sale end date *</label>
-                                <input id="saleEnd" />
+                                <input id="saleEnd" readonly />
                             </div>`;
             $('#sellNFTFormWrapper').html(bidHtml);
             $('#saleEnd').datetimepicker({
@@ -474,7 +474,7 @@ $(document).ready(function (){
                                     </div>
                                     <div class="form-group">
                                         <label for="saleEnd" class="control-label">Sale end date *</label>
-                                        <input id="saleEnd" />
+                                        <input id="saleEnd" readonly />
                                     </div>`;
             $('#sellNFTFormWrapper').html(fixedPriceHtml);
             $('#saleEnd').datetimepicker({
