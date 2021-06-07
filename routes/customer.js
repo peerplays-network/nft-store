@@ -512,7 +512,14 @@ router.get('/customer/login', async (req, res, next) => {
 // login the customer and check the password
 router.post('/customer/login_action', async (req, res) => {
     const db = req.app.db;
-
+    
+    // check if email or password empty
+    if(req.body.loginEmail === '' || req.body.loginPassword === ''){
+        res.status(400).json({
+            message: 'Please provide email and password.'
+        });
+        return;
+    }
     const customer = await db.customers.findOne({ email: mongoSanitize(req.body.loginEmail) });
     // check if customer exists with that email
     if(customer === undefined || customer === null){

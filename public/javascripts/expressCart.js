@@ -381,20 +381,10 @@ $(document).ready(function (){
                 }
             })
             .done(function(msg){
-                $('.danger').hide();
                 window.location = '/';
             })
             .fail(function(msg){
-                $('.danger').hide();
-                
-                if($.trim($('#email').val()) === ''){
-                    $('.login-email-error').show();
-                }
-
-                if($('#password').val() ===''){
-                    $('.login-pass-error').show();
-                }
-               
+                showNotification(msg.responseJSON.message, 'danger');
             });
         }
         e.preventDefault();
