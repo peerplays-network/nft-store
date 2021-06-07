@@ -1,0 +1,213 @@
+/* login page css */
+
+.login-fullscreen {
+    min-height: calc(100vh - 65px);
+    display: flex;
+    align-items: center;
+}
+.login-box {
+    background-color: #fff;
+    box-shadow: 0px 3px 6px #00000029;
+    border: 1px solid #ABABAB;
+    border-radius: 10px;
+    /* border: 1px solid #afacac; */
+    width: 100%;
+}
+.top-align-space {
+    padding-top: 100px;
+    padding-bottom: 100px;
+}
+.left-right-align {
+    border-right: 1px solid #ABABAB;
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-bottom: 50px;
+}
+.only-text-space {
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-bottom: 50px;
+}
+.heading-title-text-color {
+    color: #707070;
+}
+.form-control {
+    box-shadow: 0px 3px 6px #00000029;
+    border: 1px solid #A1A1A1;
+    border-radius: 6px;
+    background-color: #fff;
+    height: 44px;
+}
+.form-control:focus {
+    box-shadow: none !important;
+}
+.has-search .form-control {
+    padding-left: 2.375rem;
+}
+
+.has-search .form-control-feedback {
+    position: absolute;
+    z-index: 2;
+    display: block;
+    width: 16px;
+    height: 16px;
+    line-height: 2.375rem;
+    text-align: center;
+    pointer-events: none;
+    color: #aaa;
+}
+.has-search .form-control-feedback-password {
+    position: absolute;
+    z-index: 2;
+    display: block;
+    width: 16px;
+    height: 22px;
+    line-height: 2.375rem;
+    text-align: center;
+    pointer-events: none;
+    color: #aaa;
+}
+.email-img img {
+    margin-left: 10px;
+}
+.bottom-space {
+    margin-bottom: 20px;
+}
+.outline-large-btn {
+    box-shadow: 0px 3px 6px #0000001C;
+    border: 1px solid #3D9AD4;
+    background-color: #3D9AD4;
+}
+.same-btn-style {
+    height: 45px;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 22px;
+    width: 100%;
+}
+.medium-btn-style {
+    box-shadow: 0px 3px 6px #00000029;
+    border-radius: 22px;
+    background-color: #ababab;
+    border: 1px solid #ababab;
+}
+.same-btn-style:hover {
+    color: #fff;
+}
+.nft-store-text-style h1{
+    color: #084AC2;
+    font-size: 47px;
+}
+.text-blue {
+    color: #1685FB;
+}
+.font-normal {
+    font-weight: 400;
+}
+.left-right-space-remove {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}
+.customer-header {
+    padding-top: 30px;
+    padding-left: 65px;
+    padding-right: 65px;
+    padding-bottom: 34px;
+    border-bottom: 1px solid #ABABAB;
+}
+.customer-form {
+    padding-left: 65px;
+    padding-right: 65px;
+}
+.customer-header h2 {
+    color: #707070;
+    font-size: 30px;
+}
+.first-input-space {
+    padding-top: 36px;
+}
+.control-form-label {
+    margin-bottom: .5rem;
+    color: #707070;
+    font-size: 16px;
+    font-weight: 600;
+}
+.register-btn-style {
+    border: 1px solid #75AE4A;
+    border-radius: 30px;
+    background-color: #75AE4A;
+    color: #fff;
+    min-width: 140px;
+    height: 50px;
+}
+.register-btn-style:hover {
+    color: #fff;
+}
+.control-form-bottom-align {
+    padding-top: 50px;
+}
+@media (min-width:900px) and (max-width:1600px) {
+    .top-align-space,.only-text-space {
+        padding-top: 25px;
+        padding-bottom: 25px;
+    }
+}  
+@media (min-width:768px) and (max-width:1366px) {
+    .left-right-align {
+        padding-bottom: 0px;
+    }
+    .only-text-space {
+        padding-bottom: 0px;
+    }
+}
+@media (min-width:210px) and (max-width:767px) {
+    .login-box {
+        background-color: transparent;
+        border: none;
+        box-shadow: none;
+    }
+    .left-right-align,.only-text-space {
+        padding-left: 15px;
+        padding-right: 15px;
+        padding-bottom: 15px;
+    }
+    .nft-store-text-style h1 {
+        font-size: 35px;
+    }
+    .heading-title-text-color {
+        font-size: 25px;
+        text-align: center;
+    }
+    .customer-form {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+    .customer-header h2 {
+        font-size: 18px;
+        text-align: center;
+    }
+    .customer-header {
+        padding-left: 14px;
+        padding-right: 14px;
+        padding-top: 14px;
+        padding-bottom: 14px;
+    }
+    .control-form-bottom-align {
+        padding-top: 0px;
+    }
+}
+@media (min-width:210px) and (max-width:1024px) {
+    .mobile-view-none {
+        display: none;
+    }
+    .left-right-align {
+        border: none;
+    }
+    .mobile-direction {
+        flex-direction: column-reverse;
+    }
+    .login-fullscreen {
+        min-height: calc(100vh - 100px);
+    }
+}
+
