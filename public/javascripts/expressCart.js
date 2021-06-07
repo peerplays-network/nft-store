@@ -654,7 +654,7 @@ $(document).ready(function (){
                 productVariant: $('#productVariant-' + $(this).attr('data-id')).val()
             }
         })
-		.done(function(msg){
+		    .done(function(msg){
             updateCartDiv();
             showNotification(msg.message, 'success');
         })
@@ -664,31 +664,32 @@ $(document).ready(function (){
     });
 
     $(document).on('click', '.product-add-to-cart', function(e){
-        if(parseInt($('#product_quantity').val()) < 1){
-            $('#product_quantity').val(1);
+        if(parseFloat($('#product_bid').val()) > parseFloat($('#maxPrice').val())){
+            showNotification(`Exceeds maximum price: ${$('#maxPrice').val()}`, 'warning', false);
+        } else if(parseFloat($('#product_bid').val()) < parseFloat($('#minPrice').val())) {
+            showNotification(`Below minimum price: ${$('#minPrice').val()}`, 'warning', false);
+        } else {
+            $.ajax({
+                method: 'POST',
+                url: '/product/bid',
+                data: {
+                    productId: $('#productId').val(),
+                    offerId: $('#offerId').val(),
+                    productPrice: $('#product_bid').val(),
+                    isBidding: $('#minPrice').val() !== $('#maxPrice').val()
+                }
+            })
+            .done(function(msg){
+                showNotification(msg.message, 'success');
+            })
+            .fail(function(msg){
+                showNotification(msg.responseJSON.message, 'danger');
+            });
         }
-
-        $.ajax({
-            method: 'POST',
-            url: '/product/addtocart',
-            data: {
-                productId: $('#productId').val(),
-                productQuantity: $('#product_quantity').val(),
-                productVariant: $('#product_variant').val(),
-                productComment: $('#product_comment').val()
-            }
-        })
-		.done(function(msg){
-            updateCartDiv();
-            showNotification(msg.message, 'success');
-        })
-        .fail(function(msg){
-            showNotification(msg.responseJSON.message, 'danger');
-        });
     });
 
-    $('#product_quantity').on('keyup', function(e){
-        checkMaxQuantity(e, $('#product_quantity'));
+    $('#product_bid').on('keyup', function(e){
+        checkMinMaxPrice(e, $('#product_bid'));
     });
 
     $('.cart-product-quantity').on('keyup', function(e){
@@ -701,30 +702,6 @@ $(document).ready(function (){
 
     $(document).on('click', '.pushy-link', function(e){
         $('body').removeClass('pushy-open-right');
-    });
-
-    $(document).on('click', '.add-to-cart', function(e){
-        var productLink = '/product/' + $(this).attr('data-id');
-        if($(this).attr('data-link')){
-            productLink = '/product/' + $(this).attr('data-link');
-        }
-
-        if($(this).attr('data-has-variants') === 'true'){
-            window.location = productLink;
-        }else{
-            $.ajax({
-                method: 'POST',
-                url: '/product/addtocart',
-                data: { productId: $(this).attr('data-id') }
-            })
-            .done(function(msg){
-                updateCartDiv();
-                showNotification(msg.message, 'success');
-            })
-            .fail(function(msg){
-                showNotification(msg.responseJSON.message, 'danger');
-            });
-        }
     });
 
     // On create review
@@ -779,12 +756,16 @@ $(document).ready(function (){
     });
 
     $('.qty-btn-minus').on('click', function(){
-        var number = parseInt($('#product_quantity').val()) - 1;
-        $('#product_quantity').val(number > 0 ? number : 1);
+        if(parseInt($('#product_bid').val()) - 1 >= parseFloat($('#minPrice').val())){
+            var number = parseInt($('#product_bid').val()) - 1;
+            $('#product_bid').val(number > 0 ? number : 1);
+        }
     });
 
     $('.qty-btn-plus').on('click', function(){
-        $('#product_quantity').val(parseInt($('#product_quantity').val()) + 1);
+        if(parseInt($('#product_bid').val()) + 1 <= parseFloat($('#maxPrice').val())){
+            $('#product_bid').val(parseInt($('#product_bid').val()) + 1);
+        }
     });
 
     // product thumbnail image click
@@ -879,6 +860,25 @@ function checkMaxQuantity(e, element){
             showNotification(`Exceeds maximum quantity: ${$('#maxQuantity').val()}`, 'warning', false);
         }
     }
+}
+
+function checkMinMaxPrice(e, element){
+  if($('#maxPrice').length && $('#minPrice').length){
+      if(e.keyCode === 46 || e.keyCode === 8){
+          return;
+      }
+      if(parseFloat($(e.target).val()) > parseFloat($('#maxPrice').val())){
+          const qty = element.val();
+          e.preventDefault();
+          element.val(qty.slice(0, -1));
+          showNotification(`Exceeds maximum price: ${$('#maxPrice').val()}`, 'warning', false);
+      } else if(parseFloat($(e.target).val()) < parseFloat($('#minPrice').val())) {
+          const qty = element.val();
+          e.preventDefault();
+          element.val(qty.slice(0, -1));
+          showNotification(`Below minimum price: ${$('#minPrice').val()}`, 'warning', false);
+      }
+  }
 }
 
 function deleteFromCart(element){

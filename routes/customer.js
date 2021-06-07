@@ -551,7 +551,19 @@ router.post('/customer/login_action', async (req, res) => {
             peerIDRefreshToken: accessToken.result.refresh_token,
             peerIDTokenExpires: accessToken.result.expires
         };
-    
+
+        if(!customer.peerplaysAccountId) {
+            peerIdUser = await new PeerplaysService().signIn({
+                login: req.body.loginEmail,
+                password: req.body.loginPassword
+            });
+
+            customer['peerplaysAccountId'] = peerIdUser.result.peerplaysAccountId;
+
+            customerObj['peerplaysAccountId'] = peerIdUser.result.peerplaysAccountId;
+            customerObj['peerplaysAccountName'] = peerIdUser.result.peerplaysAccountName;
+        }
+
         const schemaResult = validateJson('editCustomer', customerObj);
         if(!schemaResult.result){
             console.log('errors', schemaResult.errors);
@@ -560,7 +572,7 @@ router.post('/customer/login_action', async (req, res) => {
         }
 
         const updatedCustomer = await db.customers.findOneAndUpdate(
-              { _id: getId(req.session.customerId) },
+              { _id: getId(customer._id) },
               {
                   $set: customerObj
               }, { multi: false, returnOriginal: false }
