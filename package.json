@@ -1,6 +1,6 @@
 {
-  "name": "express-cart",
-  "version": "1.1.19",
+  "name": "NFT Store",
+  "version": "0.1.0",
   "description": "A fully functioning Node.js shopping cart with Stripe, PayPal and Authorize.net payments.",
   "private": false,
   "scripts": {
@@ -113,14 +113,14 @@
     "payway",
     "westpac"
   ],
-  "author": "Mark Moffat",
-  "homepage": "https://expresscart.markmoffat.com",
+  "author": "Peerplays",
+  "homepage": "https://gitlab.com/PBSA/dapps/NFT-store",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mrvautin/expressCart.git"
+    "url": "git+https://gitlab.com/PBSA/dapps/NFT-store"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mrvautin/expressCart/issues"
+    "url": "https://gitlab.com/PBSA/dapps/NFT-store/-/issues"
   }
 }

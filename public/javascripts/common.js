@@ -157,7 +157,7 @@ function showNotification(msg, type, reloadPage, redirect){
 
     // Check for message or fallback to unknown
     if(!msg){
-        msg = 'Unknown error has occured. Check inputs.';
+        msg = 'Unknown error has occurred. Check inputs.';
     }
 
     $('#notify_message').removeClass();
