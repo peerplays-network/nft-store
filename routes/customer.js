@@ -48,6 +48,13 @@ router.post('/customer/create', async (req, res) => {
         return;
     }
 
+    if(req.body.password && req.body.password.length <= 6 ) {
+        res.status(400).json({
+            message: 'Password length must be at least 6 characters long.'
+        });
+        return;
+    }
+
     if(req.body.password && !req.body.password.match(/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])[a-zA-Z0-9!@#\\$%\\^&\\*]+$/)) {
         res.status(400).json({
             message: 'Password should contain an alphabet, a number and a special character (!@#$%^&*)'
@@ -106,9 +113,9 @@ router.post('/customer/create', async (req, res) => {
         } else {
             console.error(ex.message);
             if(typeof ex.message === 'string') {
-                res.status(400).json({message:  ex.message});
+                res.status(400).json({message: 'PeerID Sign-up error: ' + ex.message});
             } else {
-                res.status(400).json({ message: 'Password length must be at least 6 characters long.' });
+                res.status(400).json({ message: 'PeerID Sign-up error: ' + Object.values(ex.message) });
             }
             return;
         }
