@@ -381,7 +381,7 @@ $(document).ready(function (){
                 window.location = '/admin';
             })
             .fail(function(msg){
-                $('login-error').show();
+                showNotification(msg.responseJSON.message, 'danger');
             });
         }
         e.preventDefault();
