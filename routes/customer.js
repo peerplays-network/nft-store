@@ -106,9 +106,9 @@ router.post('/customer/create', async (req, res) => {
         } else {
             console.error(ex.message);
             if(typeof ex.message === 'string') {
-                res.status(400).json({message: 'PeerID Sign-up error: ' + ex.message});
+                res.status(400).json({message:  ex.message});
             } else {
-                res.status(400).json({ message: 'PeerID Sign-up error: ' + Object.values(ex.message) });
+                res.status(400).json({ message: 'Password length must be at least 6 characters long.' });
             }
             return;
         }
