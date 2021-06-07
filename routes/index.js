@@ -840,7 +840,7 @@ router.post('/product/addreview', async (req, res, next) => {
         // Check if a customer is logged in
         if(!req.session.customerPresent){
             return res.status(400).json({
-                message: 'You need to be logged in to create a review'
+                message: 'You need to be logged in to add a review'
             });
         }
 
