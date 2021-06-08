@@ -66,10 +66,10 @@ $(document).ready(function (){
                 }
             })
             .done(function(msg){
-                showNotification(msg.message, 'success', false, '/');
+                showNotification(msg.message, 'success', true, '/');
             })
             .fail(function(msg){
-                showNotification(msg.responseJSON.message, 'danger');
+                showNotification(msg.responseJSON[0]?.message || msg.responseJSON?.message, 'danger');
             });
         }
     });
@@ -173,6 +173,22 @@ $(document).ready(function (){
             showNotification(msg.responseJSON.message, 'danger');
         });
     });
+
+    $('.btn-delete-offer').on('click', function(){
+      if(confirm('Are you sure you want to delete this sell offer?')){
+          $.ajax({
+              method: 'POST',
+              url: '/customer/product/delete',
+              data: { offerId: $(this).attr('data-id') }
+          })
+          .done(function(msg){
+              showNotification(msg.message, 'success', true);
+          })
+          .fail(function(msg){
+              showNotification(msg.responseJSON.message, 'danger');
+          });
+      }
+  });
 
     $(document).on('click', '.menu-btn', function(e){
         e.preventDefault();
@@ -416,6 +432,7 @@ $(document).ready(function (){
 
     // Mint NFT
     $(document).on('click', '#buttonMint', function(e){
+        $("#buttonMint").attr("disabled", true);
         $.ajax({
             method: 'POST',
             url: '/customer/product/mint',
@@ -426,6 +443,7 @@ $(document).ready(function (){
         })
         .done(function(msg){
             showNotification(msg.message, 'success', true);
+            $("#buttonMint").attr("disabled", false);
         })
         .fail(function(msg){
             if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
@@ -437,6 +455,7 @@ $(document).ready(function (){
             }
 
             showNotification(msg.responseJSON.message, 'danger');
+            $("#buttonMint").attr("disabled", false);
         });
     });
 
