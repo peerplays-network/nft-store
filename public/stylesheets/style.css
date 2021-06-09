@@ -639,6 +639,6 @@ a {
 }
 
 .btn-delete-offer {
-  cursor:grab;
+  cursor:pointer;
 }
 
