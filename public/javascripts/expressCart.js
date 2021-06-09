@@ -102,7 +102,7 @@ $(document).ready(function (){
         var formData = new FormData();
         formData.append("title", $('#productTitle').val());
         formData.append("productDescription", $('#productDescription').val());
-        formData.append("productCategory", $('#category').val());
+        formData.append("productCategory", $('#category').val() || '');
         formData.append("productPublished", $('#productPublished').val());
         formData.append("productPermalink", $('#productPermalink').val());
         formData.append("productImage",file);
