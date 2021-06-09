@@ -66,7 +66,7 @@ $(document).ready(function (){
                 }
             })
             .done(function(msg){
-                showNotification(msg.message, 'success', false, '/');
+              showNotification(msg.message, 'success', false, '/');
             })
             .fail(function(msg){
                 showNotification(msg.responseJSON.message, 'danger');
