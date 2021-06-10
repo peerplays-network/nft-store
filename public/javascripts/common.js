@@ -42,9 +42,9 @@ $(document).ready(function (){
                             token: response.token.id
                         }
                     }).done((response) => {
-                        window.location = '/payment/' + response.paymentId;
+                        showNotification(response.message, 'success', false, '/');
                     }).fail((response) => {
-                        window.location = '/payment/' + response.paymentId;
+                        showNotification(response.message, 'danger', true);
                     });
                 }
             });

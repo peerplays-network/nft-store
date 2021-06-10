@@ -104,10 +104,42 @@ router.post('/admin/login_action', async (req, res) => {
     bcrypt.compare(req.body.password, user.userPassword)
         .then(async (result) => {
             if(result){
-                await new PeerplaysService().signIn({
+                const accessToken = await new PeerplaysService().loginAndJoinApp({
                     login: req.body.email,
                     password: req.body.password
                 });
+
+                const userObj = {
+                    ...user,
+                    peerIDAccessToken: accessToken.result.token,
+                    peerIDRefreshToken: accessToken.result.refresh_token,
+                    peerIDTokenExpires: accessToken.result.expires
+                };
+
+                if(!user.peerplaysAccountId) {
+                    peerIdUser = await new PeerplaysService().signIn({
+                        login: req.body.email,
+                        password: req.body.password
+                    });
+        
+                    userObj['peerplaysAccountId'] = peerIdUser.result.peerplaysAccountId;
+                    userObj['peerplaysAccountName'] = peerIdUser.result.peerplaysAccountName;
+                }
+      
+                const schemaResult = validateJson('editUser', userObj);
+                if(!schemaResult.result){
+                    console.log('errors', schemaResult.errors);
+                    res.status(400).json(schemaResult.errors);
+                    return;
+                }
+        
+                await db.users.findOneAndUpdate(
+                      { _id: getId(user._id) },
+                      {
+                          $set: userObj
+                      }, { multi: false, returnOriginal: false }
+                );
+
                 req.session.user = req.body.email;
                 req.session.usersName = user.usersName;
                 req.session.userId = user._id.toString();
@@ -167,17 +199,18 @@ router.post('/admin/setup_action', async (req, res) => {
     // check for users
     const userCount = await db.users.countDocuments({});
     if(userCount === 0){
+        let peerIdUser;
         try{
-            await new PeerplaysService().register({
+            peerIdUser = await new PeerplaysService().register({
                 email: req.body.userEmail,
                 password: req.body.userPassword
             });
         }catch(ex) {
             if(ex.message.email && ex.message.email === "Email already exists") {
-              await new PeerplaysService().signIn({
-                login: req.body.userEmail,
-                password: req.body.userPassword
-              });
+                peerIdUser = await new PeerplaysService().signIn({
+                    login: req.body.userEmail,
+                    password: req.body.userPassword
+                });
             } else {
               console.error(ex.message);
               if(typeof ex.message === 'string') {
@@ -190,6 +223,17 @@ router.post('/admin/setup_action', async (req, res) => {
         }
         // email is ok to be used.
         try{
+            const accessToken = await new PeerplaysService().loginAndJoinApp({
+                login: req.body.userEmail,
+                password: req.body.userPassword
+            });
+
+            doc['peerplaysAccountId'] = peerIdUser.result.peerplaysAccountId;
+            doc['peerplaysAccountName'] = peerIdUser.result.peerplaysAccountName;
+            doc['peerIDAccessToken'] = accessToken.result.token;
+            doc['peerIDRefreshToken'] = accessToken.result.refresh_token;
+            doc['peerIDTokenExpires'] = accessToken.result.expires;
+
             await db.users.insertOne(doc);
             res.status(200).json({ message: 'User account inserted' });
             return;

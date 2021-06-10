@@ -257,9 +257,17 @@ router.get('/checkout/cartdata', (req, res) => {
     });
 });
 
-router.get('/checkout/payment', async (req, res) => {
+router.get('/checkout/payment/:ppyAmount', async (req, res) => {
     const config = req.app.config;
 
+    req.session.cart = {
+      ppyAmount: req.params.ppyAmount
+    };
+
+    req.session.totalCartAmount = (req.params.ppyAmount * config.ppyExchangeRate).toFixed(2);
+    req.session.totalCartShipping = 0;
+    req.session.totalCartItems = 1;
+    req.session.totalCartProducts = 1;
     // if there is no items in the cart then render a failure
     if(!req.session.cart){
         req.session.message = 'The are no items in your cart. Please add some items before checking out';
@@ -268,21 +276,13 @@ router.get('/checkout/payment', async (req, res) => {
         return;
     }
 
-    let paymentType = '';
-    if(req.session.cartSubscription){
-        paymentType = '_subscription';
-    }
-
-    // update total cart amount one last time before payment
-    await updateTotalCart(req, res);
-
     res.render(`${config.themeViews}checkout-payment`, {
         title: 'Checkout - Payment',
         config: req.app.config,
         paymentConfig: getPaymentConfig(),
         session: req.session,
         paymentPage: true,
-        paymentType,
+        paymentType: '',
         cartClose: true,
         cartReadOnly: true,
         page: 'checkout-information',
@@ -413,7 +413,7 @@ router.get('/product/:id/:offerId', async (req, res) => {
         return;
     }
 
-    let metadata, offer;
+    let metadata, offer, balance, fee;
 
     try {
         metadata = await peerplaysService.getBlockchainData({
@@ -426,6 +426,28 @@ router.get('/product/:id/:offerId', async (req, res) => {
             method: "get_objects",
             "params[0][]": req.params.offerId
         });
+
+        if(req.session.peerplaysAccountId) {
+            const account = await peerplaysService.getBlockchainData({
+                api: "database",
+                method: "get_full_accounts",
+                "params[0][]": req.session.peerplaysAccountId,
+                params: true
+            });
+
+            const object200 = await peerplaysService.getBlockchainData({
+                api: "database",
+                method: "get_objects",
+                "params[0][]": "2.0.0",
+                params: true
+            });
+
+            const bidFees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 89);
+            fee = bidFees[1].fee;
+
+            const assetBalance = account.result[0][1].balances.find((bal) => bal.asset_type === config.peerplaysAssetID);
+            balance = assetBalance ? assetBalance.balance : 0;
+        }
     } catch(ex) {
         console.error(ex);
     }
@@ -534,6 +556,8 @@ router.get('/product/:id/:offerId', async (req, res) => {
         title: product.productTitle,
         result: product,
         relatedProducts,
+        balance,
+        fee,
         productDescription: stripHtml(product.productDescription),
         metaDescription: `${config.cartTitle} - ${product.productTitle}`,
         config: config,

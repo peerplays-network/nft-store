@@ -112,6 +112,9 @@ input[type=number]::-webkit-outer-spin-button {
   width: auto;
   height: 100%;
 }
+.stripe-logo {
+  height: 1.5rem;
+}
 /*
  * Sidebar
  */
