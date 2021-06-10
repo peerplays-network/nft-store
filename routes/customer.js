@@ -105,7 +105,7 @@ router.post('/customer/create', async (req, res) => {
             password: req.body.password
         });
     } catch(ex) {
-        if(ex.message.email && ex.message.email === "Email already exists") {
+        if(ex.message && ex.message.email && ex.message.email === "Email already exists") {
             peerIdUser = await new PeerplaysService().signIn({
                 login: req.body.userEmail,
                 password: req.body.userPassword
@@ -138,6 +138,7 @@ router.post('/customer/create', async (req, res) => {
         .then(() => {
             // Return the new customer
             const customerReturn = newCustomer.ops[0];
+            customerReturn.message = "Customer has been registered successfully."
             delete customerReturn.password;
 
             // Set the customer into the session
