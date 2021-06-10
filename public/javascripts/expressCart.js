@@ -685,7 +685,7 @@ $(document).ready(function (){
         } else if(parseFloat($('#product_bid').val()) < parseFloat($('#minPrice').val())) {
             showNotification(`Below minimum price: ${$('#minPrice').val()}`, 'warning', false);
         } else {
-            var bidAmount = Math.round(parseFloat($('#product_bid').val()) * Math.pow(10, parseInt($('#addFundsAssetPrecision').val())), parseInt($('#addFundsAssetPrecision').val()));
+            var bidAmount = Math.round((parseFloat($('#product_bid').val()) + Number.EPSILON) * Math.pow(10, parseInt($('#addFundsAssetPrecision').val())));
             if(parseInt($('#ppyBalance').val()) < bidAmount + parseInt($('#bidFee').val())) {
                 showNotification('Insufficient funds. Please add funds.', 'warning', false);
                 var minFundsRequired = (bidAmount + parseInt($('#bidFee').val()) - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
@@ -699,7 +699,7 @@ $(document).ready(function (){
                     data: {
                         productId: $('#productId').val(),
                         offerId: $('#offerId').val(),
-                        productPrice: Math.round($('#product_bid').val(), parseInt($('#addFundsAssetPrecision').val())),
+                        productPrice: parseFloat($('#product_bid').val()).toFixed(parseInt($('#addFundsAssetPrecision').val())),
                         isBidding: $('#minPrice').val() !== $('#maxPrice').val()
                     }
                 })
