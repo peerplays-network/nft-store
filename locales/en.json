@@ -232,5 +232,8 @@
 	"Product GTIN": "Product GTIN",
 	"The Serial number, GTIN or Barcode": "The Serial number, GTIN or Barcode",
 	"Product Brand": "Category",
-	"The brand of the product": "The category of the NFT"
+	"The brand of the product": "The category of the NFT",
+  "Bid price": "Bid price",
+  "Bid": "Bid",
+  "Buy": "Buy"
 }

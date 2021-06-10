@@ -48,6 +48,13 @@ router.post('/customer/create', async (req, res) => {
         return;
     }
 
+    if(req.body.password && req.body.password.length <= 6 ) {
+        res.status(400).json({
+            message: 'Password length must be at least 6 characters long.'
+        });
+        return;
+    }
+
     if(req.body.password && !req.body.password.match(/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])[a-zA-Z0-9!@#\\$%\\^&\\*]+$/)) {
         res.status(400).json({
             message: 'Password should contain an alphabet, a number and a special character (!@#$%^&*)'
@@ -512,7 +519,14 @@ router.get('/customer/login', async (req, res, next) => {
 // login the customer and check the password
 router.post('/customer/login_action', async (req, res) => {
     const db = req.app.db;
-
+    
+    // check if email or password empty
+    if(req.body.loginEmail === '' || req.body.loginPassword === ''){
+        res.status(400).json({
+            message: 'Please provide email and password.'
+        });
+        return;
+    }
     const customer = await db.customers.findOne({ email: mongoSanitize(req.body.loginEmail) });
     // check if customer exists with that email
     if(customer === undefined || customer === null){
@@ -551,7 +565,19 @@ router.post('/customer/login_action', async (req, res) => {
             peerIDRefreshToken: accessToken.result.refresh_token,
             peerIDTokenExpires: accessToken.result.expires
         };
-    
+
+        if(!customer.peerplaysAccountId) {
+            peerIdUser = await new PeerplaysService().signIn({
+                login: req.body.loginEmail,
+                password: req.body.loginPassword
+            });
+
+            customer['peerplaysAccountId'] = peerIdUser.result.peerplaysAccountId;
+
+            customerObj['peerplaysAccountId'] = peerIdUser.result.peerplaysAccountId;
+            customerObj['peerplaysAccountName'] = peerIdUser.result.peerplaysAccountName;
+        }
+
         const schemaResult = validateJson('editCustomer', customerObj);
         if(!schemaResult.result){
             console.log('errors', schemaResult.errors);
@@ -560,7 +586,7 @@ router.post('/customer/login_action', async (req, res) => {
         }
 
         const updatedCustomer = await db.customers.findOneAndUpdate(
-              { _id: getId(req.session.customerId) },
+              { _id: getId(customer._id) },
               {
                   $set: customerObj
               }, { multi: false, returnOriginal: false }

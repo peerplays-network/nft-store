@@ -220,7 +220,8 @@ input[type=number]::-webkit-outer-spin-button {
 .product-option {
   font-size: 18px;
 }
-.btnAddToCart,
+.btnBuy,
+.btnBid,
 .body_text {
   padding-top: 15px;
   padding-bottom: 15px;
@@ -636,3 +637,4 @@ a {
     min-height: 0;
   }
 }
+
