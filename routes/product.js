@@ -35,7 +35,7 @@ const randomizeLottoName = () => {
 // Config multer for using inside upload middleware
 const imgStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-      cb(null, path.join(__dirname, '../public/uploads'))
+      cb(null, path.join(__dirname, '../uploads'))
   },
   filename: (req, file, cb) => {
       cb(null, new Date().toISOString().replace(/[\/\\:.]/g, "_") + '-' + file.originalname)
@@ -219,7 +219,7 @@ router.post('/customer/product/insert', upload.single("productImage"), async (re
         productPermalink: req.body.productPermalink,
         owner: req.session.peerplaysAccountId
     };
-console.log("req.file====" ,req.file)
+
     if(req.file) {
         filePath = req.file.path;
     }
