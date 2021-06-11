@@ -368,6 +368,12 @@ router.post('/customer/product/sell', async (req, res) => {
             });
         }
 
+        if(Number(req.body.minPrice) === 0) {
+            return res.status(400).json({
+                message: 'Min price cannot be zero'
+            });
+        }
+
         if(Number(req.body.minPrice) <= 0 && Number(req.body.maxPrice) <= 0) {
             return res.status(400).json({
                 message: 'Price cannot be zero'
