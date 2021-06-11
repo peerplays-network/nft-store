@@ -99,8 +99,8 @@ router.post('/customer/create', async (req, res) => {
             email: req.body.email,
             password: req.body.password
         });
-    }catch(ex){
-        if(ex.message.email && ex.message.email === 'Email already exists'){
+    } catch(ex) {
+        if(ex.message && ex.message.email && ex.message.email === "Email already exists") {
             peerIdUser = await new PeerplaysService().signIn({
                 login: req.body.userEmail,
                 password: req.body.userPassword
