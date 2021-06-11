@@ -1,19 +1,17 @@
 {{> themes/Cloth/front-menu}}
 <div class="product-layout col-sm-8 offset-sm-2">
     <div class="row">
-        <div class="col-sm-12 col-md-6 mr-auto">
-            <div class="title-image-container">
+        <div class="col-sm-12 col-md-11 mr-auto">
+            <div class="title-image-container float-left pr-3">
                 <img src="{{result.base_uri}}" id="product-title-image" class="product-title-image img-fluid" alt="...">
             </div>
-        </div>
-        <div class="col-sm-12 col-md-6 ml-auto">
-            <div class="row">
-                <h1 class="col-md-10 product-title text-truncate">{{result.productTitle}}</h1>
+            <div class="p-3">
+                <h1 class="product-title text-truncate">{{result.productTitle}}</h1>
                 {{#if result.is_bidding}}
-                <h4 class="col-md-10 product-price mp-0">{{currencySymbol config.peerplaysAssetSymbol}} {{result.minimum_price}} - {{currencySymbol config.peerplaysAssetSymbol}} {{result.maximum_price}}</h4>
-                <div class="col-md-10 productOptions">
+                <h4 class="product-price mp-0">{{currencySymbol config.peerplaysAssetSymbol}} {{result.minimum_price}} - {{currencySymbol config.peerplaysAssetSymbol}} {{result.maximum_price}}</h4>
+                <div class="productOptions w-25 d-inline">
                     <p class="product-option-text">{{ @root.__ "Bid price" }}</p>
-                    <div class="input-group">
+                    <div class="input-group float-left w-25 mb-4">
                         <div class="input-group-prepend">
                             <button class="btn btn-primary qty-btn-minus" type="button">-</button>
                         </div>
@@ -23,17 +21,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-10 btnBid">
-                    <button class="btn btn-primary btn-block product-add-to-cart" type="button">{{ @root.__ "Bid" }}</button>
-                </div>
+                <button class="btn btn-primary btn-block product-add-to-cart w-25" type="button">{{ @root.__ "Bid" }}</button>
                 {{else}}
                 <input type="hidden" id="product_bid" value="{{result.minimum_price}}">
-                <h4 class="col-md-10 product-price mp-0">{{currencySymbol config.peerplaysAssetSymbol}} {{result.minimum_price}}</h4>
-                <div class="col-md-10 btnBuy">
-                    <button class="btn btn-primary btn-block product-add-to-cart" type="button">{{ @root.__ "Buy" }}</button>
-                </div>
+                <h4 class="product-price mp-0">{{currencySymbol config.peerplaysAssetSymbol}} {{result.minimum_price}}</h4>
+                <button class="btn btn-primary btn-block product-add-to-cart w-25" type="button">{{ @root.__ "Buy" }}</button>
                 {{/if}}
-                <div class="col-md-10 body_text">
+                <div class="body_text">
                     {{{fixTags result.productDescription}}}
                 </div>
             </div>
@@ -90,4 +84,6 @@
 <input type="hidden" id="offerId" value="{{result.offerId}}">
 <input type="hidden" id="maxPrice" value="{{result.maximum_price}}">
 <input type="hidden" id="minPrice" value="{{result.minimum_price}}">
+<input type="hidden" id="ppyBalance" value="{{balance}}">
+<input type="hidden" id="bidFee" value="{{fee}}">
 <input type="hidden" id="currencySymbol" value="{{currencySymbol config.peerplaysAssetSymbol}}">

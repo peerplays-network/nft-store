@@ -599,6 +599,19 @@ $(document).ready(function (){
         }
     });
 
+    $('#buttonAddFunds').validator().on('click', function(e) {
+        e.preventDefault();
+        var precision = parseInt($('#addFundsAssetPrecision').val());
+        var amountToAdd = Math.round((parseFloat($('#amountToAdd').val()) + Number.EPSILON) * Math.pow(10, precision));
+        var minAmount = Math.round((parseFloat($('#minFundsRequired').val()) + Number.EPSILON) * Math.pow(10,precision));
+
+        if(amountToAdd < minAmount) {
+            showNotification('Add more funds', 'danger');
+        } else {
+            window.location.replace(`/checkout/payment/${(amountToAdd/Math.pow(10, precision)).toFixed(precision)}`);
+        }
+    });
+
     $(document).on('click', '.image-next', function(e){
         var thumbnails = $('.thumbnail-image');
         var index = 0;
@@ -672,27 +685,32 @@ $(document).ready(function (){
         } else if(parseFloat($('#product_bid').val()) < parseFloat($('#minPrice').val())) {
             showNotification(`Below minimum price: ${$('#minPrice').val()}`, 'warning', false);
         } else {
-            $.ajax({
-                method: 'POST',
-                url: '/product/bid',
-                data: {
-                    productId: $('#productId').val(),
-                    offerId: $('#offerId').val(),
-                    productPrice: $('#product_bid').val(),
-                    isBidding: $('#minPrice').val() !== $('#maxPrice').val()
-                }
-            })
-            .done(function(msg){
-                showNotification(msg.message, 'success');
-            })
-            .fail(function(msg){
-                showNotification(msg.responseJSON.message, 'danger');
-            });
+            var bidAmount = Math.round((parseFloat($('#product_bid').val()) + Number.EPSILON) * Math.pow(10, parseInt($('#addFundsAssetPrecision').val())));
+            if(parseInt($('#ppyBalance').val()) < bidAmount + parseInt($('#bidFee').val())) {
+                showNotification('Insufficient funds. Please add funds.', 'warning', false);
+                var minFundsRequired = (bidAmount + parseInt($('#bidFee').val()) - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
+                $('#minFundsRequired').val(minFundsRequired);
+                $('#amountToAdd').val(minFundsRequired);
+                $('#addFundsModal').modal('show');
+            } else {
+                $.ajax({
+                    method: 'POST',
+                    url: '/product/bid',
+                    data: {
+                        productId: $('#productId').val(),
+                        offerId: $('#offerId').val(),
+                        productPrice: parseFloat($('#product_bid').val()).toFixed(parseInt($('#addFundsAssetPrecision').val())),
+                        isBidding: $('#minPrice').val() !== $('#maxPrice').val()
+                    }
+                })
+                .done(function(msg){
+                    showNotification(msg.message, 'success');
+                })
+                .fail(function(msg){
+                    showNotification(msg.responseJSON.message, 'danger');
+                });
+            }
         }
-    });
-
-    $('#product_bid').on('keyup', function(e){
-        checkMinMaxPrice(e, $('#product_bid'));
     });
 
     $('.cart-product-quantity').on('keyup', function(e){
