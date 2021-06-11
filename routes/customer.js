@@ -202,7 +202,8 @@ router.post('/customer/save', async (req, res) => {
 router.get('/customer/account', async (req, res) => {
     const db = req.app.db;
     const config = req.app.config;
-
+    
+    
     if(!req.session.customerPresent){
         res.redirect('/customer/login');
         return;
@@ -213,10 +214,15 @@ router.get('/customer/account', async (req, res) => {
     })
     .sort({ orderDate: -1 })
     .toArray();
+
+    let user =await db.customers.find({email: req.session.customerEmail}).toArray();
+    
+
     res.render(`${config.themeViews}customer-account`, {
         title: 'Orders',
         session: req.session,
         orders,
+        user,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         countryList: getCountryList(),

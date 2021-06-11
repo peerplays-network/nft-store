@@ -5,6 +5,16 @@
             <li class="breadcrumb-item active" aria-current="page"><a href="/customer/account">Orders</a></li>
         </ol>
     </nav>
+       <div>
+       {{#each user}}
+       <div>
+            Peerplays ID : {{this.peerplaysAccountId}}
+        </div>
+    <div>
+            Account name : {{this.peerplaysAccountName}}
+    </div>
+        {{/each}}
+        </div>
     <div class="row">
         <div class="col-12 col-md-5 bottom-pad-15">
             <div class="card top-marg-15">
@@ -44,6 +54,7 @@
                 </div>
             </div>
         </div>
+     
         <div class="col-md-7">
             <div class="col-12 bottom-pad-15 no-pad-right">
                 <div class="card top-marg-15">
