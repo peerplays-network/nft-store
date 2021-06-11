@@ -192,5 +192,9 @@
 	"Password": "Password",
 	"Create Order": "Create Order",
 	"Create order": "Create order",
-  "Product Brand": "Categoria"
+  "Product Brand": "Categoria",
+  "Bid price": "Prezzo di offerta",
+  "Bid": "Bid",
+  "Buy": "Buy",
+  "Amount to add": "Importo da aggiungere"
 }

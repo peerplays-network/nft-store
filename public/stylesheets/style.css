@@ -113,6 +113,9 @@ input[type=number]::-webkit-outer-spin-button {
   width: auto;
   height: 100%;
 }
+.stripe-logo {
+  height: 1.5rem;
+}
 /*
  * Sidebar
  */
@@ -221,7 +224,8 @@ input[type=number]::-webkit-outer-spin-button {
 .product-option {
   font-size: 18px;
 }
-.btnAddToCart,
+.btnBuy,
+.btnBid,
 .body_text {
   padding-top: 15px;
   padding-bottom: 15px;
@@ -229,8 +233,6 @@ input[type=number]::-webkit-outer-spin-button {
 .product-option-text {
   font-size: 16px;
   color: #aaaaaa;
-  padding-bottom: 10px;
-  padding-top: 10px;
 }
 .seporator {
   padding-top: 5px;
@@ -643,3 +645,4 @@ a {
     min-height: 0;
   }
 }
+
