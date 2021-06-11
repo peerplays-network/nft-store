@@ -153,7 +153,7 @@ router.post('/customer/create', async (req, res) => {
             req.session.peerIDTokenExpires = customerReturn.peerIDTokenExpires;
 
             // Return customer oject
-            res.status(200).json(customerReturn);
+            res.status(200).json({ message: 'Customer created successfully', customerReturn: customerReturn });
         });
     }catch(ex){
         console.error(colors.red('Failed to insert customer: ', ex));
@@ -542,6 +542,13 @@ router.get('/customer/login', async (req, res, next) => {
 router.post('/customer/login_action', async (req, res) => {
     const db = req.app.db;
 
+    // check if email or password empty
+    if(req.body.loginEmail === '' || req.body.loginPassword === ''){
+        res.status(400).json({
+            message: 'Please provide email and password.'
+        });
+        return;
+    }
     const customer = await db.customers.findOne({ email: mongoSanitize(req.body.loginEmail) });
     // check if customer exists with that email
     if(customer === undefined || customer === null){
@@ -589,7 +596,7 @@ router.post('/customer/login_action', async (req, res) => {
         }
 
         const updatedCustomer = await db.customers.findOneAndUpdate(
-              { _id: getId(req.session.customerId) },
+              { _id: getId(customer._id) },
               {
                   $set: customerObj
               }, { multi: false, returnOriginal: false }

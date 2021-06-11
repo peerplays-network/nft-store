@@ -66,10 +66,10 @@ $(document).ready(function (){
                 }
             })
             .done(function(msg){
-                showNotification(msg.message, 'success', false, '/');
+                showNotification(msg.message, 'success', true, '/');
             })
             .fail(function(msg){
-                showNotification(msg.responseJSON.message, 'danger');
+                showNotification(msg.responseJSON[0]?.message || msg.responseJSON?.message, 'danger');
             });
         }
     });
@@ -102,7 +102,7 @@ $(document).ready(function (){
         var formData = new FormData();
         formData.append("title", $('#productTitle').val());
         formData.append("productDescription", $('#productDescription').val());
-        formData.append("productCategory", $('#category').val());
+        formData.append("productCategory", $('#category').val() || '');
         formData.append("productPublished", $('#productPublished').val());
         formData.append("productPermalink", $('#productPermalink').val());
         formData.append("productImage",file);
@@ -173,6 +173,22 @@ $(document).ready(function (){
             showNotification(msg.responseJSON.message, 'danger');
         });
     });
+
+    $('.btn-delete-offer').on('click', function(){
+      if(confirm('Are you sure you want to delete this sell offer?')){
+          $.ajax({
+              method: 'POST',
+              url: '/customer/product/delete',
+              data: { offerId: $(this).attr('data-id') }
+          })
+          .done(function(msg){
+              showNotification(msg.message, 'success', true);
+          })
+          .fail(function(msg){
+              showNotification(msg.responseJSON.message, 'danger');
+          });
+      }
+  });
 
     $(document).on('click', '.menu-btn', function(e){
         e.preventDefault();
@@ -416,6 +432,7 @@ $(document).ready(function (){
 
     // Mint NFT
     $(document).on('click', '#buttonMint', function(e){
+        $("#buttonMint").attr("disabled", true);
         $.ajax({
             method: 'POST',
             url: '/customer/product/mint',
@@ -426,6 +443,7 @@ $(document).ready(function (){
         })
         .done(function(msg){
             showNotification(msg.message, 'success', true);
+            $("#buttonMint").attr("disabled", false);
         })
         .fail(function(msg){
             if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
@@ -437,6 +455,7 @@ $(document).ready(function (){
             }
 
             showNotification(msg.responseJSON.message, 'danger');
+            $("#buttonMint").attr("disabled", false);
         });
     });
 
@@ -453,7 +472,7 @@ $(document).ready(function (){
                             </div>
                             <div class="form-group">
                                 <label for="saleEnd" class="control-label">Sale end date *</label>
-                                <input id="saleEnd" />
+                                <input id="saleEnd" readonly />
                             </div>`;
             $('#sellNFTFormWrapper').html(bidHtml);
             $('#saleEnd').datetimepicker({
@@ -473,7 +492,7 @@ $(document).ready(function (){
                                     </div>
                                     <div class="form-group">
                                         <label for="saleEnd" class="control-label">Sale end date *</label>
-                                        <input id="saleEnd" />
+                                        <input id="saleEnd" readonly />
                                     </div>`;
             $('#sellNFTFormWrapper').html(fixedPriceHtml);
             $('#saleEnd').datetimepicker({
@@ -580,6 +599,19 @@ $(document).ready(function (){
         }
     });
 
+    $('#buttonAddFunds').validator().on('click', function(e) {
+        e.preventDefault();
+        var precision = parseInt($('#addFundsAssetPrecision').val());
+        var amountToAdd = Math.round((parseFloat($('#amountToAdd').val()) + Number.EPSILON) * Math.pow(10, precision));
+        var minAmount = Math.round((parseFloat($('#minFundsRequired').val()) + Number.EPSILON) * Math.pow(10,precision));
+
+        if(amountToAdd < minAmount) {
+            showNotification('Add more funds', 'danger');
+        } else {
+            window.location.replace(`/checkout/payment/${(amountToAdd/Math.pow(10, precision)).toFixed(precision)}`);
+        }
+    });
+
     $(document).on('click', '.image-next', function(e){
         var thumbnails = $('.thumbnail-image');
         var index = 0;
@@ -638,7 +670,7 @@ $(document).ready(function (){
                 productVariant: $('#productVariant-' + $(this).attr('data-id')).val()
             }
         })
-		.done(function(msg){
+		    .done(function(msg){
             updateCartDiv();
             showNotification(msg.message, 'success');
         })
@@ -648,31 +680,37 @@ $(document).ready(function (){
     });
 
     $(document).on('click', '.product-add-to-cart', function(e){
-        if(parseInt($('#product_quantity').val()) < 1){
-            $('#product_quantity').val(1);
-        }
-
-        $.ajax({
-            method: 'POST',
-            url: '/product/addtocart',
-            data: {
-                productId: $('#productId').val(),
-                productQuantity: $('#product_quantity').val(),
-                productVariant: $('#product_variant').val(),
-                productComment: $('#product_comment').val()
+        if(parseFloat($('#product_bid').val()) > parseFloat($('#maxPrice').val())){
+            showNotification(`Exceeds maximum price: ${$('#maxPrice').val()}`, 'warning', false);
+        } else if(parseFloat($('#product_bid').val()) < parseFloat($('#minPrice').val())) {
+            showNotification(`Below minimum price: ${$('#minPrice').val()}`, 'warning', false);
+        } else {
+            var bidAmount = Math.round((parseFloat($('#product_bid').val()) + Number.EPSILON) * Math.pow(10, parseInt($('#addFundsAssetPrecision').val())));
+            if(parseInt($('#ppyBalance').val()) < bidAmount + parseInt($('#bidFee').val())) {
+                showNotification('Insufficient funds. Please add funds.', 'warning', false);
+                var minFundsRequired = (bidAmount + parseInt($('#bidFee').val()) - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
+                $('#minFundsRequired').val(minFundsRequired);
+                $('#amountToAdd').val(minFundsRequired);
+                $('#addFundsModal').modal('show');
+            } else {
+                $.ajax({
+                    method: 'POST',
+                    url: '/product/bid',
+                    data: {
+                        productId: $('#productId').val(),
+                        offerId: $('#offerId').val(),
+                        productPrice: parseFloat($('#product_bid').val()).toFixed(parseInt($('#addFundsAssetPrecision').val())),
+                        isBidding: $('#minPrice').val() !== $('#maxPrice').val()
+                    }
+                })
+                .done(function(msg){
+                    showNotification(msg.message, 'success');
+                })
+                .fail(function(msg){
+                    showNotification(msg.responseJSON.message, 'danger');
+                });
             }
-        })
-		.done(function(msg){
-            updateCartDiv();
-            showNotification(msg.message, 'success');
-        })
-        .fail(function(msg){
-            showNotification(msg.responseJSON.message, 'danger');
-        });
-    });
-
-    $('#product_quantity').on('keyup', function(e){
-        checkMaxQuantity(e, $('#product_quantity'));
+        }
     });
 
     $('.cart-product-quantity').on('keyup', function(e){
@@ -685,30 +723,6 @@ $(document).ready(function (){
 
     $(document).on('click', '.pushy-link', function(e){
         $('body').removeClass('pushy-open-right');
-    });
-
-    $(document).on('click', '.add-to-cart', function(e){
-        var productLink = '/product/' + $(this).attr('data-id');
-        if($(this).attr('data-link')){
-            productLink = '/product/' + $(this).attr('data-link');
-        }
-
-        if($(this).attr('data-has-variants') === 'true'){
-            window.location = productLink;
-        }else{
-            $.ajax({
-                method: 'POST',
-                url: '/product/addtocart',
-                data: { productId: $(this).attr('data-id') }
-            })
-            .done(function(msg){
-                updateCartDiv();
-                showNotification(msg.message, 'success');
-            })
-            .fail(function(msg){
-                showNotification(msg.responseJSON.message, 'danger');
-            });
-        }
     });
 
     // On create review
@@ -763,12 +777,16 @@ $(document).ready(function (){
     });
 
     $('.qty-btn-minus').on('click', function(){
-        var number = parseInt($('#product_quantity').val()) - 1;
-        $('#product_quantity').val(number > 0 ? number : 1);
+        if(parseInt($('#product_bid').val()) - 1 >= parseFloat($('#minPrice').val())){
+            var number = parseInt($('#product_bid').val()) - 1;
+            $('#product_bid').val(number > 0 ? number : 1);
+        }
     });
 
     $('.qty-btn-plus').on('click', function(){
-        $('#product_quantity').val(parseInt($('#product_quantity').val()) + 1);
+        if(parseInt($('#product_bid').val()) + 1 <= parseFloat($('#maxPrice').val())){
+            $('#product_bid').val(parseInt($('#product_bid').val()) + 1);
+        }
     });
 
     // product thumbnail image click
@@ -863,6 +881,25 @@ function checkMaxQuantity(e, element){
             showNotification(`Exceeds maximum quantity: ${$('#maxQuantity').val()}`, 'warning', false);
         }
     }
+}
+
+function checkMinMaxPrice(e, element){
+  if($('#maxPrice').length && $('#minPrice').length){
+      if(e.keyCode === 46 || e.keyCode === 8){
+          return;
+      }
+      if(parseFloat($(e.target).val()) > parseFloat($('#maxPrice').val())){
+          const qty = element.val();
+          e.preventDefault();
+          element.val(qty.slice(0, -1));
+          showNotification(`Exceeds maximum price: ${$('#maxPrice').val()}`, 'warning', false);
+      } else if(parseFloat($(e.target).val()) < parseFloat($('#minPrice').val())) {
+          const qty = element.val();
+          e.preventDefault();
+          element.val(qty.slice(0, -1));
+          showNotification(`Below minimum price: ${$('#minPrice').val()}`, 'warning', false);
+      }
+  }
 }
 
 function deleteFromCart(element){

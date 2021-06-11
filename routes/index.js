@@ -36,6 +36,8 @@ const {
     getMenu
 } = require('../lib/menu');
 const countryList = getCountryList();
+const PeerplaysService = require('../services/PeerplaysService');
+const peerplaysService = new PeerplaysService();
 
 // Google products
 router.get('/googleproducts.xml', async (req, res, next) => {
@@ -255,9 +257,17 @@ router.get('/checkout/cartdata', (req, res) => {
     });
 });
 
-router.get('/checkout/payment', async (req, res) => {
+router.get('/checkout/payment/:ppyAmount', async (req, res) => {
     const config = req.app.config;
 
+    req.session.cart = {
+      ppyAmount: req.params.ppyAmount
+    };
+
+    req.session.totalCartAmount = (req.params.ppyAmount * config.ppyExchangeRate).toFixed(2);
+    req.session.totalCartShipping = 0;
+    req.session.totalCartItems = 1;
+    req.session.totalCartProducts = 1;
     // if there is no items in the cart then render a failure
     if(!req.session.cart){
         req.session.message = 'The are no items in your cart. Please add some items before checking out';
@@ -266,21 +276,13 @@ router.get('/checkout/payment', async (req, res) => {
         return;
     }
 
-    let paymentType = '';
-    if(req.session.cartSubscription){
-        paymentType = '_subscription';
-    }
-
-    // update total cart amount one last time before payment
-    await updateTotalCart(req, res);
-
     res.render(`${config.themeViews}checkout-payment`, {
         title: 'Checkout - Payment',
         config: req.app.config,
         paymentConfig: getPaymentConfig(),
         session: req.session,
         paymentPage: true,
-        paymentType,
+        paymentType: '',
         cartClose: true,
         cartReadOnly: true,
         page: 'checkout-information',
@@ -397,10 +399,9 @@ router.post('/checkout/removediscountcode', async (req, res) => {
 });
 
 // show an individual product
-router.get('/product/:id', async (req, res) => {
+router.get('/product/:id/:offerId', async (req, res) => {
     const db = req.app.db;
     const config = req.app.config;
-    const productsIndex = req.app.productsIndex;
 
     const product = await db.products.findOne({ $or: [{ _id: getId(req.params.id) }, { productPermalink: req.params.id }] });
     if(!product){
@@ -412,53 +413,110 @@ router.get('/product/:id', async (req, res) => {
         return;
     }
 
+    let metadata, offer, balance, fee;
+
+    try {
+        metadata = await peerplaysService.getBlockchainData({
+            api: "database",
+            method: "get_objects",
+            "params[0][]": product.nftMetadataID
+        });
+        offer = await peerplaysService.getBlockchainData({
+            api: "database",
+            method: "get_objects",
+            "params[0][]": req.params.offerId
+        });
+
+        if(req.session.peerplaysAccountId) {
+            const account = await peerplaysService.getBlockchainData({
+                api: "database",
+                method: "get_full_accounts",
+                "params[0][]": req.session.peerplaysAccountId,
+                params: true
+            });
+
+            const object200 = await peerplaysService.getBlockchainData({
+                api: "database",
+                method: "get_objects",
+                "params[0][]": "2.0.0",
+                params: true
+            });
+
+            const bidFees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 89);
+            fee = bidFees[1].fee;
+
+            const assetBalance = account.result[0][1].balances.find((bal) => bal.asset_type === config.peerplaysAssetID);
+            balance = assetBalance ? assetBalance.balance : 0;
+        }
+    } catch(ex) {
+        console.error(ex);
+    }
+
+    if(!metadata || !metadata.result || metadata.result.length === 0 ||
+          !offer || !offer.result || offer.result.length === 0) {
+        res.render('error', { title: 'Not found', message: 'Product not found', helpers: req.handlebars.helpers, config });
+        return;
+    }
+
+    if(metadata.result[0].base_uri.includes('/uploads/')) {
+        product.base_uri = req.protocol + '://' + req.get('host') + '/imgs' + metadata.result[0].base_uri.split('/uploads')[1];
+    } else {
+        product.base_uri = metadata.result[0].base_uri;
+    }
+
+    product.offerId = req.params.offerId;
+    product.minimum_price = offer.result[0].minimum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
+    product.maximum_price = offer.result[0].maximum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
+
+    product.is_bidding = product.minimum_price !== product.maximum_price;
+
     // Get variants for this product
-    const variants = await db.variants.find({ product: product._id }).sort({ added: 1 }).toArray();
+    // const variants = await db.variants.find({ product: product._id }).sort({ added: 1 }).toArray();
 
     // Grab review data
-    const reviews = {
-        reviews: [],
-        average: 0,
-        count: 0,
-        featured: {},
-        ratingHtml: '',
-        highestRating: 0
-    };
-    if(config.modules.enabled.reviews){
-        reviews.reviews = await db.reviews.find({ product: product._id }).sort({ date: 1 }).limit(5).toArray();
-        // only aggregate if reviews are found
-        if(reviews.reviews.length > 0){
-            reviews.highestRating = await db.reviews.find({ product: product._id }).sort({ rating: -1 }).limit(1).toArray();
-            if(reviews.highestRating.length > 0){
-                reviews.highestRating = reviews.highestRating[0].rating;
-            }
-            const featuredReview = await db.reviews.find({ product: product._id }).sort({ date: -1 }).limit(1).toArray();
-            if(featuredReview.length > 0){
-                reviews.featured.review = featuredReview[0];
-                reviews.featured.customer = await db.customers.findOne({ _id: reviews.featured.review.customer });
-            }
-            const reviewRating = await db.reviews.aggregate([
-                {
-                    $match: {
-                        product: ObjectId(product._id)
-                    }
-                },
-                {
-                    $group: {
-                        _id: '$item',
-                        avgRating: { $avg: '$rating' }
-                    }
-                }
-            ]).toArray();
-            reviews.count = await db.reviews.countDocuments({ product: product._id });
-            // Assign if returned
-            if(reviewRating.length > 0 && reviewRating[0].avgRating){
-                reviews.average = reviewRating[0].avgRating;
-            }
-        }
-        // Set review html
-        reviews.ratingHtml = getRatingHtml(Math.round(reviews.average));
-    }
+    // const reviews = {
+    //     reviews: [],
+    //     average: 0,
+    //     count: 0,
+    //     featured: {},
+    //     ratingHtml: '',
+    //     highestRating: 0
+    // };
+    // if(config.modules.enabled.reviews){
+    //     reviews.reviews = await db.reviews.find({ product: product._id }).sort({ date: 1 }).limit(5).toArray();
+    //     // only aggregate if reviews are found
+    //     if(reviews.reviews.length > 0){
+    //         reviews.highestRating = await db.reviews.find({ product: product._id }).sort({ rating: -1 }).limit(1).toArray();
+    //         if(reviews.highestRating.length > 0){
+    //             reviews.highestRating = reviews.highestRating[0].rating;
+    //         }
+    //         const featuredReview = await db.reviews.find({ product: product._id }).sort({ date: -1 }).limit(1).toArray();
+    //         if(featuredReview.length > 0){
+    //             reviews.featured.review = featuredReview[0];
+    //             reviews.featured.customer = await db.customers.findOne({ _id: reviews.featured.review.customer });
+    //         }
+    //         const reviewRating = await db.reviews.aggregate([
+    //             {
+    //                 $match: {
+    //                     product: ObjectId(product._id)
+    //                 }
+    //             },
+    //             {
+    //                 $group: {
+    //                     _id: '$item',
+    //                     avgRating: { $avg: '$rating' }
+    //                 }
+    //             }
+    //         ]).toArray();
+    //         reviews.count = await db.reviews.countDocuments({ product: product._id });
+    //         // Assign if returned
+    //         if(reviewRating.length > 0 && reviewRating[0].avgRating){
+    //             reviews.average = reviewRating[0].avgRating;
+    //         }
+    //     }
+    //     // Set review html
+    //     reviews.ratingHtml = getRatingHtml(Math.round(reviews.average));
+    // }
 
     // If JSON query param return json instead
     if(req.query.json === 'true'){
@@ -467,37 +525,39 @@ router.get('/product/:id', async (req, res) => {
     }
 
     // show the view
-    const images = await getImages(product._id, req, res);
+    //const images = await getImages(product._id, req, res);
 
     // Related products
     let relatedProducts = {};
     if(config.showRelatedProducts){
-        const lunrIdArray = [];
-        const productTags = product.productTags.split(',');
-        const productTitleWords = product.productTitle.split(' ');
-        const searchWords = productTags.concat(productTitleWords);
-        searchWords.forEach((word) => {
-            try{
-                const results = productsIndex.search(word);
-                results.forEach((id) => {
-                    lunrIdArray.push(getId(id.ref));
-                });
-            }catch(e){
-                console.log('lunr search query error');
-            }
-        });
-        relatedProducts = await db.products.find({
-            _id: { $in: lunrIdArray, $ne: product._id }
-        }).limit(4).toArray();
+        const searchWords = product.productTitle.split(' ');
+        let searchResults = await Promise.all(searchWords.map(async (searchTerm) => {
+            const {data} = await paginateProducts(true, db, 1, {
+                $or: [
+                    { "productTitle": {$regex: searchTerm, $options: 'i'} },
+                    { "productDescription": {$regex: searchTerm, $options: 'i'} }
+                ]
+            }, getSort(), req);
+            return data;
+        }));
+
+        if(searchResults) {
+            searchResults = searchResults.reduce((acc, results) => acc.concat(results), []);
+            relatedProducts = searchResults.reduce((unique, product) => {
+                if(!unique.some(obj => obj.id === product.id) && product.id !== req.params.offerId && unique.length < 4) {
+                  unique.push(product);
+                }
+                return unique;
+            },[]);
+        }
     }
 
     res.render(`${config.themeViews}product`, {
         title: product.productTitle,
         result: product,
-        variants,
-        reviews,
-        images: images,
         relatedProducts,
+        balance,
+        fee,
         productDescription: stripHtml(product.productDescription),
         metaDescription: `${config.cartTitle} - ${product.productTitle}`,
         config: config,
@@ -831,6 +891,56 @@ router.post('/product/addtocart', async (req, res, next) => {
     });
 });
 
+// Bid on NFT
+router.post('/product/bid', async (req, res, next) => {
+    if(!req.session.peerplaysAccountId){
+        return res.status(400).json({
+            message: 'You need to be logged in to bid on NFT'
+        });
+    }
+
+    const db = req.app.db;
+    const config = req.app.config;
+
+    // Get the product from the DB
+    const product = await db.products.findOne({ _id: getId(req.body.productId) });
+
+    // No product found
+    if(!product){
+        return res.status(400).json({ message: 'Error placing bid. Please try again.' });
+    }
+
+    let productPrice = parseFloat(req.body.productPrice).toFixed(config.peerplaysAssetPrecision) * Math.pow(10, config.peerplaysAssetPrecision);
+
+    const body = {
+        operations: [{
+            op_name: 'bid',
+            fee_asset: config.peerplaysAssetID,
+            bidder: req.session.peerplaysAccountId,
+            bid_price: {
+                amount: productPrice,
+                asset_id: config.peerplaysAssetID
+            },
+            offer_id: req.body.offerId
+        }]
+    };
+
+    let bidId;
+
+    try{
+        const {result} = await peerplaysService.sendOperations(body, req.session.peerIDAccessToken);
+        bidId = result.trx.operation_results[0][1];
+        return res.status(200).json({
+            message: req.body.isBidding ? 'Bid placed successfully' : 'NFT bought successfully',
+            bidId
+        });
+    } catch(ex) {
+        console.error(ex);
+        res.status(400).json({ message: 'Error bidding on/buying NFT' });
+        return;
+    }
+});
+
 // Totally empty the cart
 router.post('/product/addreview', async (req, res, next) => {
     const config = req.app.config;
@@ -840,7 +950,7 @@ router.post('/product/addreview', async (req, res, next) => {
         // Check if a customer is logged in
         if(!req.session.customerPresent){
             return res.status(400).json({
-                message: 'You need to be logged in to create a review'
+                message: 'You need to be logged in to add a review'
             });
         }
 

@@ -1,46 +1,46 @@
-<div class="col-md-9 mx-sm-auto col-lg-10 px-4">
+<div class="col-md-12 mx-sm-auto col-lg-12">
 	<form method="post" class="form-horizontal" id="customer-form" role="form" data-toggle="validator" novalidate="false">
-        <div class="col-sm-12">
-            <div class="page-header">
-                <div class="btn-group float-right" role="group" aria-label="Basic example">
+        <div class="col-sm-12 left-right-space-remove">
+            <div class="page-header customer-header">
+                {{!-- <div class="btn-group float-right" role="group" aria-label="Basic example">
                     <button class="btn btn-outline-success" id="createCustomer">Register</button>
-                </div>
+                </div> --}}
                 <h2>Customer</h2>
             </div>
         </div>
-        <div class="col-sm-12">
-            <div class="form-group">
-            <label class="control-label">Email *</label>
+        <div class="col-sm-12 customer-form first-input-space">
+            <div class="bottom-space">
+            <label class="control-form-label">Email *</label>
                 <input type="text" class="form-control" name="email" id="email" required>
             </div>
         </div>
-        <div class="col-sm-5">
-            <div class="form-group">
-            <label class="control-label">{{ @root.__ "First name" }} *</label>
+        <div class="col-sm-12 customer-form">
+            <div class="bottom-space">
+            <label class="control-form-label">{{ @root.__ "First name" }} *</label>
                 <input type="text" class="form-control" name="firstName" id="firstName" required>
             </div>
         </div>
-        <div class="col-sm-5">
-            <div class="form-group">
-            <label class="control-label">{{ @root.__ "Last name" }} *</label>
+        <div class="col-sm-12 customer-form">
+            <div class="bottom-space">
+            <label class="control-form-label">{{ @root.__ "Last name" }} *</label>
                 <input type="text" class="form-control" name="lastName" id="lastName" required>
             </div>
         </div>
-        <div class="col-sm-12">
-            <div class="form-group">
-            <label class="control-label">{{ @root.__ "Address 1" }} *</label>   
+        <div class="col-sm-12 customer-form">
+            <div class="bottom-space">
+            <label class="control-form-label">{{ @root.__ "Address 1" }} *</label>   
                 <input type="text" class="form-control" name="address1" id="address1" required>
             </div>
         </div>
-        <div class="col-sm-12">
-            <div class="form-group">
-            <label class="control-label">{{ @root.__ "Address 2" }}</label>
+        <div class="col-sm-12 customer-form">
+            <div class="bottom-space">
+            <label class="control-form-label">{{ @root.__ "Address 2" }}</label>
                 <input type="text" class="form-control" name="address2" id="address2">
             </div>
         </div>
-        <div class="col-sm-12">
-            <div class="form-group">
-            <label class="control-label">{{ @root.__ "Country" }} *</label>
+        <div class="col-sm-8 customer-form">
+            <div class="bottom-space">
+            <label class="control-form-label">{{ @root.__ "Country" }} *</label>
                 <select class="form-control" id="country" name="country" required>
                     <option value="" disabled selected>Select Country</option>
                     {{#each countryList}}
@@ -49,36 +49,51 @@
                 </select>
             </div>
         </div>
-        <div class="col-sm-5">
-            <div class="form-group">
-            <label class="control-label">{{ @root.__ "State" }} *</label>
+        <div class="col-sm-8 customer-form">
+            <div class="bottom-space">
+            <label class="control-form-label">{{ @root.__ "State" }} *</label>
                 <input type="text" class="form-control" name="state" id="state" required>
             </div>
         </div>
-        <div class="col-sm-5">
-            <div class="form-group">
-            <label class="control-label">{{ @root.__ "Postcode" }} *</label>
+        <div class="col-sm-8 customer-form">
+            <div class="bottom-space">
+            <label class="control-form-label">{{ @root.__ "Postcode" }} *</label>
                 <input type="text" class="form-control" name="postcode" id="postcode" required>
             </div>
         </div>
-        <div class="col-sm-5">
-            <div class="form-group">
-            <label class="control-label">{{ @root.__ "Phone number" }} *</label>
+        <div class="col-sm-8 customer-form">
+            <div class="bottom-space">
+            <label class="control-form-label">{{ @root.__ "Phone number" }} *</label>
                 <input type="text" class="form-control" name="phone" id="phone" required>
             </div>
         </div>
-        <div class="col-sm-5">
-            <div class="form-group">
-            <label class="control-label">{{ @root.__ "Password" }} *</label>
+        <div class="col-sm-8 customer-form">
+            <div class="bottom-space">
+            <label class="control-form-label">{{ @root.__ "Password" }} *</label>
                 <input type="password" class="form-control" name="password" id="password" required>
             </div>
         </div>
-        <div class="col-sm-5">
-          <div class="form-group">
-            <label for="frm_userPassword_confirm">{{ @root.__ "Password confirm" }} *</label>
+        <div class="col-sm-8 customer-form">
+          <div class="bottom-space">
+            <label class="control-form-label" for="frm_userPassword_confirm">{{ @root.__ "Password confirm" }} *</label>
             <input type="password" data-match="#password" placeholder="Confirm password" class="form-control" id="frm_userPassword_confirm" name="frm_userPassword_confirm" required>
           </div>
-        </div>
+        </div>       
         <input type="hidden" name="customerId" id="customerId" value="{{result._id}}">
     </form>
+    <div class="row first-input-space customer-form">
+        <div class="col-sm-12">
+            <button class="btn register-btn-style" id="createCustomer">
+                Register
+            </button>
+        </div>
+    </div>
+    <div class="control-form-bottom-align"></div>
+</div>
+
+<div class="nft-store-text-style1">
+   <a href="/" style="text-decoration: none;"><p>
+        PEER <span class="text-blue font-normal">PLAYS</span><br/>
+        <span class="text-blue">NFT STORE</span>
+    </p></a>
 </div>

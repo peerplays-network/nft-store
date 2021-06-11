@@ -1,13 +1,43 @@
-<div class="col-md-4 offset-md-4 top-pad-100">
-	<form class="form-signin"  method="post" role="form" data-toggle="validator">
-		<h2 class="form-signin-heading">{{ @root.__ "Please sign in" }}</h2>
-		<div class="form-group">
-			<input type="email" id="email" name="email" class="form-control" placeholder="email address" required autofocus>
+<div class="col-md-12 col-lg-12">
+	<div class="row top-align-space h-100 mobile-direction">
+		<div class="col-lg-6 left-right-align">
+			<form class="form-signin"  method="post" role="form" data-toggle="validator">
+				<h2 class="form-signin-heading heading-title-text-color pt-5">{{ @root.__ "Please sign in" }}</h2>
+				<div class="bottom-space pt-4">
+					 <div class="form-group has-search email-img d-flex align-items-center">
+						 <img class="form-control-feedback" src="/images/email.png" alt="email"/>
+						<input type="email" id="email" name="email" class="form-control" placeholder="email address" required autofocus>
+					</div>
+				</div>
+				<div class="bottom-space">
+					<div class="form-group has-search email-img d-flex align-items-center">
+						<img class="form-control-feedback-password" src="/images/lock.png" alt="password"/>
+						<input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+					</div>
+				</div>
+				<div class="bottom-space">
+					<button class="btn outline-large-btn same-btn-style" id="customerloginForm" type="submit">{{ @root.__ "Sign in" }}</button>
+				</div>
+				<div class="bottom-space">
+					<button type="button" class="btn medium-btn-style same-btn-style" id="customerRegister" >{{ @root.__ "Register" }}</button>
+				</div>
+			</form>
 		</div>
-		<div class="form-group">
-			<input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+		<div class="col-lg-6 only-text-space d-flex align-items-center justify-content-center">
+			<div>
+				<div class="nft-store-text-style">
+					<a href="/" style="text-decoration: none;"><h1>
+						PEER <span class="text-blue font-normal">PLAYS</span><br/>
+						<span class="text-blue">NFT STORE</span>
+					</h1>
+					</a>
+				</div>
+			</div>
 		</div>
 		<button class="btn btn-outline-primary btn-block" id="customerloginForm" type="submit">{{ @root.__ "Sign in" }}</button>
-    <button class="btn btn-outline-secondary btn-block" id="customerRegister" >{{ @root.__ "Register" }}</button>
+    	<button class="btn btn-outline-secondary btn-block mt-3" id="customerRegister" type="button" >{{ @root.__ "Register" }}</button>
 	</form>
 </div>
+
+
+
