@@ -158,7 +158,7 @@ router.post('/customer/create', async (req, res) => {
             req.session.peerIDTokenExpires = customerReturn.peerIDTokenExpires;
 
             // Return customer oject
-            res.status(200).json(customerReturn);
+            res.status(200).json({message:"Customer created successfully",customerReturn:customerReturn});
         });
     }catch(ex){
         console.error(colors.red('Failed to insert customer: ', ex));

@@ -1,9 +1,9 @@
 {
-    "description": "Card payment",
-    "secretKey": "sk_test_this_is_not_real",
-    "publicKey": "pk_test_this_is_not_real",
+    "description": "Card payment powered by",
+    "secretKey": "sk_test_51J0pGKEqo8vSMOg6rCztfRMYmhWlxrDx5Y3EalZUkkZ4kzUvIVxPyH6UmKbeQL4kOzSWSCy2aglW9kbyx62UJAoy00kxYAvdzY",
+    "publicKey": "pk_test_51J0pGKEqo8vSMOg6d67oY2rkxnh8uUR7C5UBWR3oWI34trN9q11o0HdKxx9N5srD4GFJHb0zidLMdqWing8EdsoG00tOOypSHq",
     "stripeCurrency": "usd",
-    "stripeDescription": "expressCart payment",
+    "stripeDescription": "nft store payment",
     "stripeLogoURL": "http://localhost:1111/images/stripelogo.png",
     "stripeWebhookSecret": ""
 }

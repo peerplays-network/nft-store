@@ -3,7 +3,8 @@ html {
   min-height: 100%;
 }
 body {
-  margin-bottom: 140px;
+  /* margin-bottom: 140px; */
+  background-color: #f5f5f5;
 }
 html,
 body {
@@ -111,6 +112,9 @@ input[type=number]::-webkit-outer-spin-button {
 .navbar-brand > img {
   width: auto;
   height: 100%;
+}
+.stripe-logo {
+  height: 1.5rem;
 }
 /*
  * Sidebar
@@ -229,8 +233,6 @@ input[type=number]::-webkit-outer-spin-button {
 .product-option-text {
   font-size: 16px;
   color: #aaaaaa;
-  padding-bottom: 10px;
-  padding-top: 10px;
 }
 .seporator {
   padding-top: 5px;
@@ -429,8 +431,14 @@ input.form-control.customerDetails {
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 100px;
-  background-color: #f5f5f5;
+  height: 63px;
+  /* background-color: #f5f5f5; */
+}
+.footer-heading-text h4 {
+  color: #bababa;
+  font-weight: 400;
+  font-size: 16px;
+  cursor: pointer;
 }
 .admin {
   margin-bottom: 0;
@@ -627,7 +635,7 @@ a {
     height: 100px;
   }
   body {
-    margin-bottom: 100px;
+    margin-bottom: 30px;
   }
   .navbar-brand {
     padding-left: 0px;
