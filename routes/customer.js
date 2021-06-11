@@ -16,6 +16,7 @@ const { indexCustomers } = require('../lib/indexing');
 const { validateJson } = require('../lib/schema');
 const { restrict } = require('../lib/auth');
 const PeerplaysService = require('../services/PeerplaysService');
+const peerplaysService = new PeerplaysService();
 
 const apiLimiter = rateLimit({
     windowMs: 300000, // 5 minutes
@@ -41,27 +42,21 @@ router.get('/customer/setup', async (req, res) => {
 router.post('/customer/create', async (req, res) => {
     const db = req.app.db;
 
-    if(req.body.password != req.body.confirmpassword) {
+    // eslint-disable-next-line eqeqeq
+    if(req.body.password != req.body.confirmpassword){
         res.status(400).json({
             message: 'Password and Confirm Password should be same.'
         });
         return;
     }
 
-    if(req.body.password && req.body.password.length <= 6 ) {
-        res.status(400).json({
-            message: 'Password length must be at least 6 characters long.'
-        });
-        return;
-    }
-
-    if(req.body.password && !req.body.password.match(/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])[a-zA-Z0-9!@#\\$%\\^&\\*]+$/)) {
+    if(req.body.password && !req.body.password.match(/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])[a-zA-Z0-9!@#\\$%\\^&\\*]+$/)){
         res.status(400).json({
             message: 'Password should contain an alphabet, a number and a special character (!@#$%^&*)'
         });
         return;
     }
-    if(req.body.phone && !req.body.phone.match(/^[0-9]{10}$/)) {
+    if(req.body.phone && !req.body.phone.match(/^[0-9]{10}$/)){
         res.status(400).json({
             message: 'Mobile should contain a number and 10 digit only.'
         });
@@ -99,22 +94,22 @@ router.post('/customer/create', async (req, res) => {
 
     let peerIdUser;
     // email is ok to be used.
-    try {
+    try{
         peerIdUser = await new PeerplaysService().register({
             email: req.body.email,
             password: req.body.password
         });
-    } catch(ex) {
-        if(ex.message.email && ex.message.email === "Email already exists") {
+    }catch(ex){
+        if(ex.message.email && ex.message.email === 'Email already exists'){
             peerIdUser = await new PeerplaysService().signIn({
                 login: req.body.userEmail,
                 password: req.body.userPassword
             });
-        } else {
+        }else{
             console.error(ex.message);
-            if(typeof ex.message === 'string') {
-                res.status(400).json({message: 'PeerID Sign-up error: ' + ex.message});
-            } else {
+            if(typeof ex.message === 'string'){
+                res.status(400).json({ message: 'PeerID Sign-up error: ' + ex.message });
+            }else{
                 res.status(400).json({ message: 'PeerID Sign-up error: ' + Object.values(ex.message) });
             }
             return;
@@ -158,7 +153,7 @@ router.post('/customer/create', async (req, res) => {
             req.session.peerIDTokenExpires = customerReturn.peerIDTokenExpires;
 
             // Return customer oject
-            res.status(200).json({message:"Customer created successfully",customerReturn:customerReturn});
+            res.status(200).json({ message: 'Customer created successfully', customerReturn: customerReturn });
         });
     }catch(ex){
         console.error(colors.red('Failed to insert customer: ', ex));
@@ -220,16 +215,43 @@ router.get('/customer/account', async (req, res) => {
     })
     .sort({ orderDate: -1 })
     .toArray();
-    res.render(`${config.themeViews}customer-account`, {
-        title: 'Orders',
-        session: req.session,
-        orders,
-        message: clearSessionValue(req.session, 'message'),
-        messageType: clearSessionValue(req.session, 'messageType'),
-        countryList: getCountryList(),
-        config: req.app.config,
-        helpers: req.handlebars.helpers
+
+    const user = await db.customers.findOne({ _id: getId(req.session.customerId) });
+    const account = await peerplaysService.getBlockchainData({
+        api: 'database',
+        method: 'get_full_accounts',
+        'params[0][]': req.session.peerplaysAccountId,
+        params: true
     });
+    if(account.result[0][1].balances[0].asset_type === config.peerplaysAssetID){
+        const balance = account.result[0][1].balances[0].balance;
+        res.render(`${config.themeViews}customer-account`, {
+            title: 'Orders',
+            session: req.session,
+            orders,
+            user,
+            balance,
+            message: clearSessionValue(req.session, 'message'),
+            messageType: clearSessionValue(req.session, 'messageType'),
+            countryList: getCountryList(),
+            config: req.app.config,
+            helpers: req.handlebars.helpers
+        });
+    }else{
+        const balance = 0;
+        res.render(`${config.themeViews}customer-account`, {
+            title: 'Orders',
+            session: req.session,
+            orders,
+            user,
+            balance,
+            message: clearSessionValue(req.session, 'message'),
+            messageType: clearSessionValue(req.session, 'messageType'),
+            countryList: getCountryList(),
+            config: req.app.config,
+            helpers: req.handlebars.helpers
+        });
+    }
 });
 
 // Update a customer
@@ -519,7 +541,7 @@ router.get('/customer/login', async (req, res, next) => {
 // login the customer and check the password
 router.post('/customer/login_action', async (req, res) => {
     const db = req.app.db;
-    
+
     // check if email or password empty
     if(req.body.loginEmail === '' || req.body.loginPassword === ''){
         res.status(400).json({
@@ -566,18 +588,6 @@ router.post('/customer/login_action', async (req, res) => {
             peerIDTokenExpires: accessToken.result.expires
         };
 
-        if(!customer.peerplaysAccountId) {
-            peerIdUser = await new PeerplaysService().signIn({
-                login: req.body.loginEmail,
-                password: req.body.loginPassword
-            });
-
-            customer['peerplaysAccountId'] = peerIdUser.result.peerplaysAccountId;
-
-            customerObj['peerplaysAccountId'] = peerIdUser.result.peerplaysAccountId;
-            customerObj['peerplaysAccountName'] = peerIdUser.result.peerplaysAccountName;
-        }
-
         const schemaResult = validateJson('editCustomer', customerObj);
         if(!schemaResult.result){
             console.log('errors', schemaResult.errors);
@@ -595,7 +605,7 @@ router.post('/customer/login_action', async (req, res) => {
         .then(() => {
             const returnCustomer = updatedCustomer.value;
 
-            if(returnCustomer) {
+            if(returnCustomer){
                 delete returnCustomer.password;
             }
         });
