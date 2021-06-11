@@ -1004,12 +1004,11 @@ router.post('/product/addreview', async (req, res, next) => {
 });
 
 // search products
-router.get('/search/:searchTerm/:pageNum?', (req, res) => {
+router.get('/search/:searchTerm?/:pageNum?', (req, res) => {
     const db = req.app.db;
-    const searchTerm = req.params.searchTerm;
+    const searchTerm = req.params.searchTerm ? req.params.searchTerm : '';
     const config = req.app.config;
     const numberProducts = config.productsPerPage ? config.productsPerPage : 6;
-
     let pageNum = 1;
     if(req.params.pageNum){
         pageNum = req.params.pageNum;
