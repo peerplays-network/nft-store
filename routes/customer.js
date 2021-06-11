@@ -216,27 +216,42 @@ router.get('/customer/account', async (req, res) => {
     .sort({ orderDate: -1 })
     .toArray();
 
-    const user = await db.customers.find({ _id: getId(req.session.customerId) }).toArray();
+    const user = await db.customers.findOne({ _id: getId(req.session.customerId) });
     const account = await peerplaysService.getBlockchainData({
         api: 'database',
         method: 'get_full_accounts',
         'params[0][]': req.session.peerplaysAccountId,
         params: true
     });
-    const balance = account.result[0][1].balances[0].balance;
-
-    res.render(`${config.themeViews}customer-account`, {
-        title: 'Orders',
-        session: req.session,
-        orders,
-        user,
-        balance,
-        message: clearSessionValue(req.session, 'message'),
-        messageType: clearSessionValue(req.session, 'messageType'),
-        countryList: getCountryList(),
-        config: req.app.config,
-        helpers: req.handlebars.helpers
-    });
+    if(account.result[0][1].balances[0].asset_type === config.peerplaysAssetID){
+        const balance = account.result[0][1].balances[0].balance;
+        res.render(`${config.themeViews}customer-account`, {
+            title: 'Orders',
+            session: req.session,
+            orders,
+            user,
+            balance,
+            message: clearSessionValue(req.session, 'message'),
+            messageType: clearSessionValue(req.session, 'messageType'),
+            countryList: getCountryList(),
+            config: req.app.config,
+            helpers: req.handlebars.helpers
+        });
+    }else{
+        const balance = 0;
+        res.render(`${config.themeViews}customer-account`, {
+            title: 'Orders',
+            session: req.session,
+            orders,
+            user,
+            balance,
+            message: clearSessionValue(req.session, 'message'),
+            messageType: clearSessionValue(req.session, 'messageType'),
+            countryList: getCountryList(),
+            config: req.app.config,
+            helpers: req.handlebars.helpers
+        });
+    }
 });
 
 // Update a customer
