@@ -20,7 +20,7 @@
                 <div class="thumbnail">
                     {{#if productPermalink}}
                         <div class="product-wrapper">
-                            <a href="/product/{{this.productPermalink}}">
+                            <a href="/product/{{this.productPermalink}}/{{this.id}}">
                                 <div class="vertical-center img-thumbnail">
                                     {{#if base_uri}}
                                         <img class="img-fluid" src="{{this.base_uri}}" alt="...">
@@ -34,7 +34,7 @@
                             </a>
                         </div>
                     {{else}}
-                        <a href="/product/{{this._id}}">
+                        <a href="/product/{{this._id}}/{{this.id}}">
                             <div class="vertical-center img-thumbnail">
                                 {{#if base_uri}}
                                     <img class="img-fluid" src="{{this.base_uri}}" alt="...">
@@ -66,13 +66,6 @@
                             {{currencySymbol @root.config.peerplaysAssetSymbol}} {{formatAmount minimum_price.amount}}
                         </h4>
                     {{/if}}
-                    <p class="text-center">
-                        {{#if @root.config.showHomepageVariants}}
-                        <a class="btn btn-primary add-variant-to-cart" data-id="{{this._id}}" role="button">{{ @root.__ "Add to cart" }}</a>
-                        {{else}}
-                        <a class="btn btn-primary add-to-cart" data-id="{{this._id}}" data-link="{{this.productPermalink}}" data-has-variants="{{checkProductVariants this.variants}}" role="button">{{ @root.__ "Add to cart" }}</a>
-                        {{/if}}
-                    </p>
                 </div>
             </div>
         {{/each}}

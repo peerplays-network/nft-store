@@ -206,7 +206,7 @@
                         <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {{{feather 'globe'}}}
                         </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
                             {{#availableLanguages}}
                                 <li><a class="dropdown-item" href="/lang/{{this}}">{{@root.__ this}}</a></li>
                             {{/availableLanguages}}
@@ -218,7 +218,7 @@
                         <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {{{feather 'user'}}}
                         </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
                             <li><a class="dropdown-item" href="/customer/account">Account</a></li>
                             <li><a class="dropdown-item" href="/customer/logout">Logout</a></li>
                             <li><a class="dropdown-item" href="/customer/products">My NFTs</a></li>
@@ -300,6 +300,7 @@
         {{> partials/confirmModal}}
         {{> partials/nftMintModal}}
         {{> partials/sellNFTModal}}
+        {{> partials/addFundsModal}}
         {{#if @root.config.modules.enabled.reviews}}
         {{> partials/reviewModal}}
         {{/if}}

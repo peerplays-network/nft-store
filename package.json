@@ -1,5 +1,5 @@
 {
-  "name": "NFT Store",
+  "name": "NFT-Store",
   "version": "0.1.0",
   "description": "A fully functioning Node.js shopping cart with Stripe, PayPal and Authorize.net payments.",
   "private": false,

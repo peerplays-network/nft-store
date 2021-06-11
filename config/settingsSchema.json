@@ -221,6 +221,9 @@
           "type": "string",
           "default": ""
         },
+        "ppyExchangeRate": {
+            "type": "number"
+        },
         "commission": {
           "type": "number",
           "default": 0
@@ -239,7 +242,8 @@
         "emailAddress",
         "paymentGateway",
         "databaseConnectionString",
-        "modules"
+        "modules",
+        "ppyExchangeRate"
     ],
     "additionalProperties": false
 }
