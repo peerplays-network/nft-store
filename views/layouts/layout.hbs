@@ -187,15 +187,15 @@
     <body>
     {{/if}}
         {{#unless admin}}
-        <nav class="navbar navbar-expand-lg justify-content-between mainNavBar">
-            <div> </div>
-            <a class="navbar-brand" href="/">
+        <nav class="navbar navbar-expand-lg justify-content-between mainNavBar mobile-view-none mb-3">
+            <div class="tablet-none"> </div>
+            {{!-- <a class="navbar-brand" href="/">
             {{#if @root.config.cartLogo}}
             <img src="{{@root.config.cartLogo}}" class="img-fluid">
             {{else}}
             {{@root.config.cartTitle}}
             {{/if}}
-            </a>
+            </a> --}}
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
                 {{{feather 'menu'}}}
             </button>
@@ -227,6 +227,11 @@
                     {{else}}
                         <li class="nav-item ml-3"><a href="/customer/account" class="btn">{{{feather 'user'}}}</a></li>
                     {{/if}}
+                    {{#if @root.session.cart}}
+                        {{!-- <li class="nav-item"><a href="/checkout/cart" class="btn menu-btn">{{{feather 'shopping-cart'}}} {{ @root.__ "Cart" }} <span class="badge badge-danger" id="cart-count">{{@root.session.totalCartItems}}</span></a></li> --}}
+                        {{else}}
+                        {{!-- <li class="nav-item"><a href="/checkout/cart" class="btn menu-btn">{{{feather 'shopping-cart'}}}</i> {{ @root.__ "Cart" }} <span class="badge badge-danger" id="cart-count">0</span></a></li> --}}
+                    {{/if}}
                 </ul>
             </div>
         </nav>
@@ -256,11 +261,15 @@
             {{/ifCond}}
             {{/ifCond}}
         {{/unless}}
-		<div class="container-fluid content-body h-100" id="container">
-            <div class="row">
-                {{{body}}}
+        <div id="myDIV">
+		<div class="container" id="container">
+            <div id="loginclass">
+                <div class="row h-100">
+                    {{{body}}}
+                </div>
             </div>
-		</div>
+        </div>
+        </div>
 		<input type="hidden" id="input_notify_message" value="{{message}}">
 		<input type="hidden" id="input_notify_messageType" value="{{messageType}}">
         <input type="hidden" id="cartCheckout" value="{{checkout}}">
@@ -271,7 +280,7 @@
 		{{#if showFooter}}
             <div class="footer">
                 <div class="d-flex h-100">
-                    <div class="col-12 align-self-center">
+                    <div class="col-12 align-self-center footer-heading-text">
                     {{#isNull @root.config.footerHtml}}
                         <h5 class="text-center">Powered by expressCart</h5>
                     {{else}}
@@ -297,6 +306,11 @@
         {{/if}}
         <script>
             feather.replace();
+            if(window.location.pathname == "/customer/login" || window.location.pathname =="/admin/login" || window.location.pathname =="/customer/setup"){
+               document.getElementById("myDIV").className = "login-fullscreen";
+               document.getElementById("loginclass").className = "login-box";
+              }
+            console.log("path no console",window.location.pathname)
         </script>
 	</body>
 </html>
