@@ -48,7 +48,7 @@
         },
         "footerHtml": {
             "type": "string",
-            "default": "&lt;h4 class=&quot;text-center&quot;&gt;Powered by expressCart&lt;/h4&gt;"
+            "default": "&lt;h4 class=&quot;text-center&quot;&gt;Powered by Peerplays&lt;/h4&gt;"
         },
         "googleAnalytics": {
             "type": "string"

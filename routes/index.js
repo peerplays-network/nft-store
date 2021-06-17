@@ -439,7 +439,7 @@ router.get('/product/:id/:offerId', async (req, res) => {
                 api: "database",
                 method: "get_objects",
                 "params[0][]": "2.0.0",
-                params: true
+                params: false
             });
 
             const bidFees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 89);
