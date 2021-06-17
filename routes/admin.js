@@ -317,6 +317,29 @@ router.get('/admin/settings', csrfProtection, restrict, (req, res) => {
     });
 });
 
+// redeem requests
+router.get('/admin/redemptions', restrict, checkAccess, async (req, res) => {
+    const db = req.app.db;
+
+    const redemptions = await db.redemption.find({}).toArray();
+
+    await Promise.all(redemptions.map(async (redemption) => {
+        const customer = await db.customers.findOne({_id: getId(redemption.customer)});
+        redemption.customer = customer
+    }));
+
+    res.render('redemptions', {
+        title: 'Redeem Requests',
+        config: req.app.config,
+        helpers: req.handlebars.helpers,
+        redemptions,
+        message: clearSessionValue(req.session, 'message'),
+        messageType: clearSessionValue(req.session, 'messageType'),
+        showFooter: 'showFooter'
+    });
+    return;
+});
+
 // create API key
 router.post('/admin/createApiKey', restrict, checkAccess, async (req, res) => {
     const db = req.app.db;

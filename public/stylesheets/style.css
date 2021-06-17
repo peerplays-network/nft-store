@@ -81,6 +81,7 @@ a.text-danger:focus {
 }
 .product-layout {
   padding-top: 30px;
+  padding-bottom: 30px;
 }
 .product-results h1 {
   font-size: 22px;
