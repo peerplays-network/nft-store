@@ -2,6 +2,15 @@
 /* globals showNotification, numeral, feather */
 $(document).ready(function (){
     $('#loder').hide();
+    $('a').click(function(){
+        $('#loder').show();
+        $('.main').css('opacity','0.5');
+        $('.index-main').css('opacity','0.5');
+     });
+     $('li a').click(function(){
+        $('#loder').show();
+        $('.account-main').css('opacity','0.5');
+     });
     if($(window).width() < 768){
         $('.menu-side').on('click', function(e){
             e.preventDefault();
@@ -109,6 +118,9 @@ $(document).ready(function (){
 
     $('#productNewForm').validator().on('submit', function(e){
         e.preventDefault();
+        $('#loder').show();
+        $('#productNewForm').css('opacity','0.5')
+       
         if($('#productPermalink').val() === '' && $('#productTitle').val() !== ''){
             $('#productPermalink').val(slugify($('#productTitle').val()));
         }
@@ -130,15 +142,20 @@ $(document).ready(function (){
             processData: false
         })
         .done(function(msg){
+            $('#loder').hide();
+            $('#productNewForm').css('opacity','1')
             showNotification(msg.message, 'success', false, '/customer/products/1');
         })
         .fail(function(msg){
+            $('#loder').hide();
+            $('#productNewForm').css('opacity','1')
             if(msg.responseJSON && msg.responseJSON.length > 0){
                 var errorMessages = validationErrors(msg.responseJSON);
                 $('#validationModalBody').html(errorMessages);
                 $('#validationModal').modal('show');
                 return;
             }
+           
             showNotification(msg.responseJSON.message, 'danger');
         });
     });
@@ -403,9 +420,13 @@ $(document).ready(function (){
     });
 
     $('#customerloginForm').on('click', function(e){
+       
         if(!e.isDefaultPrevented()){
             e.preventDefault();
-            $.ajax({
+            $('#loder').show();
+            $('#login-form').css('opacity','0.5')
+          
+             $.ajax({
                 method: 'POST',
                 url: '/customer/login_action',
                 data: {
@@ -415,8 +436,12 @@ $(document).ready(function (){
             })
             .done(function(msg){
                 window.location = '/';
+                // $('#loder').hide();
+                // $('#login-form').css('opacity','1')
             })
             .fail(function(msg){
+                $('#loder').hide();
+                $('#login-form').css('opacity','1')
                 showNotification(msg.responseJSON.message, 'danger');
             });
         }
@@ -448,6 +473,10 @@ $(document).ready(function (){
     // Mint NFT
     $(document).on('click', '#buttonMint', function(e){
         $("#buttonMint").attr("disabled", true);
+        $('#nftMintModal').modal('hide');
+        $('#loder').show();
+        $('.main').css('opacity','0.5')
+        
         $.ajax({
             method: 'POST',
             url: '/customer/product/mint',
@@ -457,10 +486,14 @@ $(document).ready(function (){
             }
         })
         .done(function(msg){
-            showNotification(msg.message, 'success', true);
+            $('#loder').hide();
+            $('.main').css('opacity','1')
             $("#buttonMint").attr("disabled", false);
+            showNotification(msg.message, 'success', true);
         })
         .fail(function(msg){
+            $('#loder').hide();
+            $('.main').css('opacity','1')
             if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
                 showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
             }
@@ -520,9 +553,13 @@ $(document).ready(function (){
     });
 
     // Sell NFT
+   
     $(document).on('click', '#buttonSell', function(e){
         const isBidding = $('#productSellTypeCheckbox').prop('checked');
-
+         $('#sellNFTModal').modal('hide');
+         $('#loder').show();
+        $('.main').css('opacity','0.5')
+        debugger
         $.ajax({
             method: 'POST',
             url: '/customer/product/sell',
@@ -536,8 +573,12 @@ $(document).ready(function (){
         })
         .done(function(msg){
             showNotification(msg.message, 'success', true);
+            $('#loder').hide();
+            $('.main').css('opacity','1')
         })
         .fail(function(msg){
+            $('#loder').hide();
+            $('.main').css('opacity','1')
             if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
                 showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
             }
