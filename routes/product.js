@@ -212,7 +212,6 @@ router.get('/customer/product/new', (req, res) => {
 router.post('/customer/product/insert', upload.single('productImage'), async (req, res) => {
     const db = req.app.db;
     let filePath = '';
-
     const doc = {
         nftMetadataID: '1.26.0',
         productTitle: req.body.title,
@@ -234,7 +233,7 @@ router.post('/customer/product/insert', upload.single('productImage'), async (re
             console.log('schemaValidate error', schemaValidate.errors);
         }
         res.status(400).json({
-            message: 'Provide inputs at all mandatory fields should be displayed',
+            message: 'Provide inputs at all mandatory fields',
             error: schemaValidate.errors
         });
         return;
