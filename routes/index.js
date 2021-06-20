@@ -910,6 +910,10 @@ router.post('/product/bid', async (req, res, next) => {
         return res.status(400).json({ message: 'Error placing bid. Please try again.' });
     }
 
+    if(req.session.peerplaysAccountId === product.owner) {
+        return res.status(400).json({ message: 'You cannot bid on an item that you are selling.' });
+    }
+
     let productPrice = parseFloat(req.body.productPrice).toFixed(config.peerplaysAssetPrecision) * Math.pow(10, config.peerplaysAssetPrecision);
 
     const body = {

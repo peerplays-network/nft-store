@@ -94,83 +94,101 @@ $(document).ready(function (){
 
     $('#productNewForm').validator().on('submit', function(e){
         e.preventDefault();
-        if($('#productPermalink').val() === '' && $('#productTitle').val() !== ''){
-            $('#productPermalink').val(slugify($('#productTitle').val()));
-        }
 
-        var file = document.getElementById("productImage").files[0];
-        var formData = new FormData();
-        formData.append("title", $('#productTitle').val());
-        formData.append("productDescription", $('#productDescription').val());
-        formData.append("productCategory", $('#category').val() || '');
-        formData.append("productPublished", $('#productPublished').val());
-        formData.append("productPermalink", $('#productPermalink').val());
-        formData.append("productImage",file);
-        
-        $.ajax({
-            method: 'POST',
-            url: '/customer/product/insert',
-            data: formData,
-            contentType: false,
-            processData: false
-        })
-        .done(function(msg){
-            showNotification(msg.message, 'success', false, '/customer/products/1');
-        })
-        .fail(function(msg){
-            if(msg.responseJSON && msg.responseJSON.length > 0){
-                var errorMessages = validationErrors(msg.responseJSON);
-                $('#validationModalBody').html(errorMessages);
-                $('#validationModal').modal('show');
-                return;
+        if(parseInt($('#ppyBalance').val()) < parseInt($('#createFee').val())) {
+            showNotification('Insufficient funds. Please add funds.', 'warning', false);
+            var minFundsRequired = (parseInt($('#createFee').val()) - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
+            $('#minFundsRequired').val(minFundsRequired);
+            $('#amountToAdd').val(minFundsRequired);
+            $('#addFundsModal').modal('show');
+        } else {
+            if($('#productPermalink').val() === '' && $('#productTitle').val() !== ''){
+                $('#productPermalink').val(slugify($('#productTitle').val()));
             }
-            showNotification(msg.responseJSON.message, 'danger');
-        });
+
+            var file = document.getElementById("productImage").files[0];
+            var formData = new FormData();
+            formData.append("title", $('#productTitle').val());
+            formData.append("productDescription", $('#productDescription').val());
+            formData.append("productCategory", $('#category').val() || '');
+            formData.append("productPublished", $('#productPublished').val());
+            formData.append("productPermalink", $('#productPermalink').val());
+            formData.append("productImage",file);
+            
+            $.ajax({
+                method: 'POST',
+                url: '/customer/product/insert',
+                data: formData,
+                contentType: false,
+                processData: false
+            })
+            .done(function(msg){
+                showNotification(msg.message, 'success', false, '/customer/products/1');
+            })
+            .fail(function(msg){
+                if(msg.responseJSON && msg.responseJSON.length > 0){
+                    var errorMessages = validationErrors(msg.responseJSON);
+                    $('#validationModalBody').html(errorMessages);
+                    $('#validationModal').modal('show');
+                    return;
+                }
+                showNotification(msg.responseJSON.message, 'danger');
+            });
+        }
     });
 
     $('#productEditForm').validator().on('submit', function(e){
         e.preventDefault();
-        if($('#productPermalink').val() === '' && $('#productTitle').val() !== ''){
-            $('#productPermalink').val(slugify($('#productTitle').val()));
-        }
-
-        let file;
-        if(document.getElementById("productImage").files) {
-            file = document.getElementById("productImage").files[0];
-        }
-
-        var formData = new FormData();
-        formData.append("title", $('#productTitle').val());
-        formData.append("productID", $('#productID').val());
-        formData.append("nftMetadataID", $('#nftMetadataID').val());
-        formData.append("productDescription", $('#productDescription').val());
-        formData.append("productCategory", $('#category').val());
-        formData.append("productPublished", $('#productPublished').val());
-        formData.append("productPermalink", $('#productPermalink').val());
-
-        if(file) {
-            formData.append("productImage",file);
-        }
-
-        $.ajax({
-            method: 'POST',
-            url: '/customer/product/update',
-            data: formData,
-            contentType: false,
-            processData: false
-        })
-        .done(function(msg){
-            showNotification(msg.message, 'success', true);
-        })
-        .fail(function(msg){
-            if(msg.responseJSON && msg.responseJSON.length > 0){
-                var errorMessages = validationErrors(msg.responseJSON);
-                $('#validationModalBody').html(errorMessages);
-                $('#validationModal').modal('show');
-                return;
+        if(parseInt($('#ppyBalance').val()) < parseInt($('#updateFee').val()) * $('#productQuantity').val()) {
+            showNotification('Insufficient funds. Please add funds.', 'warning', false);
+            $('#nftMintModal').modal('hide');
+            var minFundsRequired = (parseInt($('#updateFee').val()) * $('#productQuantity').val() - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
+            $('#minFundsRequired').val(minFundsRequired);
+            $('#amountToAdd').val(minFundsRequired);
+            $('#addFundsModal').modal('show');
+        } else {
+            if($('#productPermalink').val() === '' && $('#productTitle').val() !== ''){
+                $('#productPermalink').val(slugify($('#productTitle').val()));
             }
-            showNotification(msg.responseJSON.message, 'danger');
-        });
+
+            let file;
+            if(document.getElementById("productImage").files) {
+                file = document.getElementById("productImage").files[0];
+            }
+
+            var formData = new FormData();
+            formData.append("title", $('#productTitle').val());
+            formData.append("productID", $('#productID').val());
+            formData.append("nftMetadataID", $('#nftMetadataID').val());
+            formData.append("productDescription", $('#productDescription').val());
+            formData.append("productCategory", $('#category').val());
+            formData.append("productPublished", $('#productPublished').val());
+            formData.append("productPermalink", $('#productPermalink').val());
+
+            if(file) {
+                formData.append("productImage",file);
+            }
+
+            $.ajax({
+                method: 'POST',
+                url: '/customer/product/update',
+                data: formData,
+                contentType: false,
+                processData: false
+            })
+            .done(function(msg){
+                showNotification(msg.message, 'success', true);
+            })
+            .fail(function(msg){
+                if(msg.responseJSON && msg.responseJSON.length > 0){
+                    var errorMessages = validationErrors(msg.responseJSON);
+                    $('#validationModalBody').html(errorMessages);
+                    $('#validationModal').modal('show');
+                    return;
+                }
+                showNotification(msg.responseJSON.message, 'danger');
+            });
+        }
     });
 
     $('.btn-delete-offer').on('click', function(){
@@ -416,6 +434,7 @@ $(document).ready(function (){
             var productId = $(this).attr('data-id');
             $('.modal-body #productId').val(productId);
             $('#nftMintModal').modal('show');
+            $("#buttonMint").attr("disabled", false);
         } else if($(this).text() === 'Sell') {
             var productId = $(this).attr('data-id');
             $('.modal-body #sellProductId').val(productId);
@@ -432,30 +451,40 @@ $(document).ready(function (){
     // Mint NFT
     $(document).on('click', '#buttonMint', function(e){
         $("#buttonMint").attr("disabled", true);
-        $.ajax({
-            method: 'POST',
-            url: '/customer/product/mint',
-            data: {
-                productId: $('#productId').val(),
-                quantity: $('#productQuantity').val()
-            }
-        })
-        .done(function(msg){
-            showNotification(msg.message, 'success', true);
-            $("#buttonMint").attr("disabled", false);
-        })
-        .fail(function(msg){
-            if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
-                showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
-            }
 
-            if(msg.responseJSON.message === 'Product not found'){
-                showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
-            }
+        if(parseInt($('#ppyBalance').val()) < parseInt($('#mintFee').val()) * $('#productQuantity').val()) {
+            showNotification('Insufficient funds. Please add funds.', 'warning', false);
+            $('#nftMintModal').modal('hide');
+            var minFundsRequired = (parseInt($('#mintFee').val()) * $('#productQuantity').val() - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
+            $('#minFundsRequired').val(minFundsRequired);
+            $('#amountToAdd').val(minFundsRequired);
+            $('#addFundsModal').modal('show');
+        } else {
+            $.ajax({
+                method: 'POST',
+                url: '/customer/product/mint',
+                data: {
+                    productId: $('#productId').val(),
+                    quantity: $('#productQuantity').val()
+                }
+            })
+            .done(function(msg){
+                showNotification(msg.message, 'success', true);
+                $("#buttonMint").attr("disabled", false);
+            })
+            .fail(function(msg){
+                if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
+                    showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
+                }
 
-            showNotification(msg.responseJSON.message, 'danger');
-            $("#buttonMint").attr("disabled", false);
-        });
+                if(msg.responseJSON.message === 'Product not found'){
+                    showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
+                }
+
+                showNotification(msg.responseJSON.message, 'danger');
+                $("#buttonMint").attr("disabled", false);
+            });
+        }
     });
 
     $(document).on('click','#productSellTypeCheckbox', function(e) {
@@ -506,32 +535,42 @@ $(document).ready(function (){
     // Sell NFT
     $(document).on('click', '#buttonSell', function(e){
         const isBidding = $('#productSellTypeCheckbox').prop('checked');
+        const quantity = isBidding ? 1 : $('#productSellQuantity').val();
 
-        $.ajax({
-            method: 'POST',
-            url: '/customer/product/sell',
-            data: {
-                productId: $('#sellProductId').val(),
-                quantity: isBidding ? 1 : $('#productSellQuantity').val(),
-                minPrice: isBidding ? $('#productMinPrice').val() : $('#productPrice').val(),
-                maxPrice: isBidding ? $('#productMaxPrice').val() : $('#productPrice').val(),
-                expirationDate: $('#saleEnd').val()
-            }
-        })
-        .done(function(msg){
-            showNotification(msg.message, 'success', true);
-        })
-        .fail(function(msg){
-            if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
-                showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
-            }
+        if(parseInt($('#ppyBalance').val()) < parseInt($('#sellFee').val()) * quantity) {
+            showNotification('Insufficient funds. Please add funds.', 'warning', false);
+            $('#sellNFTModal').modal('hide');
+            var minFundsRequired = (parseInt($('#sellFee').val()) * quantity - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
+            $('#minFundsRequired').val(minFundsRequired);
+            $('#amountToAdd').val(minFundsRequired);
+            $('#addFundsModal').modal('show');
+        } else {
+            $.ajax({
+                method: 'POST',
+                url: '/customer/product/sell',
+                data: {
+                    productId: $('#sellProductId').val(),
+                    quantity,
+                    minPrice: isBidding ? $('#productMinPrice').val() : $('#productPrice').val(),
+                    maxPrice: isBidding ? $('#productMaxPrice').val() : $('#productPrice').val(),
+                    expirationDate: $('#saleEnd').val()
+                }
+            })
+            .done(function(msg){
+                showNotification(msg.message, 'success', true);
+            })
+            .fail(function(msg){
+                if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
+                    showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
+                }
 
-            if(msg.responseJSON.message === 'Product not found'){
-                showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
-            }
+                if(msg.responseJSON.message === 'Product not found'){
+                    showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
+                }
 
-            showNotification(msg.responseJSON.message, 'danger');
-        });
+                showNotification(msg.responseJSON.message, 'danger');
+            });
+        }
     });
 
     // call update settings API

@@ -50,7 +50,7 @@ const upload = multer({
   }
 });
 
-const getSellOffers = async (start = 0, k = 0) => {
+const getSellOffers = async (start = 0) => {
     let sellOffers = [];
     const {result} = await peerplaysService.getBlockchainData({
         api: "database",
@@ -84,12 +84,31 @@ const getSellOffers = async (start = 0, k = 0) => {
     if(result.length < 100) {
         return sellOffers;
     } else {
-        sellOffers.push(await getSellOffers(start+100, k));
+        sellOffers.push(await getSellOffers(start+100));
         return sellOffers;
     }
 }
 
+const getAllBidOffers = async (start = 0) => {
+  let bidOffers = [];
+  const {result} = await peerplaysService.getBlockchainData({
+      api: "database",
+      method: "list_offers",
+      params: [`1.29.${start}`, 100]
+  });
+
+  bidOffers.push(...result);
+
+  if(result.length < 100) {
+      return bidOffers;
+  } else {
+      bidOffers.push(await getAllBidOffers(start+100));
+      return bidOffers;
+  }
+}
+
 router.get('/customer/products/:page?', async (req, res, next) => {
+    const db = req.app.db;
     if(!req.session.peerplaysAccountId) {
         res.redirect('/customer/login');
         return;
@@ -99,6 +118,31 @@ router.get('/customer/products/:page?', async (req, res, next) => {
     if(req.params.page){
         pageNum = req.params.page;
     }
+
+    let sellFee = 0, mintFee = 0, balance = 0;
+
+    const account = await peerplaysService.getBlockchainData({
+        api: "database",
+        method: "get_full_accounts",
+        "params[0][]": req.session.peerplaysAccountId,
+        params: true
+    });
+
+    const object200 = await peerplaysService.getBlockchainData({
+        api: "database",
+        method: "get_objects",
+        "params[0][]": "2.0.0",
+        params: false
+    });
+
+    const mintFees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 94);
+    mintFee = mintFees[1].fee;
+
+    const sellFees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 88);
+    sellFee = sellFees[1].fee;
+
+    const assetBalance = account.result[0][1].balances.find((bal) => bal.asset_type === config.peerplaysAssetID);
+    balance = assetBalance ? assetBalance.balance : 0;
 
     // Get our paginated data
     const products = await paginateData(false, req, pageNum, 'products', { owner: req.session.peerplaysAccountId }, { orderDate: -1 });
@@ -125,6 +169,19 @@ router.get('/customer/products/:page?', async (req, res, next) => {
                 sellOffersCount = sellOffers.reduce((sum, s) => sum + s.item_ids.length, 0);
 
                 minted = minted ? minted.result.filter((m) => m.nft_metadata_id === nft.nftMetadataID) : [];
+
+                const bidOffers = await getAllBidOffers();
+
+                for(let i = 0; i < sellOffers.length; i++) {
+                    const bids = bidOffers.filter((bid) => bid.item_ids[0] === sellOffers[i].item_ids[0] && bid.hasOwnProperty('bidder'));
+                    await Promise.all(bids.map(async (bid) => {
+                      const bidder = await db.customers.findOne({peerplaysAccountId: bid.bidder});
+                      bid.bidder = bidder;
+                      bid.bid_price.amount = bid.bid_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
+                    }));
+                    sellOffers[i].bids = bids;
+                }
+
                 nft.minted = minted;
                 nft.mintedCount = minted.length;
                 nft.sellOffers = sellOffers;
@@ -146,6 +203,9 @@ router.get('/customer/products/:page?', async (req, res, next) => {
         results: products.data,
         totalItemCount: products.totalItems,
         allSellOffers,
+        mintFee,
+        sellFee,
+        balance,
         pageNum,
         paginateUrl: 'customer/products',
         resultType: 'top',
@@ -185,11 +245,34 @@ router.get('/customer/products/filter/:search', async (req, res, next) => {
 });
 
 // insert form
-router.get('/customer/product/new', (req, res) => {
+router.get('/customer/product/new', async (req, res) => {
     if(!req.session.peerIDAccessToken) {
         res.redirect('/customer/login');
         return;
     }
+
+    let createFee = 0, balance = 0;
+
+    const account = await peerplaysService.getBlockchainData({
+        api: "database",
+        method: "get_full_accounts",
+        "params[0][]": req.session.peerplaysAccountId,
+        params: true
+    });
+
+    const object200 = await peerplaysService.getBlockchainData({
+        api: "database",
+        method: "get_objects",
+        "params[0][]": "2.0.0",
+        params: false
+    });
+
+    const fees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 92);
+    createFee = fees[1].fee;
+    const createFeeFloat = (fees[1].fee / Math.pow(10, config.peerplaysAssetPrecision)).toFixed(config.peerplaysAssetPrecision);
+
+    const assetBalance = account.result[0][1].balances.find((bal) => bal.asset_type === config.peerplaysAssetID);
+    balance = assetBalance ? assetBalance.balance : 0;
 
     res.render('product-new', {
         title: 'New NFT',
@@ -197,6 +280,9 @@ router.get('/customer/product/new', (req, res) => {
         productTitle: clearSessionValue(req.session, 'productTitle'),
         productDescription: clearSessionValue(req.session, 'productDescription'),
         productPermalink: clearSessionValue(req.session, 'productPermalink'),
+        createFee,
+        createFeeFloat,
+        balance,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         editor: true,
@@ -469,6 +555,29 @@ router.get('/customer/product/edit/:id', async (req, res) => {
         console.error(ex);
     }
 
+    let updateFee = 0, balance = 0;
+
+    const account = await peerplaysService.getBlockchainData({
+        api: "database",
+        method: "get_full_accounts",
+        "params[0][]": req.session.peerplaysAccountId,
+        params: true
+    });
+
+    const object200 = await peerplaysService.getBlockchainData({
+        api: "database",
+        method: "get_objects",
+        "params[0][]": "2.0.0",
+        params: false
+    });
+
+    const fees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 93);
+    updateFee = fees[1].fee;
+    const updateFeeFloat = (fees[1].fee / Math.pow(10, config.peerplaysAssetPrecision)).toFixed(config.peerplaysAssetPrecision);
+
+    const assetBalance = account.result[0][1].balances.find((bal) => bal.asset_type === config.peerplaysAssetID);
+    balance = assetBalance ? assetBalance.balance : 0;
+
     if(metadata && metadata.result[0] && metadata.result[0].base_uri.includes('/uploads/')) {
         product.base_uri = req.protocol + '://' + req.get('host') + '/imgs' + metadata.result[0].base_uri.split('/uploads')[1];
     } else {
@@ -480,6 +589,9 @@ router.get('/customer/product/edit/:id', async (req, res) => {
         result: product,
         admin: false,
         session: req.session,
+        updateFee,
+        updateFeeFloat,
+        balance,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         config: req.app.config,

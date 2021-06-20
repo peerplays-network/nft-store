@@ -1,6 +1,8 @@
 {{> partials/menu}}
 <div class="col-md-9 ml-sm-auto col-lg-10 px-4">
     <form class="form-horizontal bg-light m-4" id="productNewForm" data-toggle="validator">
+        <input type="hidden" id="ppyBalance" value="{{balance}}">
+        <input type="hidden" id="createFee" value="{{createFee}}">
         <div class="col-12">
             <div class="page-header mt-2">
                 <div class="float-right mt-1 mr-1">
@@ -64,6 +66,7 @@
         </div>
         {{#if config.commission}}
         <div class="col-12">
+            <div class="txt-danger">Fee: {{createFeeFloat}} {{config.peerplaysAssetSymbol}}</div>
             <div>A commission of {{config.commission}}% will be deducted from the sale price.</div>
         </div>
         {{/if}}
