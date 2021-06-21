@@ -320,13 +320,15 @@ router.post('/customer/product/insert', upload.single("productImage"), async (re
         return;
     }
 
-    const body = {
+    let nftName = randomizeLottoName();
+
+    let body = {
         operations: [{
             op_name: 'nft_metadata_create',
             fee_asset: config.peerplaysAssetID,
             owner: req.session.peerplaysAccountId,
-            name: req.body.title,
-            symbol: randomizeLottoName(),
+            name: nftName,
+            symbol: nftName,
             base_uri: filePath,
             revenue_partner: config.peerplaysAccountID,
             revenue_split: config.commission * 100,
@@ -339,8 +341,37 @@ router.post('/customer/product/insert', upload.single("productImage"), async (re
     try{
         peerplaysResult = await peerplaysService.sendOperations(body, req.session.peerIDAccessToken);
     } catch(ex) {
-        res.status(400).json({ message: ex.message });
-        return;
+        if(ex.message && ex.message.includes('is_valid_nft_token_name')) {
+            //try with another random name
+            nftName = randomizeLottoName();
+
+            body = {
+                operations: [{
+                    op_name: 'nft_metadata_create',
+                    fee_asset: config.peerplaysAssetID,
+                    owner: req.session.peerplaysAccountId,
+                    name: nftName,
+                    symbol: nftName,
+                    base_uri: filePath,
+                    revenue_partner: config.peerplaysAccountID,
+                    revenue_split: config.commission * 100,
+                    is_transferable: false,
+                    is_sellable: true
+                }]
+            };
+
+            try{
+                peerplaysResult = await peerplaysService.sendOperations(body, req.session.peerIDAccessToken);
+            } catch(ex) {
+                console.log(ex);
+                res.status(400).json({message: ex.message ? ex.message : 'Some error occurred. Please try again later.'});
+                return;
+            }
+        } else {
+            console.log(ex);
+            res.status(400).json({ message: ex.message ? ex.message : 'Some error occurred. Please try again later.' });
+            return;
+        }
     }
 
     doc.nftMetadataID = peerplaysResult.result.trx.operation_results[0][1];

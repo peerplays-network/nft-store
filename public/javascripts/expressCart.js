@@ -131,8 +131,9 @@ $(document).ready(function (){
                     $('#validationModalBody').html(errorMessages);
                     $('#validationModal').modal('show');
                     return;
+                } else {
+                    showNotification(msg.responseJSON.message, 'danger');
                 }
-                showNotification(msg.responseJSON.message, 'danger');
             });
         }
     });
@@ -185,8 +186,9 @@ $(document).ready(function (){
                     $('#validationModalBody').html(errorMessages);
                     $('#validationModal').modal('show');
                     return;
+                } else {
+                    showNotification(msg.responseJSON.message, 'danger');
                 }
-                showNotification(msg.responseJSON.message, 'danger');
             });
         }
     });
