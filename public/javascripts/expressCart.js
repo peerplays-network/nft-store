@@ -729,7 +729,7 @@ $(document).ready(function (){
                     }
                 })
                 .done(function(msg){
-                    showNotification(msg.message, 'success');
+                    showNotification(msg.message, 'success', true);
                 })
                 .fail(function(msg){
                     showNotification(msg.responseJSON.message, 'danger');
