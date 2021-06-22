@@ -11,17 +11,17 @@
                 <h4 class="product-price mp-0">{{currencySymbol config.peerplaysAssetSymbol}} {{result.minimum_price}} - {{currencySymbol config.peerplaysAssetSymbol}} {{result.maximum_price}}</h4>
                 <div class="productOptions w-25 d-inline">
                     <p class="product-option-text">{{ @root.__ "Bid price" }}</p>
-                    <div class="input-group float-left w-25 mb-4">
+                    <div class="input-group float-left mb-4">
                         <div class="input-group-prepend">
                             <button class="btn btn-primary qty-btn-minus" type="button">-</button>
                         </div>
-                        <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"  class="form-control add-color text-center" id="product_bid" maxlength="5" value="1">
+                        <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"  class="form-control add-color text-center" id="product_bid" maxlength="5" value="{{result.minimum_price}}">
                         <div class="input-group-append">
                             <button class="btn btn-primary qty-btn-plus" type="button">+</button>
                         </div>
                     </div>
                 </div>
-                <div class="p-3 w-25">
+                <div class="p-3">
                     <button class="btn btn-primary btn-block product-add-to-cart" type="button">{{ @root.__ "Bid" }}</button>
                 </div>
                 {{else}}
