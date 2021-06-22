@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 const express = require('express');
 const router = express.Router();
 const colors = require('colors');
@@ -433,16 +434,16 @@ router.get('/product/:id/:offerId', async (req, res) => {
 
     let metadata, offer, balance, fee, bids;
 
-    try {
+    try{
         metadata = await peerplaysService.getBlockchainData({
-            api: "database",
-            method: "get_objects",
-            "params[0][]": product.nftMetadataID
+            api: 'database',
+            method: 'get_objects',
+            'params[0][]': product.nftMetadataID
         });
         offer = await peerplaysService.getBlockchainData({
-            api: "database",
-            method: "get_objects",
-            "params[0][]": req.params.offerId
+            api: 'database',
+            method: 'get_objects',
+            'params[0][]': req.params.offerId
         });
 
         const bidOffers = await getAllBidOffers();
@@ -457,17 +458,17 @@ router.get('/product/:id/:offerId', async (req, res) => {
 
         if(req.session.peerplaysAccountId) {
             const account = await peerplaysService.getBlockchainData({
-                api: "database",
-                method: "get_full_accounts",
-                "params[0][]": req.session.peerplaysAccountId,
+                api: 'database',
+                method: 'get_full_accounts',
+                'params[0][]': req.session.peerplaysAccountId,
                 params: true
             });
 
             const object200 = await peerplaysService.getBlockchainData({
-                api: "database",
-                method: "get_objects",
-                "params[0][]": "2.0.0",
-                params: false
+                api: 'database',
+                method: 'get_objects',
+                'params[0][]': '2.0.0',
+                params: true
             });
 
             const bidFees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 89);
@@ -476,19 +477,19 @@ router.get('/product/:id/:offerId', async (req, res) => {
             const assetBalance = account.result[0][1].balances.find((bal) => bal.asset_type === config.peerplaysAssetID);
             balance = assetBalance ? assetBalance.balance : 0;
         }
-    } catch(ex) {
+    }catch(ex){
         console.error(ex);
     }
 
     if(!metadata || !metadata.result || metadata.result.length === 0 ||
-          !offer || !offer.result || offer.result.length === 0) {
+          !offer || !offer.result || offer.result.length === 0){
         res.render('error', { title: 'Not found', message: 'Product not found', helpers: req.handlebars.helpers, config });
         return;
     }
 
-    if(metadata.result[0].base_uri.includes('/uploads/')) {
-        product.base_uri = req.protocol + '://' + req.get('host') + '/imgs' + metadata.result[0].base_uri.split('/uploads')[1];
-    } else {
+    if(metadata.result[0].base_uri.includes('/uploads/')){
+        product.base_uri = `${req.protocol}://${req.get('host')}/imgs${metadata.result[0].base_uri.split('/uploads')[1]}`;
+    }else{
         product.base_uri = metadata.result[0].base_uri;
     }
 
@@ -562,30 +563,30 @@ router.get('/product/:id/:offerId', async (req, res) => {
     }
 
     // show the view
-    //const images = await getImages(product._id, req, res);
+    // const images = await getImages(product._id, req, res);
 
     // Related products
     let relatedProducts = {};
     if(config.showRelatedProducts){
         const searchWords = product.productTitle.split(' ');
         let searchResults = await Promise.all(searchWords.map(async (searchTerm) => {
-            const {data} = await paginateProducts(true, db, 1, {
+            const { data } = await paginateProducts(true, db, 1, {
                 $or: [
-                    { "productTitle": {$regex: searchTerm, $options: 'i'} },
-                    { "productDescription": {$regex: searchTerm, $options: 'i'} }
+                    { productTitle: { $regex: searchTerm, $options: 'i' } },
+                    { productDescription: { $regex: searchTerm, $options: 'i' } }
                 ]
             }, getSort(), req);
             return data;
         }));
 
-        if(searchResults) {
+        if(searchResults){
             searchResults = searchResults.reduce((acc, results) => acc.concat(results), []);
             relatedProducts = searchResults.reduce((unique, product) => {
-                if(!unique.some(obj => obj.id === product.id) && product.id !== req.params.offerId && unique.length < 4) {
+                if(!unique.some(obj => obj.id === product.id) && product.id !== req.params.offerId && unique.length < 4){
                   unique.push(product);
                 }
                 return unique;
-            },[]);
+            }, []);
         }
     }
 
@@ -947,7 +948,7 @@ router.post('/product/bid', async (req, res, next) => {
         return res.status(400).json({ message: 'Error placing bid. Please try again.' });
     }
 
-    let productPrice = Math.round((parseFloat(req.body.productPrice) + Number.EPSILON) * Math.pow(10, config.peerplaysAssetPrecision));
+    const productPrice = Math.round((parseFloat(req.body.productPrice) + Number.EPSILON) * Math.pow(10, config.peerplaysAssetPrecision));
 
     const body = {
         operations: [{
@@ -965,16 +966,15 @@ router.post('/product/bid', async (req, res, next) => {
     let bidId;
 
     try{
-        const {result} = await peerplaysService.sendOperations(body, req.session.peerIDAccessToken);
+        const { result } = await peerplaysService.sendOperations(body, req.session.peerIDAccessToken);
         bidId = result.trx.operation_results[0][1];
         return res.status(200).json({
             message: req.body.isBidding ? 'Bid placed successfully' : 'NFT bought successfully',
             bidId
         });
-    } catch(ex) {
+    }catch(ex){
         console.error(ex);
         res.status(400).json({ message: 'Error bidding on/buying NFT' });
-        return;
     }
 });
 
@@ -1078,8 +1078,8 @@ router.get('/search/:searchTerm?/:pageNum?', (req, res) => {
     Promise.all([
         paginateProducts(true, db, pageNum, {
             $or: [
-                { "productTitle": {$regex: searchTerm, $options: 'i'} },
-                { "productDescription": {$regex: searchTerm, $options: 'i'} }
+                { productTitle: { $regex: searchTerm, $options: 'i' } },
+                { productDescription: { $regex: searchTerm, $options: 'i' } }
             ]
         }, getSort(), req),
         getMenu(db)
