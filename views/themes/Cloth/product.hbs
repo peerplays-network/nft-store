@@ -1,27 +1,27 @@
 {{> themes/Cloth/front-menu}}
-<div class="product-layout col-sm-8 offset-sm-2">
+<div class="product-layout col-sm-12">
     <div class="row">
-        <div class="col-sm-12 col-md-11 mr-auto">
-            <div class="title-image-container float-left pr-3">
+        <div class="col-sm-12 mr-auto">
+            <div class="title-image-container float-left p-3">
                 <img src="{{result.base_uri}}" id="product-title-image" class="product-title-image img-fluid" alt="...">
             </div>
             <div class="p-3">
                 <h1 class="product-title text-truncate">{{result.productTitle}}</h1>
                 {{#if result.is_bidding}}
                 <h4 class="product-price mp-0">{{currencySymbol config.peerplaysAssetSymbol}} {{result.minimum_price}} - {{currencySymbol config.peerplaysAssetSymbol}} {{result.maximum_price}}</h4>
-                <div class="productOptions w-25 d-inline">
-                    <p class="product-option-text">{{ @root.__ "Bid price" }}</p>
-                    <div class="input-group float-left w-25 mb-4">
+                <div class="productOptions d-inline">
+                    <p class="product-option-text mb-2">{{ @root.__ "Bid price" }}</p>
+                    <div class="input-group w-40 mb-3">
                         <div class="input-group-prepend">
                             <button class="btn btn-primary qty-btn-minus" type="button">-</button>
                         </div>
-                        <input type="number" class="form-control add-color text-center" id="product_bid" maxlength="5" value="1">
+                        <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"  class="form-control add-color text-center" id="product_bid" maxlength="5" value="{{result.minimum_price}}">
                         <div class="input-group-append">
                             <button class="btn btn-primary qty-btn-plus" type="button">+</button>
                         </div>
                     </div>
                 </div>
-                <button class="btn btn-primary btn-block product-add-to-cart w-25" type="button">{{ @root.__ "Bid" }}</button>
+                <button class="btn btn-primary product-add-to-cart w-40" type="button">{{ @root.__ "Bid" }}</button>
                 {{else}}
                 <input type="hidden" id="product_bid" value="{{result.minimum_price}}">
                 <h4 class="product-price mp-0">{{currencySymbol config.peerplaysAssetSymbol}} {{result.minimum_price}}</h4>

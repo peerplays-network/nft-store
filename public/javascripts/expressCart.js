@@ -197,7 +197,6 @@ $(document).ready(function (){
         .fail(function(msg){
             if(msg.responseJSON && msg.responseJSON.length > 0){
                 var errorMessages = validationErrors(msg.responseJSON);
-                console.log('errorMessages', errorMessages);
                 $('#validationModalBody').html(errorMessages);
                 $('#validationModal').modal('show');
                 return;
@@ -668,6 +667,32 @@ $(document).ready(function (){
         }
     });
 
+    $('#btnModalWithdrawFunds').validator().on('click', function(e) {
+        e.preventDefault();
+        var precision = parseInt($('#withdrawFundsAssetPrecision').val());
+        var amountToWithdraw = Math.round((parseFloat($('#amountToWithdraw').val()) + Number.EPSILON) * Math.pow(10, precision));
+        var maxAmount = Math.round((parseFloat($('#maxAmountWithdrawn').val()) + Number.EPSILON) * Math.pow(10,precision));
+        var transferFees = Math.round((parseFloat($('#transferFees').val()) + Number.EPSILON) * Math.pow(10, precision));
+
+        if(amountToWithdraw > maxAmount - transferFees) {
+            showNotification('Select a lower amount', 'danger');
+        } else {
+            $.ajax({
+                method: 'POST',
+                url: '/customer/redeem',
+                data: {
+                    amount: amountToWithdraw,
+                }
+            })
+            .done(function(msg){
+                showNotification(msg.message, 'success', true);
+            })
+            .fail(function(msg){
+                showNotification(msg.responseJSON.message, 'danger');
+            });
+        }
+    });
+
     $(document).on('click', '.image-next', function(e){
         var thumbnails = $('.thumbnail-image');
         var index = 0;
@@ -760,13 +785,25 @@ $(document).ready(function (){
                     }
                 })
                 .done(function(msg){
-                    showNotification(msg.message, 'success');
+                    showNotification(msg.message, 'success', true);
                 })
                 .fail(function(msg){
                     showNotification(msg.responseJSON.message, 'danger');
                 });
             }
         }
+    });
+
+    $(document).on('click', '#btnAddFunds', function(e) {
+        $('#minFundsRequired').val(0);
+        $('#amountToAdd').val(0);
+        $('#addFundsModal').modal('show');
+    });
+
+    $(document).on('click', '#btnWithdrawFunds', function(e) {
+        $('#maxAmountWithdrawn').val($(this).attr('data-balance'));
+        $('#transferFees').val($(this).attr('data-fees'));
+        $('#withdrawFundsModal').modal('show');
     });
 
     $('.cart-product-quantity').on('keyup', function(e){
