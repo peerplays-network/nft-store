@@ -84,7 +84,10 @@ $(document).ready(function (){
                 }
             })
             .done(function(msg){
-                showNotification(msg.message, 'success', false, '/');
+                 $('#loder').hide();
+                $('#customer-form').css('opacity','1')
+                $('#createCustomer').css('opacity','1')
+                showNotification(msg.message, 'success', true, '/');
             })
             .fail(function(msg){
                  $('#loder').hide();

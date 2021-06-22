@@ -456,7 +456,7 @@ router.get('/product/:id/:offerId', async (req, res) => {
 
         bids = bids.sort((a, b) => b.bid_price.amount - a.bid_price.amount);
 
-        if(req.session.peerplaysAccountId){
+        if(req.session.peerplaysAccountId) {
             const account = await peerplaysService.getBlockchainData({
                 api: 'database',
                 method: 'get_full_accounts',
@@ -468,7 +468,7 @@ router.get('/product/:id/:offerId', async (req, res) => {
                 api: 'database',
                 method: 'get_objects',
                 'params[0][]': '2.0.0',
-                params: false
+                params: true
             });
 
             const bidFees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 89);
