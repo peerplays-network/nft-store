@@ -73,10 +73,13 @@
         </div>
         {{#if config.commission}}
         <div class="col-12">
+            <div class="txt-danger">Fee: {{updateFeeFloat}} {{config.peerplaysAssetSymbol}}</div>
             <div>A commission of {{config.commission}}% will be deducted from the sale price.</div>
         </div>
         {{/if}}
         <input type="hidden" id="productID" value="{{result._id}}" />
         <input type="hidden" id="nftMetadataID" value="{{result.nftMetadataID}}" />
+        <input type="hidden" id="ppyBalance" value="{{balance}}">
+        <input type="hidden" id="updateFee" value="{{updateFee}}">
     </form>
 </div>
