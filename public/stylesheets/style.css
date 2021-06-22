@@ -500,6 +500,9 @@ input.form-control.customerDetails {
   border-color: #cc3a2c !important;
   opacity: 0.65;
 }
+.txt-danger {
+  color: #cc3a2c;
+}
 a:hover,
 a:focus {
   color: #000000;

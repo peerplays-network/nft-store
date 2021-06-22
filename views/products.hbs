@@ -55,6 +55,24 @@
                                 <div>{{this.offer_expiration_date}}</div>
                                 <div><a class="text-danger btn-delete-offer" data-id={{this.id}}> {{{feather 'trash-2'}}}</a></div>
                             </div>
+                            {{#if bids}}
+                            <ul class="list-group m-3">
+                                <li class="list-group-item">
+                                    <div class="justify-content-between d-flex">
+                                        <strong>Bidder</strong>
+                                        <strong>Bid Price</strong>
+                                    </div>
+                                </li>
+                                {{#each bids}}
+                                <li class="list-group-item">
+                                    <div class="justify-content-between d-flex">
+                                        <div>{{this.bidder.firstName}} {{this.bidder.lastName}}</div>
+                                        <div>{{this.bid_price.amount}} {{@root.config.peerplaysAssetSymbol}}</div>
+                                    </div>
+                                </li>
+                                {{/each}}
+                            </ul>
+                            {{/if}}
                         </li>
                         {{/each}}
                     </ul>
@@ -86,3 +104,6 @@
 <input type="hidden" id="totalItemCount" value="{{totalItemCount}}">
 <input type="hidden" id="paginateUrl" value="{{paginateUrl}}">
 <input type="hidden" id="searchTerm" value="{{searchTerm}}">
+<input type="hidden" id="ppyBalance" value="{{balance}}">
+<input type="hidden" id="mintFee" value="{{mintFee}}">
+<input type="hidden" id="sellFee" value="{{sellFee}}">
