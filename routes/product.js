@@ -324,13 +324,15 @@ router.post('/customer/product/insert', upload.single('productImage'), async (re
         return;
     }
 
-    const body = {
+    let nftName = randomizeLottoName();
+
+    let body = {
         operations: [{
             op_name: 'nft_metadata_create',
             fee_asset: config.peerplaysAssetID,
             owner: req.session.peerplaysAccountId,
-            name: req.body.title,
-            symbol: randomizeLottoName(),
+            name: nftName,
+            symbol: nftName,
             base_uri: filePath,
             revenue_partner: config.peerplaysAccountID,
             revenue_split: config.commission * 100,
