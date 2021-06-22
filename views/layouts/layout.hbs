@@ -282,7 +282,7 @@
                 <div class="d-flex h-100">
                     <div class="col-12 align-self-center footer-heading-text">
                     {{#isNull @root.config.footerHtml}}
-                        <h5 class="text-center">Powered by expressCart</h5>
+                        <h5 class="text-center">Powered by Peerplays</h5>
                     {{else}}
                         {{{@root.config.footerHtml}}}
                     {{/isNull}}
@@ -293,14 +293,15 @@
         <script src="/javascripts/pushy.min.js"></script>
         {{#if admin}}
         {{> partials/globalSearchModal}}
-        {{> partials/validationModal}}
         {{> partials/variantModal}}
         {{> partials/variantEditModal}}
         {{/if}}
         {{> partials/confirmModal}}
+        {{> partials/validationModal}}
         {{> partials/nftMintModal}}
         {{> partials/sellNFTModal}}
         {{> partials/addFundsModal}}
+        {{> partials/withdrawFundsModal}}
         {{#if @root.config.modules.enabled.reviews}}
         {{> partials/reviewModal}}
         {{/if}}

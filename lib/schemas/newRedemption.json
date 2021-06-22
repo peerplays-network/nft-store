@@ -1,0 +1,27 @@
+{
+  "$id": "newRedemption",
+  "type": "object",
+  "properties": {
+      "customer": {
+          "type": "string",
+          "format": "objectid"
+      },
+      "amount": {
+          "type": "string"
+      },
+      "requestDate": {
+        "type": "object",
+        "format" : "datetime"
+      }
+  },
+  "errorMessage": {
+      "properties": {
+          "amount": "Should be a number"
+      }
+  },
+  "required": [
+      "customer",
+      "amount",
+      "requestDate"
+  ]
+}
