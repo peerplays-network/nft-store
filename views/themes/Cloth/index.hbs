@@ -1,5 +1,5 @@
 {{> themes/Cloth/front-menu}}
-<div class="productsWrapper col-sm-12 col-md-8 offset-md-2">
+<div class="productsWrapper col-sm-12 col-md-8 offset-md-2 index-main">
     {{#if filtered}}
         <div class="product-layout product-results col-sm-12">
             {{#ifCond @root.paginateUrl '==' 'category'}}
@@ -70,6 +70,9 @@
             </div>
         {{/each}}
     </div>
+</div>
+ <div class="spinner-border text-primary" style="position:fixed;top:60%;left:50%" id="loder" role="status">
+            <span class="sr-only">Loading...</span>
 </div>
 <input type="hidden" id="itemsPerPage" value="{{productsPerPage}}" >
 <input type="hidden" id="pageNum" value="{{pageNum}}">

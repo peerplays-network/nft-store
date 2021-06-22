@@ -1,5 +1,5 @@
 <div class="col-md-12 col-lg-12">
-	<div class="row top-align-space h-100 mobile-direction">
+	<div class="row top-align-space h-100 mobile-direction" id="login-form">
 		<div class="col-lg-6 left-right-align">
 			<form class="form-signin"  method="post" role="form" data-toggle="validator">
 				<h2 class="form-signin-heading heading-title-text-color pt-5">{{ @root.__ "Please sign in" }}</h2>
@@ -34,8 +34,12 @@
 				</div>
 			</div>
 		</div>
+		{{!-- <button class="btn btn-outline-primary btn-block" id="customerloginForm" type="submit">{{ @root.__ "Sign in" }}</button>
+    	<button class="btn btn-outline-secondary btn-block mt-3" id="customerRegister" type="button" >{{ @root.__ "Register" }}</button> --}}
 	</form>
 </div>
-
+ <div class="spinner-border text-primary" style="position:fixed;top:60%;left:50%" id="loder" role="status">
+            <span class="sr-only">Loading...</span>
+</div>
 
 
