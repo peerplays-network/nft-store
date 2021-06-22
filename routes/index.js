@@ -499,7 +499,7 @@ router.get('/product/:id/:offerId', async (req, res) => {
 
     product.is_bidding = product.minimum_price !== product.maximum_price;
 
-    if(bids) {
+    if(bids && bids.length > 0) {
         if(bids[0].bid_price.amount === product.maximum_price) {
             product.minimum_price = product.maximum_price;
         } else if(bids[0].bid_price.amount < product.maximum_price) {
