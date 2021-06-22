@@ -20,22 +20,52 @@
             {{else}}
             <strong>{{ @root.__ "Recent products" }}</strong>
             {{/ifCond}}
+
+            {{!-- <div class="table-responsvie product-information">
+                <table width="100%" class="product-data"> 
+                    <tr>
+                        <th>
+                             <strong>Image</strong>
+                        </th>
+                        <th>
+                             <strong>Title</strong>
+                        </th>
+                        <th>
+                             <strong>Minted</strong>
+                        </th>
+                        <th class="text-center">
+                             <strong>Selling</strong>
+                        </th>
+                    </tr>
+                    <tr></tr>
+                </table>
+            </div> --}}
             <ul class="list-group">
                 <li class="list-group-item">
                     <div class="justify-content-between d-flex">
-                        <strong>Image</strong>
-                        <strong>Title</strong>
-                        <strong>Minted</strong>
-                        <strong>Selling</strong>
+                        <div class="table-first-child">
+                            <strong>Image</strong>
+                        </div>
+                        <div class="table-sec-child">
+                            <strong>Title</strong>
+                        </div>
+                        <div class="table-third-child">
+                            <strong>Minted</strong>
+                        </div>
+                        <div class="table-fourth-child">
+                            <strong>Selling</strong>
+                        </div>
                     </div>
                 </li>
                 {{#each results}}
                 <li class="list-group-item">
                     <div class="justify-content-between d-flex mb-2">
-                        <img src={{this.base_uri}} class="sidebar-addon"/>
-                        <div><a href="/customer/product/edit/{{this._id}}">{{this.productTitle}}</a></div>
-                        <div>{{this.mintedCount}}</div>
-                        <div>{{this.sellOffersCount}}</div>
+                        <div class="table-first-child">
+                            <img src={{this.base_uri}} class="sidebar-addon"/>
+                        </div>
+                        <div class="table-sec-child"><a href="/customer/product/edit/{{this._id}}">{{this.productTitle}}</a></div>
+                        <div class="table-third-child">{{this.mintedCount}}</div>
+                        <div class="table-fourth-child">{{this.sellOffersCount}}</div>
                     </div>
                     {{#if sellOffers}}
                     <ul class="list-group mb-2">

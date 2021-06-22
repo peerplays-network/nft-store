@@ -241,3 +241,23 @@
     top: 10px;
     padding-left: 10px;
 }
+ /* table css */
+
+ .product-information {
+     width: 100%;
+ }
+ .product-data th, .product-data tr, .product-data td {
+     padding: .75rem;
+ }
+ .table-first-child {
+    width: 30%;
+ }
+ .table-sec-child {
+    width: 25%;
+ }
+ .table-third-child {
+    width: 25%;
+ }
+ .table-fourth-child {
+    width: 20%;
+ }
