@@ -15,13 +15,15 @@
                         <div class="input-group-prepend">
                             <button class="btn btn-primary qty-btn-minus" type="button">-</button>
                         </div>
-                        <input type="number" class="form-control add-color text-center" id="product_bid" maxlength="5" value="1">
+                        <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1');"  class="form-control add-color text-center" id="product_bid" maxlength="5" value="1">
                         <div class="input-group-append">
                             <button class="btn btn-primary qty-btn-plus" type="button">+</button>
                         </div>
                     </div>
                 </div>
-                <button class="btn btn-primary btn-block product-add-to-cart w-25" type="button">{{ @root.__ "Bid" }}</button>
+                <div class="p-3 w-25">
+                    <button class="btn btn-primary btn-block product-add-to-cart" type="button">{{ @root.__ "Bid" }}</button>
+                </div>
                 {{else}}
                 <input type="hidden" id="product_bid" value="{{result.minimum_price}}">
                 <h4 class="product-price mp-0">{{currencySymbol config.peerplaysAssetSymbol}} {{result.minimum_price}}</h4>

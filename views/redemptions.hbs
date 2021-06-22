@@ -1,0 +1,50 @@
+{{> partials/menu}}
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+    <div class="col-sm-12">
+        <h2>Redeem Requests</h2>
+    </div>
+    {{#if redemptions}}
+        <div class="col-sm-12">
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div class="text-info"><strong>{{ @root.__ "Customer Name" }}</strong></div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="text-info"><strong>{{ @root.__ "Customer Email" }}</strong></div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="text-info"><strong>{{ @root.__ "Amount" }}</strong></div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="text-info"><strong>{{ @root.__ "Request Date" }}</strong></div>
+                        </div>
+                    </div>
+                </li>
+                {{#each redemptions}}
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="text-break">{{this.customer.firstName}} {{this.customer.lastName}}</div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="text-break">{{this.customer.email}}</div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="">{{this.amount}}</div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="text-break">{{this.requestDate}}</div>
+                            </div>
+                        </div>
+                    </li>
+                {{/each}}
+            </ul>
+        </div>
+    {{else}}
+    <h4 class="text-center">
+        {{ @root.__ "No requests found" }}
+    </h4>
+    {{/if}}
+</main>

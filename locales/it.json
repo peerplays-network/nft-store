@@ -196,5 +196,11 @@
   "Bid price": "Prezzo di offerta",
   "Bid": "Bid",
   "Buy": "Buy",
-  "Amount to add": "Importo da aggiungere"
+  "Amount to add": "Importo da aggiungere",
+  "Amount to withdraw": "Importo da prelevare",
+  "Maximum amount withdrawn": "Importo massimo prelevabile",
+  "Transfer fees": "Spese di prelievo",
+  "Customer Name": "Nome del cliente",
+  "Customer Email": "E-mail cliente",
+  "Request Date": "Data richiesta"
 }

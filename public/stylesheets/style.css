@@ -81,6 +81,7 @@ a.text-danger:focus {
 }
 .product-layout {
   padding-top: 30px;
+  padding-bottom: 30px;
 }
 .product-results h1 {
   font-size: 22px;
@@ -644,5 +645,9 @@ a {
   .thumbnail {
     min-height: 0;
   }
+}
+
+.btn-delete-offer {
+  cursor:pointer;
 }
 

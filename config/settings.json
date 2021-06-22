@@ -11,7 +11,7 @@
     "emailAddress": "hi@markmoffat.com",
     "productsPerRow": 3,
     "productsPerPage": 6,
-    "footerHtml": "&lt;h4 class=&quot;text-center&quot;&gt;Powered by expressCart&lt;/h4&gt;",
+    "footerHtml": "&lt;h4 class=&quot;text-center&quot;&gt;Powered by Peerplays&lt;/h4&gt;",
     "googleAnalytics": "",
     "injectJs": "",
     "customCss": "",
@@ -58,5 +58,5 @@
     "peerplaysAccountID": "1.2.32",
     "ppyExchangeRate": 0.2,
     "commission": 10,
-    "categories": ["Digital Art", "Photographs", "Oil Paintings"]
+    "categories": ["Digital Art", "Photographs", "Oil Paintings", "Collectibles", "Fashion", "Games"]
 }
