@@ -40,6 +40,23 @@ const countryList = getCountryList();
 const PeerplaysService = require('../services/PeerplaysService');
 const peerplaysService = new PeerplaysService();
 
+const getAllBidOffers = async (start = 0) => {
+  const bidOffers = [];
+  const { result } = await peerplaysService.getBlockchainData({
+      api: 'database',
+      method: 'list_offers',
+      params: [`1.29.${start}`, 100]
+  });
+
+  bidOffers.push(...result);
+
+  if(result.length < 100){
+      return bidOffers;
+  }
+      bidOffers.push(await getAllBidOffers(start + 100));
+      return bidOffers;
+};
+
 // Google products
 router.get('/googleproducts.xml', async (req, res, next) => {
     let productsFile = '';
@@ -414,7 +431,7 @@ router.get('/product/:id/:offerId', async (req, res) => {
         return;
     }
 
-    let metadata, offer, balance, fee;
+    let metadata, offer, balance, fee, bids;
 
     try{
         metadata = await peerplaysService.getBlockchainData({
@@ -428,6 +445,17 @@ router.get('/product/:id/:offerId', async (req, res) => {
             'params[0][]': req.params.offerId
         });
 
+        const bidOffers = await getAllBidOffers();
+        // eslint-disable-next-line no-prototype-builtins
+        bids = bidOffers.filter((bid) => bid.item_ids[0] === offer.result[0].item_ids[0] && bid.hasOwnProperty('bidder'));
+        await Promise.all(bids.map(async (bid) => {
+          const bidder = await db.customers.findOne({ peerplaysAccountId: bid.bidder });
+          bid.bidder = bidder;
+          bid.bid_price.amount = bid.bid_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
+        }));
+
+        bids = bids.sort((a, b) => b.bid_price.amount - a.bid_price.amount);
+
         if(req.session.peerplaysAccountId){
             const account = await peerplaysService.getBlockchainData({
                 api: 'database',
@@ -440,7 +468,7 @@ router.get('/product/:id/:offerId', async (req, res) => {
                 api: 'database',
                 method: 'get_objects',
                 'params[0][]': '2.0.0',
-                params: true
+                params: false
             });
 
             const bidFees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 89);
@@ -467,9 +495,18 @@ router.get('/product/:id/:offerId', async (req, res) => {
 
     product.offerId = req.params.offerId;
     product.minimum_price = offer.result[0].minimum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
+
     product.maximum_price = offer.result[0].maximum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
 
     product.is_bidding = product.minimum_price !== product.maximum_price;
+
+    if(bids && bids.length > 0){
+        if(bids[0].bid_price.amount === product.maximum_price){
+            product.minimum_price = product.maximum_price;
+        }else if(bids[0].bid_price.amount < product.maximum_price){
+            product.minimum_price = Math.round((bids[0].bid_price.amount * Math.pow(10, config.peerplaysAssetPrecision) + (product.maximum_price * Math.pow(10, config.peerplaysAssetPrecision) - bids[0].bid_price.amount * Math.pow(10, config.peerplaysAssetPrecision)) / 100)) / Math.pow(10, config.peerplaysAssetPrecision);
+        }
+    }
 
     // Get variants for this product
     // const variants = await db.variants.find({ product: product._id }).sort({ added: 1 }).toArray();
@@ -911,7 +948,7 @@ router.post('/product/bid', async (req, res, next) => {
         return res.status(400).json({ message: 'Error placing bid. Please try again.' });
     }
 
-    const productPrice = parseFloat(req.body.productPrice).toFixed(config.peerplaysAssetPrecision) * Math.pow(10, config.peerplaysAssetPrecision);
+    const productPrice = Math.round((parseFloat(req.body.productPrice) + Number.EPSILON) * Math.pow(10, config.peerplaysAssetPrecision));
 
     const body = {
         operations: [{
@@ -1028,12 +1065,11 @@ router.post('/product/addreview', async (req, res, next) => {
 });
 
 // search products
-router.get('/search/:searchTerm/:pageNum?', (req, res) => {
+router.get('/search/:searchTerm?/:pageNum?', (req, res) => {
     const db = req.app.db;
-    const searchTerm = req.params.searchTerm;
+    const searchTerm = req.params.searchTerm ? req.params.searchTerm : '';
     const config = req.app.config;
     const numberProducts = config.productsPerPage ? config.productsPerPage : 6;
-
     let pageNum = 1;
     if(req.params.pageNum){
         pageNum = req.params.pageNum;

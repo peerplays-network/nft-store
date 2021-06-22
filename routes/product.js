@@ -10,7 +10,7 @@ const {
     cleanHtml,
     convertBool,
     checkboxBool,
-    safeParseInt} = require('../lib/common');
+    safeParseInt } = require('../lib/common');
 const { indexProducts } = require('../lib/indexing');
 const { validateJson } = require('../lib/schema');
 const { paginateData } = require('../lib/paginate');
@@ -232,10 +232,7 @@ router.post('/customer/product/insert', upload.single('productImage'), async (re
         if(process.env.NODE_ENV !== 'test'){
             console.log('schemaValidate error', schemaValidate.errors);
         }
-        res.status(400).json({
-            message: 'Provide inputs at all mandatory fields',
-            error: schemaValidate.errors
-        });
+        res.status(400).json(schemaValidate.errors);
         return;
     }
 
@@ -368,6 +365,12 @@ router.post('/customer/product/sell', async (req, res) => {
         if(Number(req.body.quantity) === 0){
             return res.status(400).json({
                 message: 'Quantity cannot be zero'
+            });
+        }
+
+        if(Number(req.body.minPrice) === 0){
+            return res.status(400).json({
+                message: 'Min price cannot be zero'
             });
         }
 

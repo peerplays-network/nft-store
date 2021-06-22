@@ -2,22 +2,9 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page"><a href="/customer/account">Orders</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><a href="/customer/account">Account</a></li>
         </ol>
     </nav>
-       <div>
-      
-       <div>
-            Peerplays ID : {{user.peerplaysAccountId}}
-        </div>
-    <div>
-            Account name : {{user.peerplaysAccountName}}
-    </div>
-  
-    <div>
-            Balance : {{balance}}
-    </div>
-        </div>
     <div class="row">
         <div class="col-12 col-md-5 bottom-pad-15">
             <div class="card top-marg-15">
@@ -46,14 +33,22 @@
                         </div>
                     </div>
                     {{/unless}}
-                    <form id="customer-form" role="form" data-toggle="validator" novalidate="false">
-                        {{> themes/Cloth/shipping-form}}
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <a href="/checkout/cart" id="customerSave" class="btn btn-primary float-left">Save details</a>
-                            </div>
-                        </div>
-                    </form>
+                    <div>
+                        Email: {{user.email}}
+                    </div>
+                    <div>
+                        Peerplays ID: {{user.peerplaysAccountId}}
+                    </div>
+                    <div>
+                        Peerplays Account name: {{user.peerplaysAccountName}}
+                    </div>
+                    <div class="bottom-space">
+                        Balance: {{balance}}
+                    </div>
+                    <div class="justify-content-between">
+                        <button id="btnAddFunds" class="btn btn-primary" type="button">Add Funds</button>
+                        <button id="btnWithdrawFunds" class="btn btn-secondary" data-balance={{balance}} data-fees={{transferFees}} type="button">Withdraw Funds</button>
+                    </div>
                 </div>
             </div>
         </div>

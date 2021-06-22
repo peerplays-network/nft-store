@@ -1,0 +1,33 @@
+<div class="modal fade" id="withdrawFundsModal" tabindex="-1" role="dialog" aria-labelledby="withdrawFundsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger" id="withdrawFundsModalLabel">Withdraw Funds</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal m-4" id="withdrawFundsForm" data-toggle="validator">
+                    <input type="hidden" id="withdrawFundsAssetPrecision" value="{{config.peerplaysAssetPrecision}}">
+                    <div class="form-group">
+                        <label for="maxAmountWithdrawn" class="control-label">{{ @root.__ "Maximum amount withdrawn"}} ({{config.peerplaysAssetSymbol}})</label>
+                        <input type="number" id="maxAmountWithdrawn" class="form-control" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label for="transferFees" class="control-label">{{ @root.__ "Transfer fees"}} ({{config.peerplaysAssetSymbol}})</label>
+                        <input type="number" id="transferFees" class="form-control" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label for="amountToWithdraw" class="control-label">{{ @root.__ "Amount to withdraw" }} ({{config.peerplaysAssetSymbol}}) *</label>
+                        <input type="number" id="amountToWithdraw" class="form-control" min="0" step="any" required/>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary mr-auto" data-dismiss="modal">Close</button>
+                <button type="button" id="btnModalWithdrawFunds" class="btn btn-success">Withdraw Funds</button>
+            </div>
+        </div>
+    </div>
+</div>
