@@ -456,7 +456,7 @@ router.get('/product/:id/:offerId', async (req, res) => {
 
         bids = bids.sort((a, b) => b.bid_price.amount - a.bid_price.amount);
 
-        if(req.session.peerplaysAccountId) {
+        if(req.session.peerplaysAccountId){
             const account = await peerplaysService.getBlockchainData({
                 api: 'database',
                 method: 'get_full_accounts',
@@ -974,7 +974,7 @@ router.post('/product/bid', async (req, res, next) => {
         });
     }catch(ex){
         console.error(ex);
-        res.status(400).json({ message: 'Error bidding on/buying NFT' });
+        res.status(400).json({ message: 'You can not bid your own NFTs' });
     }
 });
 

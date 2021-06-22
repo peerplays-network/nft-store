@@ -232,7 +232,10 @@ router.post('/customer/product/insert', upload.single('productImage'), async (re
         if(process.env.NODE_ENV !== 'test'){
             console.log('schemaValidate error', schemaValidate.errors);
         }
-        res.status(400).json(schemaValidate.errors);
+        res.status(400).json({
+            message: 'Provide inputs at all mandatory fields',
+            error: schemaValidate.errors
+        });
         return;
     }
 
