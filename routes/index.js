@@ -465,10 +465,10 @@ router.get('/product/:id/:offerId', async (req, res) => {
             });
 
             const object200 = await peerplaysService.getBlockchainData({
-                api: "database",
-                method: "get_objects",
-                "params[0][]": "2.0.0",
-                params: false
+                api: 'database',
+                method: 'get_objects',
+                'params[0][]': '2.0.0',
+                params: true
             });
 
             const bidFees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 89);
@@ -948,11 +948,7 @@ router.post('/product/bid', async (req, res, next) => {
         return res.status(400).json({ message: 'Error placing bid. Please try again.' });
     }
 
-<<<<<<< HEAD
-    const productPrice = parseFloat(req.body.productPrice).toFixed(config.peerplaysAssetPrecision) * Math.pow(10, config.peerplaysAssetPrecision);
-=======
-    let productPrice = Math.round((parseFloat(req.body.productPrice) + Number.EPSILON) * Math.pow(10, config.peerplaysAssetPrecision));
->>>>>>> develop
+    const productPrice = Math.round((parseFloat(req.body.productPrice) + Number.EPSILON) * Math.pow(10, config.peerplaysAssetPrecision));
 
     const body = {
         operations: [{
