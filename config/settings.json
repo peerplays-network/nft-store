@@ -11,7 +11,7 @@
     "emailAddress": "hi@markmoffat.com",
     "productsPerRow": 3,
     "productsPerPage": 6,
-    "footerHtml": "&lt;h4 class=&quot;text-center&quot;&gt;Powered by expressCart&lt;/h4&gt;",
+    "footerHtml": "&lt;h4 class=&quot;text-center&quot;&gt;Powered by Peerplays&lt;/h4&gt;",
     "googleAnalytics": "",
     "injectJs": "",
     "customCss": "",
@@ -50,13 +50,13 @@
     "showHomepageVariants": false,
     "peeridUrl": "https://peerid2.peerplays.download/api/v1/",
     "peeridClientID": "1",
-    "peeridClientSecret": "Qv16Go2MPjBhn8P1Sdc7LgzPnr18F3JLGjC7F71nXw",
+    "peeridClientSecret": "XvCSvLqRgqUtGVO9wlvrk8FX9guyPe30jrqs8UTmFc",
     "peeridRedirectUri": "https://nftstore.peerplays.download/peerid_auth/redirect",
     "peerplaysAssetID": "1.3.0",
     "peerplaysAssetSymbol": "TEST",
     "peerplaysAssetPrecision": 5,
-    "peerplaysAccountID": "1.2.73",
+    "peerplaysAccountID": "1.2.32",
     "ppyExchangeRate": 0.2,
     "commission": 10,
-    "categories": ["Digital Art", "Photographs", "Oil Paintings"]
+    "categories": ["Digital Art", "Photographs", "Oil Paintings", "Collectibles", "Fashion", "Games"]
 }

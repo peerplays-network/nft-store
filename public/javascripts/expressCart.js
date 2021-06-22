@@ -1,6 +1,16 @@
 /* eslint-disable prefer-arrow-callback, no-var, no-tabs, prefer-template */
 /* globals showNotification, numeral, feather */
 $(document).ready(function (){
+    $('#loder').hide();
+    $('a').click(function(){
+        $('#loder').show();
+        $('.main').css('opacity','0.5');
+        $('.index-main').css('opacity','0.5');
+     });
+     $('li a').click(function(){
+        $('#loder').show();
+        $('.account-main').css('opacity','0.5');
+     });
     if($(window).width() < 768){
         $('.menu-side').on('click', function(e){
             e.preventDefault();
@@ -39,15 +49,23 @@ $(document).ready(function (){
             });
         }
     });
-
+    
+   
     $('#createCustomer').validator().on('click', function(e){
         e.preventDefault();
+        $('#loder').show();
+        $('#customer-form').css('opacity','0.5')
+        $('#createCustomer').css('opacity','0.5')
         if($('#password').val() != $('#frm_userPassword_confirm').val()) {
             $('#customer-form').validator('validate')
+            $('#loder').hide();
+            $('#customer-form').css('opacity','1')
+            $('#createCustomer').css('opacity','1')
              showNotification('Password and Confirm Password should be same.', 'danger');
             return;
         }
         if($('#customer-form').validator('validate').has('.has-error').length === 0){
+            
              $.ajax({
                 method: 'POST',
                 url: '/customer/create',
@@ -66,9 +84,15 @@ $(document).ready(function (){
                 }
             })
             .done(function(msg){
+                 $('#loder').hide();
+                $('#customer-form').css('opacity','1')
+                $('#createCustomer').css('opacity','1')
                 showNotification(msg.message, 'success', true, '/');
             })
             .fail(function(msg){
+                 $('#loder').hide();
+                $('#customer-form').css('opacity','1')
+                $('#createCustomer').css('opacity','1')
                 showNotification(msg.responseJSON[0]?.message || msg.responseJSON?.message, 'danger');
             });
         }
@@ -94,6 +118,9 @@ $(document).ready(function (){
 
     $('#productNewForm').validator().on('submit', function(e){
         e.preventDefault();
+        $('#loder').show();
+        $('#productNewForm').css('opacity','0.5')
+       
         if($('#productPermalink').val() === '' && $('#productTitle').val() !== ''){
             $('#productPermalink').val(slugify($('#productTitle').val()));
         }
@@ -115,63 +142,76 @@ $(document).ready(function (){
             processData: false
         })
         .done(function(msg){
+            $('#loder').hide();
+            $('#productNewForm').css('opacity','1')
             showNotification(msg.message, 'success', false, '/customer/products/1');
         })
         .fail(function(msg){
+            $('#loder').hide();
+            $('#productNewForm').css('opacity','1')
             if(msg.responseJSON && msg.responseJSON.length > 0){
                 var errorMessages = validationErrors(msg.responseJSON);
                 $('#validationModalBody').html(errorMessages);
                 $('#validationModal').modal('show');
                 return;
             }
+           
             showNotification(msg.responseJSON.message, 'danger');
         });
     });
 
     $('#productEditForm').validator().on('submit', function(e){
         e.preventDefault();
-        if($('#productPermalink').val() === '' && $('#productTitle').val() !== ''){
-            $('#productPermalink').val(slugify($('#productTitle').val()));
-        }
-
-        let file;
-        if(document.getElementById("productImage").files) {
-            file = document.getElementById("productImage").files[0];
-        }
-
-        var formData = new FormData();
-        formData.append("title", $('#productTitle').val());
-        formData.append("productID", $('#productID').val());
-        formData.append("nftMetadataID", $('#nftMetadataID').val());
-        formData.append("productDescription", $('#productDescription').val());
-        formData.append("productCategory", $('#category').val());
-        formData.append("productPublished", $('#productPublished').val());
-        formData.append("productPermalink", $('#productPermalink').val());
-
-        if(file) {
-            formData.append("productImage",file);
-        }
-
-        $.ajax({
-            method: 'POST',
-            url: '/customer/product/update',
-            data: formData,
-            contentType: false,
-            processData: false
-        })
-        .done(function(msg){
-            showNotification(msg.message, 'success', true);
-        })
-        .fail(function(msg){
-            if(msg.responseJSON && msg.responseJSON.length > 0){
-                var errorMessages = validationErrors(msg.responseJSON);
-                console.log('errorMessages', errorMessages);
-                $('#validationModalBody').html(errorMessages);
-                $('#validationModal').modal('show');
-                return;
+        if(parseInt($('#ppyBalance').val()) < parseInt($('#updateFee').val()) * $('#productQuantity').val()) {
+            showNotification('Insufficient funds. Please add funds.', 'warning', false);
+            $('#nftMintModal').modal('hide');
+            var minFundsRequired = (parseInt($('#updateFee').val()) * $('#productQuantity').val() - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
+            $('#minFundsRequired').val(minFundsRequired);
+            $('#amountToAdd').val(minFundsRequired);
+            $('#addFundsModal').modal('show');
+        } else {
+            if($('#productPermalink').val() === '' && $('#productTitle').val() !== ''){
+                $('#productPermalink').val(slugify($('#productTitle').val()));
             }
-            showNotification(msg.responseJSON.message, 'danger');
-        });
+
+            let file;
+            if(document.getElementById("productImage").files) {
+                file = document.getElementById("productImage").files[0];
+            }
+
+            var formData = new FormData();
+            formData.append("title", $('#productTitle').val());
+            formData.append("productID", $('#productID').val());
+            formData.append("nftMetadataID", $('#nftMetadataID').val());
+            formData.append("productDescription", $('#productDescription').val());
+            formData.append("productCategory", $('#category').val());
+            formData.append("productPublished", $('#productPublished').val());
+            formData.append("productPermalink", $('#productPermalink').val());
+
+            if(file) {
+                formData.append("productImage",file);
+            }
+
+            $.ajax({
+                method: 'POST',
+                url: '/customer/product/update',
+                data: formData,
+                contentType: false,
+                processData: false
+            })
+            .done(function(msg){
+                showNotification(msg.message, 'success', true);
+            })
+            .fail(function(msg){
+                if(msg.responseJSON && msg.responseJSON.length > 0){
+                    var errorMessages = validationErrors(msg.responseJSON);
+                    $('#validationModalBody').html(errorMessages);
+                    $('#validationModal').modal('show');
+                    return;
+                }
+                showNotification(msg.responseJSON.message, 'danger');
+            });
+        }
     });
 
     $('.btn-delete-offer').on('click', function(){
@@ -388,9 +428,13 @@ $(document).ready(function (){
     });
 
     $('#customerloginForm').on('click', function(e){
+       
         if(!e.isDefaultPrevented()){
             e.preventDefault();
-            $.ajax({
+            $('#loder').show();
+            $('#login-form').css('opacity','0.5')
+          
+             $.ajax({
                 method: 'POST',
                 url: '/customer/login_action',
                 data: {
@@ -400,8 +444,12 @@ $(document).ready(function (){
             })
             .done(function(msg){
                 window.location = '/';
+                // $('#loder').hide();
+                // $('#login-form').css('opacity','1')
             })
             .fail(function(msg){
+                $('#loder').hide();
+                $('#login-form').css('opacity','1')
                 showNotification(msg.responseJSON.message, 'danger');
             });
         }
@@ -417,6 +465,7 @@ $(document).ready(function (){
             var productId = $(this).attr('data-id');
             $('.modal-body #productId').val(productId);
             $('#nftMintModal').modal('show');
+            $("#buttonMint").attr("disabled", false);
         } else if($(this).text() === 'Sell') {
             var productId = $(this).attr('data-id');
             $('.modal-body #sellProductId').val(productId);
@@ -433,6 +482,10 @@ $(document).ready(function (){
     // Mint NFT
     $(document).on('click', '#buttonMint', function(e){
         $("#buttonMint").attr("disabled", true);
+        $('#nftMintModal').modal('hide');
+        $('#loder').show();
+        $('.main').css('opacity','0.5')
+        
         $.ajax({
             method: 'POST',
             url: '/customer/product/mint',
@@ -442,21 +495,51 @@ $(document).ready(function (){
             }
         })
         .done(function(msg){
-            showNotification(msg.message, 'success', true);
+            $('#loder').hide();
+            $('.main').css('opacity','1')
             $("#buttonMint").attr("disabled", false);
+            showNotification(msg.message, 'success', true);
         })
         .fail(function(msg){
+            $('#loder').hide();
+            $('.main').css('opacity','1')
             if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
                 showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
             }
 
-            if(msg.responseJSON.message === 'Product not found'){
-                showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
-            }
+        if(parseInt($('#ppyBalance').val()) < parseInt($('#mintFee').val()) * $('#productQuantity').val()) {
+            showNotification('Insufficient funds. Please add funds.', 'warning', false);
+            $('#nftMintModal').modal('hide');
+            var minFundsRequired = (parseInt($('#mintFee').val()) * $('#productQuantity').val() - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
+            $('#minFundsRequired').val(minFundsRequired);
+            $('#amountToAdd').val(minFundsRequired);
+            $('#addFundsModal').modal('show');
+        } else {
+            $.ajax({
+                method: 'POST',
+                url: '/customer/product/mint',
+                data: {
+                    productId: $('#productId').val(),
+                    quantity: $('#productQuantity').val()
+                }
+            })
+            .done(function(msg){
+                showNotification(msg.message, 'success', true);
+                $("#buttonMint").attr("disabled", false);
+            })
+            .fail(function(msg){
+                if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
+                    showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
+                }
 
-            showNotification(msg.responseJSON.message, 'danger');
-            $("#buttonMint").attr("disabled", false);
-        });
+                if(msg.responseJSON.message === 'Product not found'){
+                    showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
+                }
+
+                showNotification(msg.responseJSON.message, 'danger');
+                $("#buttonMint").attr("disabled", false);
+            });
+        }
     });
 
     $(document).on('click','#productSellTypeCheckbox', function(e) {
@@ -505,9 +588,13 @@ $(document).ready(function (){
     });
 
     // Sell NFT
+   
     $(document).on('click', '#buttonSell', function(e){
         const isBidding = $('#productSellTypeCheckbox').prop('checked');
-
+         $('#sellNFTModal').modal('hide');
+         $('#loder').show();
+        $('.main').css('opacity','0.5')
+        debugger
         $.ajax({
             method: 'POST',
             url: '/customer/product/sell',
@@ -521,8 +608,12 @@ $(document).ready(function (){
         })
         .done(function(msg){
             showNotification(msg.message, 'success', true);
+            $('#loder').hide();
+            $('.main').css('opacity','1')
         })
         .fail(function(msg){
+            $('#loder').hide();
+            $('.main').css('opacity','1')
             if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
                 showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
             }
@@ -531,8 +622,9 @@ $(document).ready(function (){
                 showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
             }
 
-            showNotification(msg.responseJSON.message, 'danger');
-        });
+                showNotification(msg.responseJSON.message, 'danger');
+            });
+        
     });
 
     // call update settings API
@@ -609,6 +701,32 @@ $(document).ready(function (){
             showNotification('Add more funds', 'danger');
         } else {
             window.location.replace(`/checkout/payment/${(amountToAdd/Math.pow(10, precision)).toFixed(precision)}`);
+        }
+    });
+
+    $('#btnModalWithdrawFunds').validator().on('click', function(e) {
+        e.preventDefault();
+        var precision = parseInt($('#withdrawFundsAssetPrecision').val());
+        var amountToWithdraw = Math.round((parseFloat($('#amountToWithdraw').val()) + Number.EPSILON) * Math.pow(10, precision));
+        var maxAmount = Math.round((parseFloat($('#maxAmountWithdrawn').val()) + Number.EPSILON) * Math.pow(10,precision));
+        var transferFees = Math.round((parseFloat($('#transferFees').val()) + Number.EPSILON) * Math.pow(10, precision));
+
+        if(amountToWithdraw > maxAmount - transferFees) {
+            showNotification('Select a lower amount', 'danger');
+        } else {
+            $.ajax({
+                method: 'POST',
+                url: '/customer/redeem',
+                data: {
+                    amount: amountToWithdraw,
+                }
+            })
+            .done(function(msg){
+                showNotification(msg.message, 'success', true);
+            })
+            .fail(function(msg){
+                showNotification(msg.responseJSON.message, 'danger');
+            });
         }
     });
 
@@ -704,13 +822,25 @@ $(document).ready(function (){
                     }
                 })
                 .done(function(msg){
-                    showNotification(msg.message, 'success');
+                    showNotification(msg.message, 'success', true);
                 })
                 .fail(function(msg){
                     showNotification(msg.responseJSON.message, 'danger');
                 });
             }
         }
+    });
+
+    $(document).on('click', '#btnAddFunds', function(e) {
+        $('#minFundsRequired').val(0);
+        $('#amountToAdd').val(0);
+        $('#addFundsModal').modal('show');
+    });
+
+    $(document).on('click', '#btnWithdrawFunds', function(e) {
+        $('#maxAmountWithdrawn').val($(this).attr('data-balance'));
+        $('#transferFees').val($(this).attr('data-fees'));
+        $('#withdrawFundsModal').modal('show');
     });
 
     $('.cart-product-quantity').on('keyup', function(e){
@@ -1107,3 +1237,4 @@ function isNumberKey(evt){
         return false;
     return true;
 }
+})
