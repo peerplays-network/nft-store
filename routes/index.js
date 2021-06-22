@@ -41,22 +41,21 @@ const PeerplaysService = require('../services/PeerplaysService');
 const peerplaysService = new PeerplaysService();
 
 const getAllBidOffers = async (start = 0) => {
-  let bidOffers = [];
-  const {result} = await peerplaysService.getBlockchainData({
-      api: "database",
-      method: "list_offers",
+  const bidOffers = [];
+  const { result } = await peerplaysService.getBlockchainData({
+      api: 'database',
+      method: 'list_offers',
       params: [`1.29.${start}`, 100]
   });
 
   bidOffers.push(...result);
 
-  if(result.length < 100) {
-      return bidOffers;
-  } else {
-      bidOffers.push(await getAllBidOffers(start+100));
+  if(result.length < 100){
       return bidOffers;
   }
-}
+      bidOffers.push(await getAllBidOffers(start + 100));
+      return bidOffers;
+};
 
 // Google products
 router.get('/googleproducts.xml', async (req, res, next) => {
@@ -447,16 +446,17 @@ router.get('/product/:id/:offerId', async (req, res) => {
         });
 
         const bidOffers = await getAllBidOffers();
+        // eslint-disable-next-line no-prototype-builtins
         bids = bidOffers.filter((bid) => bid.item_ids[0] === offer.result[0].item_ids[0] && bid.hasOwnProperty('bidder'));
         await Promise.all(bids.map(async (bid) => {
-          const bidder = await db.customers.findOne({peerplaysAccountId: bid.bidder});
+          const bidder = await db.customers.findOne({ peerplaysAccountId: bid.bidder });
           bid.bidder = bidder;
           bid.bid_price.amount = bid.bid_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
         }));
 
-        bids = bids.sort((a,b) => b.bid_price.amount - a.bid_price.amount);
+        bids = bids.sort((a, b) => b.bid_price.amount - a.bid_price.amount);
 
-        if(req.session.peerplaysAccountId) {
+        if(req.session.peerplaysAccountId){
             const account = await peerplaysService.getBlockchainData({
                 api: 'database',
                 method: 'get_full_accounts',
@@ -500,10 +500,10 @@ router.get('/product/:id/:offerId', async (req, res) => {
 
     product.is_bidding = product.minimum_price !== product.maximum_price;
 
-    if(bids && bids.length > 0) {
-        if(bids[0].bid_price.amount === product.maximum_price) {
+    if(bids && bids.length > 0){
+        if(bids[0].bid_price.amount === product.maximum_price){
             product.minimum_price = product.maximum_price;
-        } else if(bids[0].bid_price.amount < product.maximum_price) {
+        }else if(bids[0].bid_price.amount < product.maximum_price){
             product.minimum_price = Math.round((bids[0].bid_price.amount * Math.pow(10, config.peerplaysAssetPrecision) + (product.maximum_price * Math.pow(10, config.peerplaysAssetPrecision) - bids[0].bid_price.amount * Math.pow(10, config.peerplaysAssetPrecision)) / 100)) / Math.pow(10, config.peerplaysAssetPrecision);
         }
     }
@@ -974,7 +974,7 @@ router.post('/product/bid', async (req, res, next) => {
         });
     }catch(ex){
         console.error(ex);
-        res.status(400).json({ message: 'Error bidding on/buying NFT' });
+        res.status(400).json({ message: 'You can not bid your own NFTs' });
     }
 });
 

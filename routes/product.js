@@ -10,7 +10,7 @@ const {
     cleanHtml,
     convertBool,
     checkboxBool,
-    safeParseInt} = require('../lib/common');
+    safeParseInt } = require('../lib/common');
 const { indexProducts } = require('../lib/indexing');
 const { validateJson } = require('../lib/schema');
 const { paginateData } = require('../lib/paginate');
@@ -212,7 +212,6 @@ router.get('/customer/product/new', (req, res) => {
 router.post('/customer/product/insert', upload.single('productImage'), async (req, res) => {
     const db = req.app.db;
     let filePath = '';
-
     const doc = {
         nftMetadataID: '1.26.0',
         productTitle: req.body.title,
@@ -233,7 +232,10 @@ router.post('/customer/product/insert', upload.single('productImage'), async (re
         if(process.env.NODE_ENV !== 'test'){
             console.log('schemaValidate error', schemaValidate.errors);
         }
-        res.status(400).json(schemaValidate.errors);
+        res.status(400).json({
+            message: 'Provide inputs at all mandatory fields',
+            error: schemaValidate.errors
+        });
         return;
     }
 
