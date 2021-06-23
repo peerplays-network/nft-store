@@ -25,7 +25,7 @@
                 {{else}}
                 <input type="hidden" id="product_bid" value="{{result.minimum_price}}">
                 <h4 class="product-price mp-0">{{currencySymbol config.peerplaysAssetSymbol}} {{result.minimum_price}}</h4>
-                <button class="btn btn-primary btn-block product-add-to-cart w-25" type="button">{{ @root.__ "Buy" }}</button>
+                <button class="btn btn-primary btn-block product-add-to-cart w-40" type="button">{{ @root.__ "Buy" }}</button>
                 {{/if}}
                 <div class="body_text">
                     {{{fixTags result.productDescription}}}

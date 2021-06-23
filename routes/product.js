@@ -109,6 +109,7 @@ const getAllBidOffers = async (start = 0) => {
 }
 
 router.get('/customer/products/:page?', async (req, res, next) => {
+    const db = req.app.db;
     if(!req.session.peerplaysAccountId){
         res.redirect('/customer/login');
         return;
@@ -165,7 +166,7 @@ router.get('/customer/products/:page?', async (req, res, next) => {
                     'params[0]': nft.owner
                 });
 
-                sellOffers = allSellOffers ? allSellOffers.filter((s) => s.nft_metadata_ids.includes(nft.nftMetadataID)) : [];
+                sellOffers = allSellOffers ? allSellOffers.filter((s) => s.nft_metadata_ids && s.nft_metadata_ids.includes(nft.nftMetadataID)) : [];
                 // eslint-disable-next-line no-undef
                 sellOffersCount = sellOffers.reduce((sum, s) => sum + s.item_ids.length, 0);
 
@@ -174,7 +175,7 @@ router.get('/customer/products/:page?', async (req, res, next) => {
                 const bidOffers = await getAllBidOffers();
 
                 for(let i = 0; i < sellOffers.length; i++) {
-                    const bids = bidOffers.filter((bid) => bid.item_ids[0] === sellOffers[i].item_ids[0] && bid.hasOwnProperty('bidder'));
+                    const bids = bidOffers.filter((bid) => bid.item_ids && bid.item_ids[0] === sellOffers[i].item_ids[0] && bid.hasOwnProperty('bidder'));
                     await Promise.all(bids.map(async (bid) => {
                       const bidder = await db.customers.findOne({peerplaysAccountId: bid.bidder});
                       bid.bidder = bidder;

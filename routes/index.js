@@ -446,15 +446,17 @@ router.get('/product/:id/:offerId', async (req, res) => {
         });
 
         const bidOffers = await getAllBidOffers();
-        // eslint-disable-next-line no-prototype-builtins
-        bids = bidOffers.filter((bid) => bid.item_ids[0] === offer.result[0].item_ids[0] && bid.hasOwnProperty('bidder'));
-        await Promise.all(bids.map(async (bid) => {
-          const bidder = await db.customers.findOne({ peerplaysAccountId: bid.bidder });
-          bid.bidder = bidder;
-          bid.bid_price.amount = bid.bid_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
-        }));
+        if(bidOffers && bidOffers.length > 0) {
+            // eslint-disable-next-line no-prototype-builtins
+            bids = bidOffers.filter((bid) => bid.item_ids && bid.item_ids.length > 0 && bid.item_ids[0] === offer.result[0].item_ids[0] && bid.hasOwnProperty('bidder'));
+            await Promise.all(bids.map(async (bid) => {
+              const bidder = await db.customers.findOne({ peerplaysAccountId: bid.bidder });
+              bid.bidder = bidder;
+              bid.bid_price.amount = bid.bid_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
+            }));
 
-        bids = bids.sort((a, b) => b.bid_price.amount - a.bid_price.amount);
+            bids = bids.sort((a, b) => b.bid_price.amount - a.bid_price.amount);
+        }
 
         if(req.session.peerplaysAccountId){
             const account = await peerplaysService.getBlockchainData({
@@ -948,6 +950,10 @@ router.post('/product/bid', async (req, res, next) => {
         return res.status(400).json({ message: 'Error placing bid. Please try again.' });
     }
 
+    if(req.session.peerplaysAccountId === product.owner) {
+        return res.status(400).json({ message: 'You cannot bid on your own NFT' });
+    }
+
     const productPrice = Math.round((parseFloat(req.body.productPrice) + Number.EPSILON) * Math.pow(10, config.peerplaysAssetPrecision));
 
     const body = {
@@ -974,7 +980,7 @@ router.post('/product/bid', async (req, res, next) => {
         });
     }catch(ex){
         console.error(ex);
-        res.status(400).json({ message: 'You can not bid your own NFTs' });
+        res.status(400).json({ message: 'Error bidding on/buying NFTs' });
     }
 });
 
