@@ -448,7 +448,7 @@ router.get('/product/:id/:offerId', async (req, res) => {
         const bidOffers = await getAllBidOffers();
         if(bidOffers && bidOffers.length > 0) {
             // eslint-disable-next-line no-prototype-builtins
-            bids = bidOffers.filter((bid) => bid.item_ids && bid.item_ids.length > 0 && bid.item_ids[0] === offer.result[0].item_ids[0] && bid.hasOwnProperty('bidder'));
+            bids = bidOffers.filter((bid) => bid.item_ids && bid.item_ids.length > 0 && offer.result[0] && offer.result[0].item_ids.length > 0 && bid.item_ids[0] === offer.result[0].item_ids[0] && bid.hasOwnProperty('bidder'));
             await Promise.all(bids.map(async (bid) => {
               const bidder = await db.customers.findOne({ peerplaysAccountId: bid.bidder });
               bid.bidder = bidder;
@@ -496,17 +496,19 @@ router.get('/product/:id/:offerId', async (req, res) => {
     }
 
     product.offerId = req.params.offerId;
-    product.minimum_price = offer.result[0].minimum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
+    if(offer.result[0] && offer.result[0].item_ids.length > 0) {
+        product.minimum_price = offer.result[0].minimum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
 
-    product.maximum_price = offer.result[0].maximum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
+        product.maximum_price = offer.result[0].maximum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
 
-    product.is_bidding = product.minimum_price !== product.maximum_price;
+        product.is_bidding = product.minimum_price !== product.maximum_price;
 
-    if(bids && bids.length > 0){
-        if(bids[0].bid_price.amount === product.maximum_price){
-            product.minimum_price = product.maximum_price;
-        }else if(bids[0].bid_price.amount < product.maximum_price){
-            product.minimum_price = Math.round((bids[0].bid_price.amount * Math.pow(10, config.peerplaysAssetPrecision) + (product.maximum_price * Math.pow(10, config.peerplaysAssetPrecision) - bids[0].bid_price.amount * Math.pow(10, config.peerplaysAssetPrecision)) / 100)) / Math.pow(10, config.peerplaysAssetPrecision);
+        if(bids && bids.length > 0){
+            if(bids[0].bid_price.amount === product.maximum_price){
+                product.minimum_price = product.maximum_price;
+            }else if(bids[0].bid_price.amount < product.maximum_price){
+                product.minimum_price = Math.round((bids[0].bid_price.amount * Math.pow(10, config.peerplaysAssetPrecision) + (product.maximum_price * Math.pow(10, config.peerplaysAssetPrecision) - bids[0].bid_price.amount * Math.pow(10, config.peerplaysAssetPrecision)) / 100)) / Math.pow(10, config.peerplaysAssetPrecision);
+            }
         }
     }
 
@@ -956,6 +958,14 @@ router.post('/product/bid', async (req, res, next) => {
 
     const productPrice = Math.round((parseFloat(req.body.productPrice) + Number.EPSILON) * Math.pow(10, config.peerplaysAssetPrecision));
 
+    const offer = await peerplaysService.getBlockchainData({
+        api: 'database',
+        method: 'get_objects',
+        'params[0][]': req.body.offerId
+    });
+
+    const isBidding = offer.result[0].minimum_price.amount !== offer.result[0].maximum_price.amount;
+
     const body = {
         operations: [{
             op_name: 'bid',
@@ -975,7 +985,7 @@ router.post('/product/bid', async (req, res, next) => {
         const { result } = await peerplaysService.sendOperations(body, req.session.peerIDAccessToken);
         bidId = result.trx.operation_results[0][1];
         return res.status(200).json({
-            message: req.body.isBidding ? 'NFT successfully added to Cart' : 'NFT bought successfully',
+            message: isBidding ? 'Placed bid successfully' : 'NFT bought successfully',
             bidId
         });
     }catch(ex){
