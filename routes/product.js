@@ -86,8 +86,11 @@ const getSellOffers = async (start = 0, k = 0) => {
     if(result.length < 100){
         return sellOffers;
     }
-        sellOffers.push(await getSellOffers(start + 100, k));
-        return sellOffers;
+
+    const newStart = parseInt(result[99].id.split('.')[2]) + 1;
+
+    sellOffers.push(...await getSellOffers(newStart, k));
+    return sellOffers;
 };
 
 const getAllBidOffers = async (start = 0) => {
@@ -102,10 +105,11 @@ const getAllBidOffers = async (start = 0) => {
 
   if(result.length < 100) {
       return bidOffers;
-  } else {
-      bidOffers.push(await getAllBidOffers(start+100));
-      return bidOffers;
   }
+
+  const newStart = parseInt(result[99].id.split('.')[2]) + 1;
+  bidOffers.push(...await getAllBidOffers(newStart));
+  return bidOffers;
 }
 
 router.get('/customer/products/:page?', async (req, res, next) => {
@@ -168,9 +172,8 @@ router.get('/customer/products/:page?', async (req, res, next) => {
 
                 sellOffers = allSellOffers ? allSellOffers.filter((s) => s.nft_metadata_ids && s.nft_metadata_ids.includes(nft.nftMetadataID)) : [];
                 // eslint-disable-next-line no-undef
-                sellOffersCount = sellOffers.reduce((sum, s) => sum + s.item_ids.length, 0);
-
-                minted = minted ? minted.result.filter((m) => m.nft_metadata_id === nft.nftMetadataID) : [];
+                const sellOffersCount = sellOffers.reduce((sum, s) => sum + s.item_ids.length, 0);
+                minted = minted ? minted.result.filter((m) => m.nft_metadata_id === nft.nftMetadataID && m.owner === req.session.peerplaysAccountId) : [];
 
                 const bidOffers = await getAllBidOffers();
 
@@ -448,10 +451,10 @@ router.post('/customer/product/sell', async (req, res) => {
         });
 
         sellOffers = await getSellOffers();
-        sellOffers = sellOffers ? sellOffers.filter((s) => s.nft_metadata_ids.includes(product.nftMetadataID)) : [];
+        sellOffers = sellOffers ? sellOffers.filter((s) => s.nft_metadata_ids && s.nft_metadata_ids.includes(product.nftMetadataID)) : [];
         const sellOffersCount = sellOffers.reduce((sum, s) => sum + s.item_ids.length, 0);
 
-        minted = minted ? minted.result.filter((m) => m.nft_metadata_id === product.nftMetadataID) : [];
+        minted = minted ? minted.result.filter((m) => m.nft_metadata_id === product.nftMetadataID && m.owner === req.session.peerplaysAccountId) : [];
 
         if(Number(req.body.quantity) === 0){
             return res.status(400).json({

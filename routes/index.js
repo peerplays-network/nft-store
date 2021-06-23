@@ -41,20 +41,22 @@ const PeerplaysService = require('../services/PeerplaysService');
 const peerplaysService = new PeerplaysService();
 
 const getAllBidOffers = async (start = 0) => {
-  const bidOffers = [];
-  const { result } = await peerplaysService.getBlockchainData({
-      api: 'database',
-      method: 'list_offers',
-      params: [`1.29.${start}`, 100]
-  });
+    const bidOffers = [];
+    const { result } = await peerplaysService.getBlockchainData({
+        api: 'database',
+        method: 'list_offers',
+        params: [`1.29.${start}`, 100]
+    });
 
-  bidOffers.push(...result);
+    bidOffers.push(...result);
 
-  if(result.length < 100){
-      return bidOffers;
-  }
-      bidOffers.push(await getAllBidOffers(start + 100));
-      return bidOffers;
+    if(result.length < 100){
+        return bidOffers;
+    }
+
+    const newStart = parseInt(result[99].id.split('.')[2]) + 1;
+    bidOffers.push(...await getAllBidOffers(newStart));
+    return bidOffers;
 };
 
 // Google products
