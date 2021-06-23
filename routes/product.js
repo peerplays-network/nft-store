@@ -247,7 +247,7 @@ router.get('/customer/products/filter/:search', async (req, res, next) => {
 });
 
 // insert form
-router.get('/customer/product/new', (req, res) => {
+router.get('/customer/product/new', async (req, res) => {
     if(!req.session.peerIDAccessToken){
         res.redirect('/customer/login');
         return;
