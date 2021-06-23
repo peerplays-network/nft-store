@@ -969,7 +969,7 @@ router.post('/product/bid', async (req, res, next) => {
         const { result } = await peerplaysService.sendOperations(body, req.session.peerIDAccessToken);
         bidId = result.trx.operation_results[0][1];
         return res.status(200).json({
-            message: req.body.isBidding ? 'Bid placed successfully' : 'NFT bought successfully',
+            message: req.body.isBidding ? 'NFT successfully added to Cart' : 'NFT bought successfully',
             bidId
         });
     }catch(ex){
