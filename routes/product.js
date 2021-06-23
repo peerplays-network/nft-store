@@ -498,8 +498,8 @@ router.post('/customer/product/sell', async (req, res) => {
             fee_asset: config.peerplaysAssetID,
             item_ids: [availableNFTs[i].id],
             issuer: req.session.peerplaysAccountId,
-            minimum_price: { amount: req.body.minPrice * Math.pow(10, config.peerplaysAssetPrecision), asset_id: config.peerplaysAssetID },
-            maximum_price: { amount: req.body.maxPrice * Math.pow(10, config.peerplaysAssetPrecision), asset_id: config.peerplaysAssetID },
+            minimum_price: { amount: Math.round(req.body.minPrice * Math.pow(10, config.peerplaysAssetPrecision)), asset_id: config.peerplaysAssetID },
+            maximum_price: { amount: Math.round(req.body.maxPrice * Math.pow(10, config.peerplaysAssetPrecision)), asset_id: config.peerplaysAssetID },
             buying_item: false,
             offer_expiration_date: Math.floor(Date.parse(req.body.expirationDate) / 1000)
         });

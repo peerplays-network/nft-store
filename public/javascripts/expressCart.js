@@ -583,11 +583,29 @@ $(document).ready(function (){
     // Sell NFT
    
     $(document).on('click', '#buttonSell', function(e){
+        if(!$('#productMinPrice').val()) {
+            showNotification('Minimum price is required', 'danger', false);
+            $('#productMinPrice').focus();
+            return;
+        }
+
+        if(!$('#productMaxPrice').val()) {
+            showNotification('Maximum price is required', 'danger', false);
+            $('#productMaxPrice').focus();
+            return;
+        }
+
+        if(!$('#saleEnd').val()) {
+            showNotification('Sale end date is required', 'danger', false);
+            $('#saleEnd').focus();
+            return;
+        }
+
         const isBidding = $('#productSellTypeCheckbox').prop('checked');
          $('#sellNFTModal').modal('hide');
          $('#loder').show();
         $('.main').css('opacity','0.5')
-        debugger
+
         $.ajax({
             method: 'POST',
             url: '/customer/product/sell',
@@ -608,7 +626,7 @@ $(document).ready(function (){
             $('#loder').hide();
             $('.main').css('opacity','1')
             if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
-                showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
+                showNotification(msg.responseJSON.message, 'danger', false, '/customer/login');
             }
 
             if(msg.responseJSON.message === 'Product not found'){
