@@ -828,12 +828,11 @@ $(document).ready(function (){
                     data: {
                         productId: $('#productId').val(),
                         offerId: $('#offerId').val(),
-                        productPrice: parseFloat($('#product_bid').val()).toFixed(parseInt($('#addFundsAssetPrecision').val())),
-                        isBidding: $('#minPrice').val() !== $('#maxPrice').val()
+                        productPrice: parseFloat($('#product_bid').val()).toFixed(parseInt($('#addFundsAssetPrecision').val()))
                     }
                 })
                 .done(function(msg){
-                    showNotification(msg.message, 'success', true);
+                    showNotification(msg.message, 'success', false, '/');
                 })
                 .fail(function(msg){
                     showNotification(msg.responseJSON.message, 'danger');
