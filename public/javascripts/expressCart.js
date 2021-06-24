@@ -224,6 +224,15 @@ $(document).ready(function (){
         }
     });
 
+        // applies an product filter
+    $(document).on('click', '#btn_product_filter', function (e) {
+        if ($('#product_filter').val() !== '') {
+            window.location.href = '/customer/products/filter/' + $('#product_filter').val();
+        } else {
+            showNotification('Please enter a keyword to filter', 'danger');
+        }
+    });
+
     $('.btn-delete-offer').on('click', function(){
       if(confirm('Are you sure you want to delete this sell offer?')){
           $.ajax({
@@ -491,32 +500,6 @@ $(document).ready(function (){
 
     // Mint NFT
     $(document).on('click', '#buttonMint', function(e){
-        $("#buttonMint").attr("disabled", true);
-        $('#nftMintModal').modal('hide');
-        $('#loder').show();
-        $('.main').css('opacity','0.5')
-        
-        $.ajax({
-            method: 'POST',
-            url: '/customer/product/mint',
-            data: {
-                productId: $('#productId').val(),
-                quantity: $('#productQuantity').val()
-            }
-        })
-        .done(function(msg){
-            $('#loder').hide();
-            $('.main').css('opacity','1')
-            $("#buttonMint").attr("disabled", false);
-            showNotification(msg.message, 'success', true);
-        })
-        .fail(function(msg){
-            $('#loder').hide();
-            $('.main').css('opacity','1')
-            if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
-                showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
-            }
-
         if(parseInt($('#ppyBalance').val()) < parseInt($('#mintFee').val()) * $('#productQuantity').val()) {
             showNotification('Insufficient funds. Please add funds.', 'warning', false);
             $('#nftMintModal').modal('hide');
@@ -525,6 +508,11 @@ $(document).ready(function (){
             $('#amountToAdd').val(minFundsRequired);
             $('#addFundsModal').modal('show');
         } else {
+            $("#buttonMint").attr("disabled", true);
+            $('#nftMintModal').modal('hide');
+            $('#loder').show();
+            $('.main').css('opacity','0.5');
+
             $.ajax({
                 method: 'POST',
                 url: '/customer/product/mint',
@@ -534,10 +522,14 @@ $(document).ready(function (){
                 }
             })
             .done(function(msg){
-                showNotification(msg.message, 'success', true);
+                $('#loder').hide();
+                $('.main').css('opacity','1');
                 $("#buttonMint").attr("disabled", false);
+                showNotification(msg.message, 'success', true);
             })
             .fail(function(msg){
+                $('#loder').hide();
+                $('.main').css('opacity','1');
                 if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
                     showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
                 }
@@ -600,11 +592,29 @@ $(document).ready(function (){
     // Sell NFT
    
     $(document).on('click', '#buttonSell', function(e){
+        if(!$('#productMinPrice').val()) {
+            showNotification('Minimum price is required', 'danger', false);
+            $('#productMinPrice').focus();
+            return;
+        }
+
+        if(!$('#productMaxPrice').val()) {
+            showNotification('Maximum price is required', 'danger', false);
+            $('#productMaxPrice').focus();
+            return;
+        }
+
+        if(!$('#saleEnd').val()) {
+            showNotification('Sale end date is required', 'danger', false);
+            $('#saleEnd').focus();
+            return;
+        }
+
         const isBidding = $('#productSellTypeCheckbox').prop('checked');
          $('#sellNFTModal').modal('hide');
          $('#loder').show();
         $('.main').css('opacity','0.5')
-        debugger
+
         $.ajax({
             method: 'POST',
             url: '/customer/product/sell',
@@ -625,7 +635,7 @@ $(document).ready(function (){
             $('#loder').hide();
             $('.main').css('opacity','1')
             if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
-                showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
+                showNotification(msg.responseJSON.message, 'danger', false, '/customer/login');
             }
 
             if(msg.responseJSON.message === 'Product not found'){
@@ -830,12 +840,11 @@ $(document).ready(function (){
                     data: {
                         productId: $('#productId').val(),
                         offerId: $('#offerId').val(),
-                        productPrice: parseFloat($('#product_bid').val()).toFixed(parseInt($('#addFundsAssetPrecision').val())),
-                        isBidding: $('#minPrice').val() !== $('#maxPrice').val()
+                        productPrice: parseFloat($('#product_bid').val()).toFixed(parseInt($('#addFundsAssetPrecision').val()))
                     }
                 })
                 .done(function(msg){
-                    showNotification(msg.message, 'success', true);
+                    showNotification(msg.message, 'success', false, '/');
                 })
                 .fail(function(msg){
                     showNotification(msg.responseJSON.message, 'danger');
@@ -1252,4 +1261,3 @@ function isNumberKey(evt){
         return false;
     return true;
 }
-})
