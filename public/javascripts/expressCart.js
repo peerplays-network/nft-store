@@ -640,6 +640,8 @@ $(document).ready(function (){
         .fail(function(msg){
             $('#loder').hide();
             $('.main').css('opacity','1')
+            $('#productMinPrice').val('')
+            $('#productMaxPrice').val('')
             if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
                 showNotification(msg.responseJSON.message, 'danger', false, '/customer/login');
             }
