@@ -448,7 +448,7 @@ router.get('/product/:id/:offerId', async (req, res) => {
         });
 
         const bidOffers = await getAllBidOffers();
-        if(bidOffers && bidOffers.length > 0) {
+        if(bidOffers && bidOffers.length > 0){
             // eslint-disable-next-line no-prototype-builtins
             bids = bidOffers.filter((bid) => bid.item_ids && bid.item_ids.length > 0 && offer.result[0] && offer.result[0].item_ids.length > 0 && bid.item_ids[0] === offer.result[0].item_ids[0] && bid.hasOwnProperty('bidder'));
             await Promise.all(bids.map(async (bid) => {
@@ -498,7 +498,7 @@ router.get('/product/:id/:offerId', async (req, res) => {
     }
 
     product.offerId = req.params.offerId;
-    if(offer.result[0] && offer.result[0].item_ids.length > 0) {
+    if(offer.result[0] && offer.result[0].item_ids.length > 0){
         product.minimum_price = offer.result[0].minimum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
 
         product.maximum_price = offer.result[0].maximum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
@@ -954,7 +954,7 @@ router.post('/product/bid', async (req, res, next) => {
         return res.status(400).json({ message: 'Error placing bid. Please try again.' });
     }
 
-    if(req.session.peerplaysAccountId === product.owner) {
+    if(req.session.peerplaysAccountId === product.owner){
         return res.status(400).json({ message: 'You cannot bid on your own NFT' });
     }
 
@@ -987,7 +987,7 @@ router.post('/product/bid', async (req, res, next) => {
         const { result } = await peerplaysService.sendOperations(body, req.session.peerIDAccessToken);
         bidId = result.trx.operation_results[0][1];
         return res.status(200).json({
-            message: isBidding ? 'Placed bid successfully' : 'NFT bought successfully',
+            message: req.body.isBidding ? 'NFT successfully added to Cart.' : 'NFT bought successfully',
             bidId
         });
     }catch(ex){

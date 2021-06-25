@@ -20,64 +20,99 @@
             {{else}}
             <strong>{{ @root.__ "Recent products" }}</strong>
             {{/ifCond}}
-            <ul class="list-group">
-                <li class="list-group-item">
-                    <div class="justify-content-between d-flex">
-                        <strong>Image</strong>
-                        <strong>Title</strong>
-                        <strong>Minted</strong>
-                        <strong>Selling</strong>
-                    </div>
-                </li>
-                {{#each results}}
-                <li class="list-group-item">
-                    <div class="justify-content-between d-flex mb-2">
-                        <img src="{{this.base_uri}}" class="sidebar-addon"/>
-                        <div><a href="/customer/product/edit/{{this._id}}">{{this.productTitle}}</a></div>
-                        <div>{{this.mintedCount}}</div>
-                        <div>{{this.sellOffersCount}}</div>
-                    </div>
-                    {{#if sellOffers}}
-                    <ul class="list-group mb-2">
-                        <li class="list-group-item">
-                            <div class="justify-content-between d-flex">
-                                <strong>Min. Price</strong>
-                                <strong>Max. Price</strong>
-                                <strong>Sale end date</strong>
-                                <strong>Actions</strong>
-                            </div>
-                        </li>
-                        {{#each sellOffers}}
-                        <li class="list-group-item">
-                            <div class="justify-content-between d-flex">
-                                <div>{{this.minimum_price.amount}} {{@root.config.peerplaysAssetSymbol}}</div>
-                                <div>{{this.maximum_price.amount}} {{@root.config.peerplaysAssetSymbol}}</div>
-                                <div>{{this.offer_expiration_date}}</div>
-                                <div><a class="text-danger btn-delete-offer" data-id={{this.id}}> {{{feather 'trash-2'}}}</a></div>
-                            </div>
+
+            <div class="table-responsvie product-information pt-3">
+                <table width="100%" class="product-data cus-border-table"> 
+                    <tr>
+                        <th>
+                             <strong>Image</strong>
+                        </th>
+                        <th>
+                             <strong>Title</strong>
+                        </th>
+                        <th>
+                             <strong>Minted</strong>
+                        </th>
+                        <th class="text-center">
+                             <strong>Selling</strong>
+                        </th>
+                    </tr>
+                      {{#each results}}
+                    <tr>
+                        <td> <img src="{{this.base_uri}}" class="sidebar-addon"/></td>
+                        <td><a href="/customer/product/edit/{{this._id}}">{{this.productTitle}}</a></td>
+                        <td>{{this.mintedCount}}</td>
+                        <td class="text-center">{{this.sellOffersCount}}</td>
+                    </tr>
+                     {{#if sellOffers}}
+                    <tr>
+                        <td colspan="4" class="table-bottom-space-none">
+                            <table class="product-data">
+                                <tr>
+                                    <th>
+                                        <strong>Min. Price</strong>
+                                    </th>
+                                    <th>
+                                        <strong>Max. Price</strong>
+                                    </th>
+                                    <th>
+                                        <strong>Sale end date</strong>
+                                    </th>
+                                    <th class="text-center">
+                                        <strong>Actions</strong>
+                                    </th>
+                                </tr>
+                                 {{#each sellOffers}}
+                                <tr>
+                                    <td>
+                                        <span>
+                                            {{this.minimum_price.amount}} {{@root.config.peerplaysAssetSymbol}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span>
+                                            {{this.maximum_price.amount}} {{@root.config.peerplaysAssetSymbol}}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span>
+                                            {{this.offer_expiration_date}}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a class="text-danger btn-delete-offer" data-id={{this.id}}> {{{feather 'trash-2'}}}</a>
+                                    </td>
+                                </tr>
                             {{#if bids}}
-                            <ul class="list-group m-3">
-                                <li class="list-group-item">
-                                    <div class="justify-content-between d-flex">
-                                        <strong>Bidder</strong>
-                                        <strong>Bid Price</strong>
-                                    </div>
-                                </li>
-                                {{#each bids}}
-                                <li class="list-group-item">
-                                    <div class="justify-content-between d-flex">
-                                        <div>{{this.bidder.firstName}} {{this.bidder.lastName}}</div>
-                                        <div>{{this.bid_price.amount}} {{@root.config.peerplaysAssetSymbol}}</div>
-                                    </div>
-                                </li>
-                                {{/each}}
-                            </ul>
+                                <tr>
+                                    <ul class="list-group m-3">
+                                        <li class="list-group-item">
+                                            <div class="justify-content-between d-flex">
+                                                <strong>Bidder</strong>
+                                                <strong>Bid Price</strong>
+                                            </div>
+                                        </li>
+                                        {{#each bids}}
+                                        <li class="list-group-item">
+                                            <div class="justify-content-between d-flex">
+                                                <div>{{this.bidder.firstName}} {{this.bidder.lastName}}</div>
+                                                <div>{{this.bid_price.amount}} {{@root.config.peerplaysAssetSymbol}}</div>
+                                            </div>
+                                        </li>
+                                        {{/each}}
+                                    </ul>
+                                </tr>
                             {{/if}}
-                        </li>
                         {{/each}}
-                    </ul>
-                    {{/if}}
-                    <div class="row justify-content-center top-pad-8" id="productButtons">
+   
+                            </table>
+                        </td>
+                    </tr>    
+                  
+                     {{/if}}
+                             <tr>
+                        <td colspan="4">
+                              <div class="row justify-content-center top-pad-8" id="productButtons">
                         <div class="col-sm-4 justify-content-between {{eqHidden this.sellOffersCount this.mintedCount}}">
                             <button class="btn btn-outline-success" data-id="{{_id}}">Mint</button>
                             <button class="btn btn-outline-success" data-id="{{_id}}">Sell</button>
@@ -86,9 +121,14 @@
                             <button class="btn btn-outline-success" data-id="{{_id}}">Mint</button>
                         </div>
                     </div>
-                </li>
-                {{/each}}
-            </ul>
+                        </td>
+                    </tr>             
+
+                    {{/each}}
+                    
+
+                </table>
+            </div>
         </div>
         <div class="col-md-12 mt-5">
             <div id="pager" class="d-flex justify-content-center"></div>
