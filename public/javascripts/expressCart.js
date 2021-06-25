@@ -2,6 +2,15 @@
 /* globals showNotification, numeral, feather */
 $(document).ready(function (){
     $('#loder').hide();
+      // applies an product filter
+      $(document).on('click', '#btn_product_filter', function(e){
+        console.log('express cart lode');
+        if($('#product_filter').val() !== ''){
+            window.location.href = '/customer/products/filter/' + $('#product_filter').val();
+        }else{
+            showNotification('Please enter a keyword to filter', 'danger');
+        }
+    });
     $('a').click(function(){
         $('#loder').show();
         $('.main').css('opacity','0.5');
@@ -212,6 +221,15 @@ $(document).ready(function (){
                     showNotification(msg.responseJSON.message, 'danger');
                 }
             });
+        }
+    });
+
+        // applies an product filter
+    $(document).on('click', '#btn_product_filter', function (e) {
+        if ($('#product_filter').val() !== '') {
+            window.location.href = '/customer/products/filter/' + $('#product_filter').val();
+        } else {
+            showNotification('Please enter a keyword to filter', 'danger');
         }
     });
 
@@ -482,32 +500,6 @@ $(document).ready(function (){
 
     // Mint NFT
     $(document).on('click', '#buttonMint', function(e){
-        $("#buttonMint").attr("disabled", true);
-        $('#nftMintModal').modal('hide');
-        $('#loder').show();
-        $('.main').css('opacity','0.5')
-        
-        $.ajax({
-            method: 'POST',
-            url: '/customer/product/mint',
-            data: {
-                productId: $('#productId').val(),
-                quantity: $('#productQuantity').val()
-            }
-        })
-        .done(function(msg){
-            $('#loder').hide();
-            $('.main').css('opacity','1')
-            $("#buttonMint").attr("disabled", false);
-            showNotification(msg.message, 'success', true);
-        })
-        .fail(function(msg){
-            $('#loder').hide();
-            $('.main').css('opacity','1')
-            if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
-                showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
-            }
-
         if(parseInt($('#ppyBalance').val()) < parseInt($('#mintFee').val()) * $('#productQuantity').val()) {
             showNotification('Insufficient funds. Please add funds.', 'warning', false);
             $('#nftMintModal').modal('hide');
@@ -516,6 +508,11 @@ $(document).ready(function (){
             $('#amountToAdd').val(minFundsRequired);
             $('#addFundsModal').modal('show');
         } else {
+            $("#buttonMint").attr("disabled", true);
+            $('#nftMintModal').modal('hide');
+            $('#loder').show();
+            $('.main').css('opacity','0.5');
+
             $.ajax({
                 method: 'POST',
                 url: '/customer/product/mint',
@@ -525,10 +522,14 @@ $(document).ready(function (){
                 }
             })
             .done(function(msg){
-                showNotification(msg.message, 'success', true);
+                $('#loder').hide();
+                $('.main').css('opacity','1');
                 $("#buttonMint").attr("disabled", false);
+                showNotification(msg.message, 'success', true);
             })
             .fail(function(msg){
+                $('#loder').hide();
+                $('.main').css('opacity','1');
                 if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
                     showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
                 }
@@ -548,11 +549,11 @@ $(document).ready(function (){
         if($('#productSellTypeCheckbox').prop('checked')){
             const bidHtml = `<div class="form-group">
                                 <label for="productMinPrice" class="control-label">Min. Price (${assetSymbol}) *</label>
-                                <input type="number" id="productMinPrice" class="form-control" min="0" step="any" required/>
+                                <input type="number" id="productMinPrice" class="form-control" min="0" step="any" value="0" required/>
                             </div>
                             <div class="form-group">
                                 <label for="productMaxPrice" class="control-label">Max. Price (${assetSymbol}) *</label>
-                                <input type="number" id="productMaxPrice" class="form-control" min="0" step="any" required/>
+                                <input type="number" id="productMaxPrice" class="form-control" min="0" step="any" value="0" required/>
                             </div>
                             <div class="form-group">
                                 <label for="saleEnd" class="control-label">Sale end date *</label>
@@ -568,11 +569,11 @@ $(document).ready(function (){
         } else {
             const fixedPriceHtml = `<div class="form-group">
                                         <label for="productSellQuantity" class="control-label">Quantity *</label>
-                                        <input type="number" id="productSellQuantity" class="form-control" min="0" step="1" onkeypress="return isNumberKey(event)" required/>
+                                        <input type="number" id="productSellQuantity" class="form-control" min="0" step="1" onkeypress="return isNumberKey(event)" value="0" required/>
                                     </div>
                                     <div class="form-group">
                                         <label for="productPrice" class="control-label">NFT Price (${assetSymbol}) *</label>
-                                        <input type="number" id="productPrice" class="form-control" min="0" step="any" required/>
+                                        <input type="number" id="productPrice" class="form-control" min="0" step="any" value="0" required/>
                                     </div>
                                     <div class="form-group">
                                         <label for="saleEnd" class="control-label">Sale end date *</label>
@@ -592,10 +593,41 @@ $(document).ready(function (){
    
     $(document).on('click', '#buttonSell', function(e){
         const isBidding = $('#productSellTypeCheckbox').prop('checked');
+
+        if(isBidding && !$('#productMinPrice').val()) {
+            showNotification('Minimum price is required', 'danger', false);
+            $('#productMinPrice').focus();
+            return;
+        }
+
+        if(isBidding && !$('#productMaxPrice').val()) {
+            showNotification('Maximum price is required', 'danger', false);
+            $('#productMaxPrice').focus();
+            return;
+        }
+
+        if(!isBidding && !$('#productSellQuantity').val()) {
+            showNotification('Quantity is required', 'danger', false);
+            $('#productSellQuantity').focus();
+            return;
+        }
+
+        if(!isBidding && !$('#productPrice').val()) {
+            showNotification('NFT price is required', 'danger', false);
+            $('#productPrice').focus();
+            return;
+        }
+
+        if(!$('#saleEnd').val()) {
+            showNotification('Sale end date is required', 'danger', false);
+            $('#saleEnd').focus();
+            return;
+        }
+
          $('#sellNFTModal').modal('hide');
          $('#loder').show();
         $('.main').css('opacity','0.5')
-        debugger
+
         $.ajax({
             method: 'POST',
             url: '/customer/product/sell',
@@ -616,7 +648,7 @@ $(document).ready(function (){
             $('#loder').hide();
             $('.main').css('opacity','1')
             if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
-                showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
+                showNotification(msg.responseJSON.message, 'danger', false, '/customer/login');
             }
 
             if(msg.responseJSON.message === 'Product not found'){
@@ -821,12 +853,11 @@ $(document).ready(function (){
                     data: {
                         productId: $('#productId').val(),
                         offerId: $('#offerId').val(),
-                        productPrice: parseFloat($('#product_bid').val()).toFixed(parseInt($('#addFundsAssetPrecision').val())),
-                        isBidding: $('#minPrice').val() !== $('#maxPrice').val()
+                        productPrice: parseFloat($('#product_bid').val()).toFixed(parseInt($('#addFundsAssetPrecision').val()))
                     }
                 })
                 .done(function(msg){
-                    showNotification(msg.message, 'success', true);
+                    showNotification(msg.message, 'success', false, '/');
                 })
                 .fail(function(msg){
                     showNotification(msg.responseJSON.message, 'danger');
@@ -1243,4 +1274,3 @@ function isNumberKey(evt){
         return false;
     return true;
 }
-})
