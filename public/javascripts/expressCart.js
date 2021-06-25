@@ -2,6 +2,15 @@
 /* globals showNotification, numeral, feather */
 $(document).ready(function (){
     $('#loder').hide();
+      // applies an product filter
+      $(document).on('click', '#btn_product_filter', function(e){
+        console.log('express cart lode');
+        if($('#product_filter').val() !== ''){
+            window.location.href = '/customer/products/filter/' + $('#product_filter').val();
+        }else{
+            showNotification('Please enter a keyword to filter', 'danger');
+        }
+    });
     $('a').click(function(){
         $('#loder').show();
         $('.main').css('opacity','0.5');
@@ -730,6 +739,7 @@ $(document).ready(function (){
 
     $('#btnModalWithdrawFunds').validator().on('click', function(e) {
         e.preventDefault();
+        
         var precision = parseInt($('#withdrawFundsAssetPrecision').val());
         var amountToWithdraw = Math.round((parseFloat($('#amountToWithdraw').val()) + Number.EPSILON) * Math.pow(10, precision));
         var maxAmount = Math.round((parseFloat($('#maxAmountWithdrawn').val()) + Number.EPSILON) * Math.pow(10,precision));
@@ -737,7 +747,9 @@ $(document).ready(function (){
 
         if(amountToWithdraw > maxAmount - transferFees) {
             showNotification('Select a lower amount', 'danger');
-        } else {
+        }else if(amountToWithdraw !== ''){
+            showNotification('Enter amount in Amount to withdraw field', 'danger');
+        }else {
             $.ajax({
                 method: 'POST',
                 url: '/customer/redeem',
@@ -865,6 +877,8 @@ $(document).ready(function (){
         $('#transferFees').val($(this).attr('data-fees'));
         $('#withdrawFundsModal').modal('show');
     });
+
+  
 
     $('.cart-product-quantity').on('keyup', function(e){
         checkMaxQuantity(e, $('.cart-product-quantity'));
