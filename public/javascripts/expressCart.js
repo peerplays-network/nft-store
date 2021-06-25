@@ -485,7 +485,7 @@ $(document).ready(function (){
             $('.modal-body #productId').val(productId);
             $('#nftMintModal').modal('show');
             $("#buttonMint").attr("disabled", false);
-        } else if($(this).text() === 'Sell') {
+        } else if($(this).text() === 'Sell' || $(this).text() === 'Re-sell') {
             var productId = $(this).attr('data-id');
             $('.modal-body #sellProductId').val(productId);
             $('#sellNFTModal').modal('show');
