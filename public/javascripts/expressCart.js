@@ -135,6 +135,12 @@ $(document).ready(function (){
         }
 
         var file = document.getElementById("productImage").files[0];
+        if(!file){
+            $('#loder').hide();
+            $('#productNewForm').css('opacity','1')
+          showNotification('Upload image', 'danger');
+          return
+        }
         var formData = new FormData();
         formData.append("title", $('#productTitle').val());
         formData.append("productDescription", $('#productDescription').val());

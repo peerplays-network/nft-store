@@ -100,8 +100,8 @@ router.post('/customer/create', async (req, res) => {
             email: req.body.email,
             password: req.body.password
         });
-    } catch(ex) {
-        if(ex.message && ex.message.email && ex.message.email === "Email already exists") {
+    }catch(ex){
+        if(ex.message && ex.message.email && ex.message.email === 'Email already exists'){
             peerIdUser = await new PeerplaysService().signIn({
                 login: req.body.email,
                 password: req.body.password
@@ -109,9 +109,9 @@ router.post('/customer/create', async (req, res) => {
         }else{
             console.error(ex.message);
             if(typeof ex.message === 'string'){
-                res.status(400).json({ message: 'PeerID Sign-up error: ' + ex.message });
+                res.status(400).json({ message: `PeerID Sign-up error: ${ex.message}` });
             }else{
-                res.status(400).json({ message: 'PeerID Sign-up error: ' + Object.values(ex.message) });
+                res.status(400).json({ message: `PeerID Sign-up error: ${Object.values(ex.message)}` });
             }
             return;
         }
@@ -159,7 +159,7 @@ router.post('/customer/create', async (req, res) => {
     }catch(ex){
         console.error(colors.red('Failed to insert customer: ', ex));
         res.status(400).json({
-            message: 'Customer creation failed: ' + ex.message
+            message: `Customer creation failed: ${ex.message}`
         });
     }
 });
@@ -230,15 +230,15 @@ router.get('/customer/account', async (req, res) => {
         balance = account.result[0][1].balances.find((bal) => bal.asset_type === config.peerplaysAssetID);
 
         const object200 = await peerplaysService.getBlockchainData({
-            api: "database",
-            method: "get_objects",
-            "params[0][]": "2.0.0",
+            api: 'database',
+            method: 'get_objects',
+            'params[0][]': '2.0.0',
             params: false
         });
 
         const currentFees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 0);
         transferFees = (currentFees[1].fee / Math.pow(10, config.peerplaysAssetPrecision)).toFixed(config.peerplaysAssetPrecision);
-    } catch(err) {
+    }catch(err){
         console.log(err);
         res.status(400).json({
             message: 'Error fetching user\'s balance or fees'
@@ -266,7 +266,7 @@ router.post('/customer/redeem', async (req, res) => {
     const db = req.app.db;
     const config = req.app.config;
 
-    if(!req.body.amount || parseFloat(req.body.amount) <= 0) {
+    if(!req.body.amount || parseFloat(req.body.amount) <= 0){
         res.status(400).json({
             message: 'Amount should be greater than 0'
         });
@@ -275,13 +275,13 @@ router.post('/customer/redeem', async (req, res) => {
 
     const adminUser = await db.users.findOne({ isOwner: true });
 
-    if(!req.session.peerplaysAccountId) {
+    if(!req.session.peerplaysAccountId){
         res.status(400).json({
             message: 'Account information missing. Please login again.'
         });
     }
 
-    if(!adminUser || !adminUser.peerplaysAccountId) {
+    if(!adminUser || !adminUser.peerplaysAccountId){
         res.status(400).json({
            message: 'App configured incorrectly. Please try again after some time.'
         });
@@ -299,7 +299,7 @@ router.post('/customer/redeem', async (req, res) => {
     }];
 
     try{
-        const peerplaysResult = await peerplaysService.sendOperations({operations}, req.session.peerIDAccessToken);
+        const peerplaysResult = await peerplaysService.sendOperations({ operations }, req.session.peerIDAccessToken);
         const amt = (peerplaysResult.result.trx.operations[0][1].amount.amount / Math.pow(10, config.peerplaysAssetPrecision)).toFixed(config.peerplaysAssetPrecision);
 
         const redeemObj = {
@@ -317,13 +317,13 @@ router.post('/customer/redeem', async (req, res) => {
         const newRedemption = await db.redemption.insertOne(redeemObj);
 
         res.status(200).json({ message: 'Amount withdrawn successfully', newRedemption });
-    }catch(err) {
+    }catch(err){
         console.log(err);
-        if(err.message) {
+        if(err.message){
             res.status(400).json({
                 message: err.message
             });
-        } else {
+        }else{
             res.status(400).json({
                 message: 'Some error occurred.'
             });
@@ -650,8 +650,8 @@ router.post('/customer/login_action', async (req, res) => {
             password: req.body.loginPassword
         });
 
-        if(new Date(accessToken.result.expires) <= new Date()) {
-            accessToken = await new PeerplaysService().refreshAccessToken({refresh_token: accessToken.result.refresh_token});
+        if(new Date(accessToken.result.expires) <= new Date()){
+            accessToken = await new PeerplaysService().refreshAccessToken({ refresh_token: accessToken.result.refresh_token });
         }
 
         const customerObj = {
@@ -838,7 +838,7 @@ router.post('/customer/reset/:token', async (req, res) => {
 
 // logout the customer
 router.post('/customer/check', (req, res) => {
-    if(!req.session.customerPresent){
+  if(!req.session.customerPresent){
         return res.status(400).json({
             message: 'Not logged in'
         });
