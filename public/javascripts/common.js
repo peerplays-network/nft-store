@@ -150,7 +150,6 @@ $(document).ready(function (){
 // show notification popup
 function showNotification(msg, type, reloadPage, redirect){
     // defaults to false
-    debugger;
     reloadPage = reloadPage || false;
 
     // defaults to null

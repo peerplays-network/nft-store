@@ -733,9 +733,11 @@ $(document).ready(function (){
         var precision = parseInt($('#addFundsAssetPrecision').val());
         var amountToAdd = Math.round((parseFloat($('#amountToAdd').val()) + Number.EPSILON) * Math.pow(10, precision));
         var minAmount = Math.round((parseFloat($('#minFundsRequired').val()) + Number.EPSILON) * Math.pow(10,precision));
-
+       
         if(amountToAdd < minAmount) {
             showNotification('Add more funds', 'danger');
+        }else if( amountToAdd == 0){
+            showNotification('Add funds amount', 'danger');
         } else {
             window.location.replace(`/checkout/payment/${(amountToAdd/Math.pow(10, precision)).toFixed(precision)}`);
         }
