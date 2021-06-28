@@ -360,7 +360,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser(config.secretCookie));
 app.use(session({
     resave: true,
-    saveUninitialized: true,
+    rolling: true,
+    saveUninitialized: false,
     secret: config.secretSession,
     cookie: {
         path: '/',

@@ -62,7 +62,7 @@
                                         <strong>Actions</strong>
                                     </th>
                                 </tr>
-                                 {{#each sellOffers}}
+                                {{#each sellOffers}}
                                 <tr>
                                     <td>
                                         <span>
@@ -83,28 +83,25 @@
                                         <a class="text-danger btn-delete-offer" data-id={{this.id}}> {{{feather 'trash-2'}}}</a>
                                     </td>
                                 </tr>
-                            {{#if bids}}
+                                {{#if bids}}
                                 <tr>
-                                    <ul class="list-group m-3">
-                                        <li class="list-group-item">
-                                            <div class="justify-content-between d-flex">
-                                                <strong>Bidder</strong>
-                                                <strong>Bid Price</strong>
-                                            </div>
-                                        </li>
-                                        {{#each bids}}
-                                        <li class="list-group-item">
-                                            <div class="justify-content-between d-flex">
-                                                <div>{{this.bidder.firstName}} {{this.bidder.lastName}}</div>
-                                                <div>{{this.bid_price.amount}} {{@root.config.peerplaysAssetSymbol}}</div>
-                                            </div>
-                                        </li>
-                                        {{/each}}
-                                    </ul>
+                                    <td colspan="4" class="table-bottom-space-none">
+                                        <table class="product-data">
+                                            <tr>
+                                                <th><strong>Bidder</strong></th>
+                                                <th><strong>Bid Price</strong></th>
+                                            </tr>
+                                            {{#each bids}}
+                                            <tr>
+                                                <td><span>{{this.bidder}}</span></td>
+                                                <td><span>{{this.bid_price.amount}} {{@root.config.peerplaysAssetSymbol}}</span></td>
+                                            </tr>
+                                            {{/each}}
+                                        </table>
+                                    </td>
                                 </tr>
-                            {{/if}}
-                        {{/each}}
-   
+                                {{/if}}
+                                {{/each}}
                             </table>
                         </td>
                     </tr>    
@@ -152,7 +149,7 @@
                             <div class="col-sm-6 col-md-4">
                                 <img src="{{this.base_uri}}" class="sidebar-addon"/>
                             </div>
-                            <div class="col-sm-6 col-md-4">{{this.productTitle}}</div>
+                            <div class="col-sm-6 col-md-4"><a href="/customer/product/edit/{{this._id}}">{{this.productTitle}}</a></div>
                         </div>
                         {{#if sellOffers}}
                         <ul class="list-group mb-2">
