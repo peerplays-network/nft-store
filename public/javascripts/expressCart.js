@@ -491,7 +491,7 @@ $(document).ready(function (){
             $('.modal-body #productId').val(productId);
             $('#nftMintModal').modal('show');
             $("#buttonMint").attr("disabled", false);
-        } else if($(this).text() === 'Sell') {
+        } else if($(this).text() === 'Sell' || $(this).text() === 'Re-sell') {
             var productId = $(this).attr('data-id');
             $('.modal-body #sellProductId').val(productId);
             $('#sellNFTModal').modal('show');
@@ -555,11 +555,11 @@ $(document).ready(function (){
         if($('#productSellTypeCheckbox').prop('checked')){
             const bidHtml = `<div class="form-group">
                                 <label for="productMinPrice" class="control-label">Min. Price (${assetSymbol}) *</label>
-                                <input type="number" id="productMinPrice" class="form-control" min="0" step="any" required/>
+                                <input type="number" id="productMinPrice" class="form-control" min="0" step="any" value="0" required/>
                             </div>
                             <div class="form-group">
                                 <label for="productMaxPrice" class="control-label">Max. Price (${assetSymbol}) *</label>
-                                <input type="number" id="productMaxPrice" class="form-control" min="0" step="any" required/>
+                                <input type="number" id="productMaxPrice" class="form-control" min="0" step="any" value="0" required/>
                             </div>
                             <div class="form-group">
                                 <label for="saleEnd" class="control-label">Sale end date *</label>
@@ -575,11 +575,11 @@ $(document).ready(function (){
         } else {
             const fixedPriceHtml = `<div class="form-group">
                                         <label for="productSellQuantity" class="control-label">Quantity *</label>
-                                        <input type="number" id="productSellQuantity" class="form-control" min="0" step="1" onkeypress="return isNumberKey(event)" required/>
+                                        <input type="number" id="productSellQuantity" class="form-control" min="0" step="1" onkeypress="return isNumberKey(event)" value="0" required/>
                                     </div>
                                     <div class="form-group">
                                         <label for="productPrice" class="control-label">NFT Price (${assetSymbol}) *</label>
-                                        <input type="number" id="productPrice" class="form-control" min="0" step="any" required/>
+                                        <input type="number" id="productPrice" class="form-control" min="0" step="any" value="0" required/>
                                     </div>
                                     <div class="form-group">
                                         <label for="saleEnd" class="control-label">Sale end date *</label>
@@ -598,15 +598,29 @@ $(document).ready(function (){
     // Sell NFT
    
     $(document).on('click', '#buttonSell', function(e){
-        if(!$('#productMinPrice').val()) {
+        const isBidding = $('#productSellTypeCheckbox').prop('checked');
+
+        if(isBidding && !$('#productMinPrice').val()) {
             showNotification('Minimum price is required', 'danger', false);
             $('#productMinPrice').focus();
             return;
         }
 
-        if(!$('#productMaxPrice').val()) {
+        if(isBidding && !$('#productMaxPrice').val()) {
             showNotification('Maximum price is required', 'danger', false);
             $('#productMaxPrice').focus();
+            return;
+        }
+
+        if(!isBidding && !$('#productSellQuantity').val()) {
+            showNotification('Quantity is required', 'danger', false);
+            $('#productSellQuantity').focus();
+            return;
+        }
+
+        if(!isBidding && !$('#productPrice').val()) {
+            showNotification('NFT price is required', 'danger', false);
+            $('#productPrice').focus();
             return;
         }
 
@@ -616,7 +630,6 @@ $(document).ready(function (){
             return;
         }
 
-        const isBidding = $('#productSellTypeCheckbox').prop('checked');
          $('#sellNFTModal').modal('hide');
          $('#loder').show();
         $('.main').css('opacity','0.5')

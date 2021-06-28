@@ -4,6 +4,6 @@
     "publicKey": "pk_test_51J0pGKEqo8vSMOg6d67oY2rkxnh8uUR7C5UBWR3oWI34trN9q11o0HdKxx9N5srD4GFJHb0zidLMdqWing8EdsoG00tOOypSHq",
     "stripeCurrency": "usd",
     "stripeDescription": "nft store payment",
-    "stripeLogoURL":"http://localhost:1111/images/stripeLogo.png",
+    "stripeLogoURL": "http://localhost:1111/images/stripeLogo.png",
     "stripeWebhookSecret": ""
 }
