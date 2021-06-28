@@ -153,6 +153,7 @@ router.get('/customer/products/:page?', async (req, res, next) => {
     const products = await paginateData(false, req, pageNum, 'products', { owner: req.session.peerplaysAccountId }, { orderDate: -1 });
 
     const allSellOffers = await getSellOffers();
+    const bidOffers = await getAllBidOffers();
 
     if(products && products.data){
         await Promise.all(products.data.map(async (nft) => {
@@ -170,12 +171,10 @@ router.get('/customer/products/:page?', async (req, res, next) => {
                     'params[0]': nft.owner
                 });
 
-                sellOffers = allSellOffers ? allSellOffers.filter((s) => s.nft_metadata_ids && s.nft_metadata_ids.includes(nft.nftMetadataID)) : [];
+                sellOffers = allSellOffers ? allSellOffers.filter((s) => s.nft_metadata_ids && s.nft_metadata_ids.includes(nft.nftMetadataID) && s.issuer === req.session.peerplaysAccountId) : [];
                 // eslint-disable-next-line no-undef
                 const sellOffersCount = sellOffers.reduce((sum, s) => sum + s.item_ids.length, 0);
                 minted = minted ? minted.result.filter((m) => m.nft_metadata_id === nft.nftMetadataID && m.owner === req.session.peerplaysAccountId) : [];
-
-                const bidOffers = await getAllBidOffers();
 
                 for(let i = 0; i < sellOffers.length; i++) {
                     const bids = bidOffers.filter((bid) => bid.item_ids && bid.item_ids[0] === sellOffers[i].item_ids[0] && bid.hasOwnProperty('bidder'));
@@ -204,9 +203,68 @@ router.get('/customer/products/:page?', async (req, res, next) => {
         }));
     }
 
+    //Get products purchased
+    let purchases;
+
+    try{
+        const allTokens = await peerplaysService.getBlockchainData({
+            api: 'database',
+            method: 'nft_get_tokens_by_owner',
+            'params[0]': req.session.peerplaysAccountId
+        });
+
+        await Promise.all(allTokens.result.map(async (token) => {
+            const metadata = await peerplaysService.getBlockchainData({
+                api: 'database',
+                method: 'get_objects',
+                'params[0][]': token.nft_metadata_id
+            });
+
+            if(metadata && metadata.result[0]) {
+                token.metadataOwner = metadata.result[0].owner;
+
+                if(metadata.result[0].base_uri.includes('/uploads/')){
+                    token.base_uri = `${req.protocol}://${req.get('host')}/imgs${metadata.result[0].base_uri.split('/uploads')[1]}`;
+                }else{
+                    token.base_uri = metadata.result[0].base_uri;
+                }
+            }
+
+            const product = await db.products.findOne({nftMetadataID: token.nft_metadata_id});
+
+            if(product) {
+                token._id = product._id;
+                token.productTitle = product.productTitle;
+                token.productDescription = product.productDescription;
+                token.productCategory = product.productCategory;
+            }
+
+            const sellOffers = allSellOffers ? allSellOffers.filter((s) => s.item_ids && s.item_ids.includes(token.id) && s.issuer === req.session.peerplaysAccountId) : [];
+
+            for(let i = 0; i < sellOffers.length; i++) {
+                const bids = bidOffers.filter((bid) => bid.item_ids && bid.item_ids[0] === sellOffers[i].item_ids[0] && bid.hasOwnProperty('bidder'));
+                await Promise.all(bids.map(async (bid) => {
+                  const bidder = await db.customers.findOne({peerplaysAccountId: bid.bidder});
+                  bid.bidder = bidder;
+                  bid.bid_price.amount = bid.bid_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
+                }));
+                sellOffers[i].bids = bids;
+            }
+
+            token.sellOffers = sellOffers;
+            token.mintedCount = 1;
+            token.sellOffersCount = sellOffers.length;
+        }));
+
+        purchases = allTokens.result.filter((nft) => nft.owner !== nft.metadataOwner && nft._id);
+    } catch(ex){
+        console.error(ex);
+    }
+
     res.render('products', {
         title: 'My NFTs',
         results: products.data,
+        purchases,
         totalItemCount: products.totalItems,
         allSellOffers,
         mintFee,
@@ -451,7 +509,10 @@ router.post('/customer/product/sell', async (req, res) => {
         });
 
         sellOffers = await getSellOffers();
-        sellOffers = sellOffers ? sellOffers.filter((s) => s.nft_metadata_ids && s.nft_metadata_ids.includes(product.nftMetadataID)) : [];
+        sellOffers = sellOffers ? sellOffers.filter((s) => s.nft_metadata_ids 
+                                && s.nft_metadata_ids.includes(product.nftMetadataID)
+                                && s.issuer === req.session.peerplaysAccountId) : [];
+
         const sellOffersCount = sellOffers.reduce((sum, s) => sum + s.item_ids.length, 0);
 
         minted = minted ? minted.result.filter((m) => m.nft_metadata_id === product.nftMetadataID && m.owner === req.session.peerplaysAccountId) : [];
@@ -564,6 +625,29 @@ router.get('/customer/product/edit/:id', async (req, res) => {
     }else{
         product.base_uri = metadata.result[0].base_uri;
     }
+
+    let updateFee = 0, balance = 0;
+
+    const account = await peerplaysService.getBlockchainData({
+        api: "database",
+        method: "get_full_accounts",
+        "params[0][]": req.session.peerplaysAccountId,
+        params: true
+    });
+
+    const object200 = await peerplaysService.getBlockchainData({
+        api: "database",
+        method: "get_objects",
+        "params[0][]": "2.0.0",
+        params: false
+    });
+
+    const fees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 93);
+    updateFee = fees[1].fee;
+    const updateFeeFloat = (fees[1].fee / Math.pow(10, config.peerplaysAssetPrecision)).toFixed(config.peerplaysAssetPrecision);
+
+    const assetBalance = account.result[0][1].balances.find((bal) => bal.asset_type === config.peerplaysAssetID);
+    balance = assetBalance ? assetBalance.balance : 0;
 
     res.render('product-edit', {
         title: 'Edit product',
