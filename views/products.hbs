@@ -21,8 +21,8 @@
             <strong>{{ @root.__ "Recent products" }}</strong>
             {{/ifCond}}
 
-            {{!-- <div class="table-responsvie product-information">
-                <table width="100%" class="product-data"> 
+            <div class="table-responsvie product-information pt-3">
+                <table width="100%" class="product-data cus-border-table"> 
                     <tr>
                         <th>
                              <strong>Image</strong>
@@ -39,7 +39,7 @@
                     </tr>
                     <tr></tr>
                 </table>
-            </div> --}}
+            </div>
             <ul class="list-group">
                 <li class="list-group-item">
                     <div class="justify-content-between d-flex">
@@ -84,28 +84,35 @@
                                 <div><a class="text-danger btn-delete-offer" data-id={{this.id}}> {{{feather 'trash-2'}}}</a></div>
                             </div>
                             {{#if bids}}
-                            <ul class="list-group m-3">
-                                <li class="list-group-item">
-                                    <div class="justify-content-between d-flex">
-                                        <strong>Bidder</strong>
-                                        <strong>Bid Price</strong>
-                                    </div>
-                                </li>
-                                {{#each bids}}
-                                <li class="list-group-item">
-                                    <div class="justify-content-between d-flex">
-                                        <div>{{this.bidder.firstName}} {{this.bidder.lastName}}</div>
-                                        <div>{{this.bid_price.amount}} {{@root.config.peerplaysAssetSymbol}}</div>
-                                    </div>
-                                </li>
-                                {{/each}}
-                            </ul>
+                                <tr>
+                                    <ul class="list-group m-3">
+                                        <li class="list-group-item">
+                                            <div class="justify-content-between d-flex">
+                                                <strong>Bidder</strong>
+                                                <strong>Bid Price</strong>
+                                            </div>
+                                        </li>
+                                        {{#each bids}}
+                                        <li class="list-group-item">
+                                            <div class="justify-content-between d-flex">
+                                                <div>{{this.bidder.firstName}} {{this.bidder.lastName}}</div>
+                                                <div>{{this.bid_price.amount}} {{@root.config.peerplaysAssetSymbol}}</div>
+                                            </div>
+                                        </li>
+                                        {{/each}}
+                                    </ul>
+                                </tr>
                             {{/if}}
-                        </li>
                         {{/each}}
-                    </ul>
-                    {{/if}}
-                    <div class="row justify-content-center top-pad-8" id="productButtons">
+   
+                            </table>
+                        </td>
+                    </tr>    
+                  
+                     {{/if}}
+                             <tr>
+                        <td colspan="4">
+                              <div class="row justify-content-center top-pad-8" id="productButtons">
                         <div class="col-sm-4 justify-content-between {{eqHidden this.sellOffersCount this.mintedCount}}">
                             <button class="btn btn-outline-success" data-id="{{_id}}">Mint</button>
                             <button class="btn btn-outline-success" data-id="{{_id}}">Sell</button>
@@ -114,14 +121,94 @@
                             <button class="btn btn-outline-success" data-id="{{_id}}">Mint</button>
                         </div>
                     </div>
-                </li>
-                {{/each}}
-            </ul>
+                        </td>
+                    </tr>             
+
+                    {{/each}}
+                    
+
+                </table>
+            </div>
         </div>
         <div class="col-md-12 mt-5">
             <div id="pager" class="d-flex justify-content-center"></div>
         </div>
     </div>
+    {{!--Recent purchases--}}
+    {{#if purchases}}
+    <div class="bg-light m-4">
+        <div class="col-sm-12">
+                <strong>{{ @root.__ "NFTs purchased" }}</span></strong>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <div class="d-flex">
+                            <strong class="col-sm-6 col-md-4">Image</strong>
+                            <strong class="col-sm-6 col-md-4">Title</strong>
+                        </div>
+                    </li>
+                    {{#each purchases}}
+                    <li class="list-group-item">
+                        <div class="d-flex mb-2">
+                            <div class="col-sm-6 col-md-4">
+                                <img src="{{this.base_uri}}" class="sidebar-addon"/>
+                            </div>
+                            <div class="col-sm-6 col-md-4">{{this.productTitle}}</div>
+                        </div>
+                        {{#if sellOffers}}
+                        <ul class="list-group mb-2">
+                            <li class="list-group-item">
+                                <div class="justify-content-between d-flex">
+                                    <strong>Min. Price</strong>
+                                    <strong>Max. Price</strong>
+                                    <strong>Sale end date</strong>
+                                    <strong>Actions</strong>
+                                </div>
+                            </li>
+                            {{#each sellOffers}}
+                            <li class="list-group-item">
+                                <div class="justify-content-between d-flex">
+                                    <div>{{this.minimum_price.amount}} {{@root.config.peerplaysAssetSymbol}}</div>
+                                    <div>{{this.maximum_price.amount}} {{@root.config.peerplaysAssetSymbol}}</div>
+                                    <div>{{this.offer_expiration_date}}</div>
+                                    <div><a class="text-danger btn-delete-offer" data-id={{this.id}}> {{{feather 'trash-2'}}}</a></div>
+                                </div>
+                                {{#if bids}}
+                                <ul class="list-group m-3">
+                                    <li class="list-group-item">
+                                        <div class="justify-content-between d-flex">
+                                            <strong>Bidder</strong>
+                                            <strong>Bid Price</strong>
+                                        </div>
+                                    </li>
+                                    {{#each bids}}
+                                    <li class="list-group-item">
+                                        <div class="justify-content-between d-flex">
+                                            <div>{{this.bidder.firstName}} {{this.bidder.lastName}}</div>
+                                            <div>{{this.bid_price.amount}} {{@root.config.peerplaysAssetSymbol}}</div>
+                                        </div>
+                                    </li>
+                                    {{/each}}
+                                </ul>
+                                {{/if}}
+                            </li>
+                            {{/each}}
+                        </ul>
+                        {{/if}}
+                        <div class="row justify-content-center top-pad-8" id="productButtons">
+                            <div class="col-sm-4 justify-content-between {{eqHidden this.sellOffersCount this.mintedCount}}">
+                                <button class="btn btn-outline-success" data-id="{{_id}}">Re-sell</button>
+                            </div>
+                        </div>
+                    </li>
+                    {{/each}}
+                </ul>
+            </div>
+            <div class="col-md-12 mt-5">
+                <div id="pager" class="d-flex justify-content-center"></div>
+            </div>
+        </div>
+    </div>
+    {{/if}}
 </div>
  <div class="spinner-border text-primary" style="position: fixed;left:50%;top:50%;" id="loder" role="status">
             <span class="sr-only">Loading...</span>
