@@ -129,6 +129,7 @@ $(document).ready(function (){
         e.preventDefault();
         $('#loder').show();
         $('#productNewForm').css('opacity','0.5')
+        $('#frm_product_save').prop('disabled', true);
        
         if($('#productPermalink').val() === '' && $('#productTitle').val() !== ''){
             $('#productPermalink').val(slugify($('#productTitle').val()));
@@ -154,6 +155,8 @@ $(document).ready(function (){
             $('#loder').hide();
             $('#productNewForm').css('opacity','1')
             showNotification(msg.message, 'success', false, '/customer/products/1');
+            document.getElementById("productNewForm").reset();
+            $('#frm_product_save').prop('disabled', false);
         })
         .fail(function(msg){
             $('#loder').hide();
@@ -166,6 +169,7 @@ $(document).ready(function (){
             }
            
             showNotification(msg.responseJSON.message, 'danger');
+            $('#frm_product_save').prop('disabled', false);
         });
     });
 
