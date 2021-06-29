@@ -2,15 +2,6 @@
 /* globals showNotification, numeral, feather */
 $(document).ready(function (){
     $('#loder').hide();
-      // applies an product filter
-      $(document).on('click', '#btn_product_filter', function(e){
-        console.log('express cart lode');
-        if($('#product_filter').val() !== ''){
-            window.location.href = '/customer/products/filter/' + $('#product_filter').val();
-        }else{
-            showNotification('Please enter a keyword to filter', 'danger');
-        }
-    });
     $('a').click(function(){
         $('#loder').show();
         $('.main').css('opacity','0.5');
