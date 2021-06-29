@@ -755,7 +755,7 @@ $(document).ready(function (){
 
         if(amountToWithdraw > maxAmount - transferFees) {
             showNotification('Select a lower amount', 'danger');
-        }else if(amountToWithdraw !== ''){
+        }else if(!amountToWithdraw){
             showNotification('Enter amount in Amount to withdraw field', 'danger');
         }else {
             $.ajax({
