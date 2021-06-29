@@ -39,25 +39,9 @@
                     </tr>
                     <tr></tr>
                 </table>
-            </div> --}}
+            </div> 
             <ul class="list-group">
-                <li class="list-group-item">
-                    <div class="justify-content-between d-flex">
-                        <div class="table-first-child">
-                            <strong>Image</strong>
-                        </div>
-                        <div class="table-sec-child">
-                            <strong>Title</strong>
-                        </div>
-                        <div class="table-third-child">
-                            <strong>Minted</strong>
-                        </div>
-                        <div class="table-fourth-child">
-                            <strong>Selling</strong>
-                        </div>
-                    </div>
-                </li>
-                {{#each results}}
+               {{#each results}}
                 <li class="list-group-item">
                     <div class="justify-content-between d-flex mb-2">
                         <img src="{{this.base_uri}}" class="sidebar-addon"/>
