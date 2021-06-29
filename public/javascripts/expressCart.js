@@ -213,7 +213,7 @@ $(document).ready(function (){
                 processData: false
             })
             .done(function(msg){
-                showNotification(msg.message, 'success', true);
+                showNotification(msg.message, 'success', true ,'/customer/products/1');
             })
             .fail(function(msg){
                 if(msg.responseJSON && msg.responseJSON.length > 0){
