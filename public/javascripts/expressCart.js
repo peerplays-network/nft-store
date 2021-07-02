@@ -511,6 +511,8 @@ $(document).ready(function (){
             $('#minFundsRequired').val(minFundsRequired);
             $('#amountToAdd').val(minFundsRequired);
             $('#addFundsModal').modal('show');
+        }else if(!minFundsRequired){
+            showNotification("Quantity is required", 'danger');  
         } else {
             $("#buttonMint").attr("disabled", true);
             $('#nftMintModal').modal('hide');
