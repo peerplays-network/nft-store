@@ -204,7 +204,7 @@ $(document).ready(function (){
                 processData: false
             })
             .done(function(msg){
-                showNotification(msg.message, 'success', true);
+                showNotification(msg.message, 'success', true ,'/customer/products/1');
             })
             .fail(function(msg){
                 if(msg.responseJSON && msg.responseJSON.length > 0){
@@ -502,6 +502,8 @@ $(document).ready(function (){
             $('#minFundsRequired').val(minFundsRequired);
             $('#amountToAdd').val(minFundsRequired);
             $('#addFundsModal').modal('show');
+        }else if(!minFundsRequired){
+            showNotification("Quantity is required", 'danger');  
         } else {
             $("#buttonMint").attr("disabled", true);
             $('#nftMintModal').modal('hide');
