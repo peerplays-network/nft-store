@@ -104,26 +104,23 @@
                                 {{/each}}
                             </table>
                         </td>
-                    </tr>    
+                    </tr>
                   
                      {{/if}}
-                             <tr>
-                        <td colspan="4">
+                      <tr>
+                          <td colspan="4">
                               <div class="row justify-content-center top-pad-8" id="productButtons">
-                        <div class="col-sm-4 justify-content-between {{eqHidden this.sellOffersCount this.mintedCount}}">
-                            <button class="btn btn-outline-success" data-id="{{_id}}">Mint</button>
-                            <button class="btn btn-outline-success" data-id="{{_id}}">Sell</button>
-                        </div>
-                        <div class="col-sm-4 justify-content-center {{neqHidden this.sellOffersCount this.mintedCount}}">
-                            <button class="btn btn-outline-success" data-id="{{_id}}">Mint</button>
-                        </div>
-                    </div>
+                                  <div class="col-sm-4 justify-content-between {{eqHidden this.sellOffersCount this.mintedCount}}">
+                                      <button class="btn btn-outline-success" data-id="{{_id}}">Mint</button>
+                                      <button class="btn btn-outline-success" data-id="{{_id}}">Sell</button>
+                                  </div>
+                                  <div class="col-sm-4 justify-content-center {{neqHidden this.sellOffersCount this.mintedCount}}">
+                                      <button class="btn btn-outline-success" data-id="{{_id}}">Mint</button>
+                                  </div>
+                            </div>
                         </td>
-                    </tr>             
-
+                    </tr>
                     {{/each}}
-                    
-
                 </table>
             </div>
         </div>
@@ -219,3 +216,5 @@
 <input type="hidden" id="ppyBalance" value="{{balance}}">
 <input type="hidden" id="mintFee" value="{{mintFee}}">
 <input type="hidden" id="sellFee" value="{{sellFee}}">
+<input type="hidden" id="sellCancelFee" value="{{sellCancelFee}}">
+<input type="hidden" id="feeAssetPrecision" value="{{config.peerplaysAssetPrecision}}">

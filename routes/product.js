@@ -125,7 +125,7 @@ router.get('/customer/products/:page?', async (req, res, next) => {
         pageNum = req.params.page;
     }
 
-    let sellFee = 0, mintFee = 0, balance = 0;
+    let sellFee = 0, mintFee = 0, balance = 0, sellCancelFee = 0;
 
     const account = await peerplaysService.getBlockchainData({
         api: "database",
@@ -146,6 +146,9 @@ router.get('/customer/products/:page?', async (req, res, next) => {
 
     const sellFees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 88);
     sellFee = sellFees[1].fee;
+
+    const sellCancelFees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 90);
+    sellCancelFee = (sellCancelFees[1].fee / Math.pow(10, config.peerplaysAssetPrecision)).toFixed(config.peerplaysAssetPrecision);
 
     const assetBalance = account.result[0][1].balances.find((bal) => bal.asset_type === config.peerplaysAssetID);
     balance = assetBalance ? assetBalance.balance : 0;
@@ -274,6 +277,7 @@ router.get('/customer/products/:page?', async (req, res, next) => {
         allSellOffers,
         mintFee,
         sellFee,
+        sellCancelFee,
         balance,
         pageNum,
         paginateUrl: 'customer/products',
