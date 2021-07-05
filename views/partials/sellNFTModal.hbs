@@ -10,6 +10,7 @@
             <div class="modal-body">
                 <form class="form-horizontal m-4" id="productSellForm" data-toggle="validator">
                     <input type="hidden" id="sellProductId" value="">
+                    <input type="hidden" id="sellFeePerUnit" value="">
                     <input type="hidden" id="assetSymbol" value="{{config.peerplaysAssetSymbol}}">
                     <div class="form-group">
                         <div class="checkbox">
@@ -29,6 +30,7 @@
                             <label for="saleEnd" class="control-label">{{ @root.__ "Sale end" }} *</label>
                             <input id="saleEnd" readonly />
                         </div>
+                        <div id="sellingFee"></div>
                     </div>
                 </form>
             </div>

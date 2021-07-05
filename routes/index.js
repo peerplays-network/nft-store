@@ -433,7 +433,7 @@ router.get('/product/:id/:offerId', async (req, res) => {
         return;
     }
 
-    let metadata, offer, balance, fee, bids;
+    let metadata, offer, balance, fee, bids, bidFee;
 
     try{
         metadata = await peerplaysService.getBlockchainData({
@@ -477,6 +477,8 @@ router.get('/product/:id/:offerId', async (req, res) => {
 
             const bidFees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 89);
             fee = bidFees[1].fee;
+
+            bidFee = (fee / Math.pow(10, config.peerplaysAssetPrecision)).toFixed(config.peerplaysAssetPrecision);
 
             const assetBalance = account.result[0][1].balances.find((bal) => bal.asset_type === config.peerplaysAssetID);
             balance = assetBalance ? assetBalance.balance : 0;
@@ -602,6 +604,7 @@ router.get('/product/:id/:offerId', async (req, res) => {
         relatedProducts,
         balance,
         fee,
+        bidFee,
         productDescription: stripHtml(product.productDescription),
         metaDescription: `${config.cartTitle} - ${product.productTitle}`,
         config: config,
