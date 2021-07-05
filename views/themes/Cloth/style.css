@@ -259,26 +259,11 @@
  .table-fourth-child {
     width: 20%;
  }
- .product-data th:nth-child(1) {
-    width: 30%;
- }
- .product-data th:nth-child(2) {
-    width: 30%;
- }
- .product-data th:nth-child(3) {
-    width: 20%;
- }
- .product-data th:nth-child(4) {
-    width: 20%;
- }
 
  .table-bottom-space-none .table  {
     margin-bottom: 0px;
     border: 1px solid #dee2e6;
     background-color: #fff;
- }
- .table-hover tbody tr:hover {
-     background-color: transparent !important;
  }
  .cus-border-table {
     border: 1px solid #dee2e6;
