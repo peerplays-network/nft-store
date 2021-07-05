@@ -154,7 +154,12 @@ router.get('/customer/products/:page?', async (req, res, next) => {
     balance = assetBalance ? assetBalance.balance : 0;
 
     // Get our paginated data
-    const products = await paginateData(false, req, pageNum, 'products', { owner: req.session.peerplaysAccountId }, { orderDate: -1 });
+    let products;
+    if(req.session.isAdmin) {
+        products = await paginateData(false, req, pageNum, 'products', {}, { orderDate: -1 });
+    } else {
+        products = await paginateData(false, req, pageNum, 'products', { owner: req.session.peerplaysAccountId }, { orderDate: -1 });
+    }
 
     const allSellOffers = await getSellOffers();
     const bidOffers = await getAllBidOffers();
@@ -295,8 +300,93 @@ router.get('/customer/products/filter/:search', async (req, res, next) => {
     const db = req.app.db;
     const searchTerm = req.params.search;
 
-    // we search on the lunr indexes
-    const results = await db.products.find({ $or: [{ productTitle: { $regex: searchTerm, $options: 'i' } }, { productDescription: { $regex: searchTerm, $options: 'i' } }] }).toArray();
+    let sellFee = 0, mintFee = 0, balance = 0, sellCancelFee = 0;
+
+    const account = await peerplaysService.getBlockchainData({
+        api: "database",
+        method: "get_full_accounts",
+        "params[0][]": req.session.peerplaysAccountId,
+        params: true
+    });
+
+    const object200 = await peerplaysService.getBlockchainData({
+        api: "database",
+        method: "get_objects",
+        "params[0][]": "2.0.0",
+        params: false
+    });
+
+    const mintFees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 94);
+    mintFee = mintFees[1].fee;
+
+    const sellFees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 88);
+    sellFee = sellFees[1].fee;
+
+    const sellCancelFees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 90);
+    sellCancelFee = (sellCancelFees[1].fee / Math.pow(10, config.peerplaysAssetPrecision)).toFixed(config.peerplaysAssetPrecision);
+
+    const assetBalance = account.result[0][1].balances.find((bal) => bal.asset_type === config.peerplaysAssetID);
+    balance = assetBalance ? assetBalance.balance : 0;
+
+    let results;
+    if(req.session.isAdmin) {
+        results = await db.products.find({ $or: [{ productTitle: { $regex: searchTerm, $options: 'i' } }, { productDescription: { $regex: searchTerm, $options: 'i' } }] }).toArray();
+    } else {
+        results = await db.products.find({ $or: [{ productTitle: { $regex: searchTerm, $options: 'i' } }, { productDescription: { $regex: searchTerm, $options: 'i' } }], owner: req.session.peerplaysAccountId }).toArray();
+    }
+
+    const allSellOffers = await getSellOffers();
+    const bidOffers = await getAllBidOffers();
+
+    if(results && results && results.length > 0){
+        const metadatas = await peerplaysService.getBlockchainData({
+            api: 'database',
+            method: 'get_objects',
+            'params[0][]': results.map((nft) => nft.nftMetadataID)
+        });
+
+        await Promise.all(results.map(async (nft) => {
+            let metadata, minted, sellOffers;
+            try{
+                metadata = metadatas.result.find((metadata) => metadata.id === nft.nftMetadataID);
+
+                minted = await peerplaysService.getBlockchainData({
+                    api: 'database',
+                    method: 'nft_get_all_tokens',
+                    'params[0]': nft.owner
+                });
+
+                sellOffers = allSellOffers ? _.cloneDeep(allSellOffers.filter((s) => s.nft_metadata_ids && s.nft_metadata_ids.includes(nft.nftMetadataID) && s.issuer === req.session.peerplaysAccountId)) : [];
+                // eslint-disable-next-line no-undef
+                const sellOffersCount = sellOffers.reduce((sum, s) => sum + s.item_ids.length, 0);
+                minted = minted ? minted.result.filter((m) => m.nft_metadata_id === nft.nftMetadataID && m.owner === req.session.peerplaysAccountId) : [];
+
+                for(let i = 0; i < sellOffers.length; i++) {
+                    const bids = _.cloneDeep(bidOffers.filter((bid) => bid.item_ids && bid.item_ids[0] === sellOffers[i].item_ids[0] && bid.hasOwnProperty('bidder'))); //Deep copy array
+                    await Promise.all(bids.map(async (bid) => {
+                      const bidder = await db.customers.findOne({peerplaysAccountId: bid.bidder});
+                      bid.bidder = `${bidder.firstName} ${bidder.lastName}`;
+                      bid.bid_price.amount = bid.bid_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
+                    }));
+                    sellOffers[i].bids = bids;
+                }
+
+                nft.minted = minted;
+                nft.mintedCount = minted.length;
+                nft.sellOffers = sellOffers;
+                // eslint-disable-next-line no-undef
+                nft.sellOffersCount = sellOffersCount;
+            }catch(ex){
+                console.error(ex);
+            }
+
+            if(metadata && metadata.base_uri.includes('/uploads/')){
+                nft.base_uri = `${req.protocol}://${req.get('host')}/imgs${metadata.base_uri.split('/uploads')[1]}`;
+            }else{
+                nft.base_uri = metadata.base_uri;
+            }
+        }));
+    }
 
     if(req.apiAuthenticated){
         res.status(200).json(results);
@@ -307,7 +397,11 @@ router.get('/customer/products/filter/:search', async (req, res, next) => {
         title: 'Results',
         results: results,
         resultType: 'filtered',
-        admin: true,
+        admin: false,
+        mintFee,
+        sellFee,
+        sellCancelFee,
+        balance,
         config: req.app.config,
         session: req.session,
         searchTerm: searchTerm,
