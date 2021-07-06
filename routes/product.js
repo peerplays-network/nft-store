@@ -468,7 +468,7 @@ router.post('/customer/product/insert', upload.single('productImage'), async (re
         productDescription: req.body.productDescription,
         productCategory: req.body.productCategory,
         productPublished: req.body.productPublished == 'true',
-        productPermalink: req.body.productPermalink,
+        // productPermalink: req.body.productPermalink,
         owner: req.session.peerplaysAccountId
     };
 
