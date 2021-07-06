@@ -10,12 +10,14 @@
         "productTitle": {
             "type": "string",
             "isNotEmpty": true,
-            "minLength": 2
+            "minLength": 2,
+            "maxLength": 50
         },
         "productDescription": {
             "type": "string",
             "isNotEmpty": true,
-            "minLength": 25
+            "minLength": 25,
+            "maxLength": 1000
         },
         "productCategory": {
             "type": "string",
