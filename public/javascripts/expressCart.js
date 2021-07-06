@@ -164,6 +164,10 @@ $(document).ready(function (){
         });
     });
 
+    $('.closemodel').click(()=>{
+    location.reload();
+    })
+
     $('#productEditForm').validator().on('submit', function(e){
         e.preventDefault();
         if(parseInt($('#ppyBalance').val()) < parseInt($('#updateFee').val()) * $('#productQuantity').val()) {
