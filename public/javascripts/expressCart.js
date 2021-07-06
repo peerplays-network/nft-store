@@ -156,17 +156,13 @@ $(document).ready(function (){
                 var errorMessages = validationErrors(msg.responseJSON);
                 $('#validationModalBody').html(errorMessages);
                 $('#validationModal').modal('show');
+                $('#frm_product_save').prop('disabled', false);
                 return;
             }
-           
-            showNotification(msg.responseJSON.message, 'danger');
+           showNotification(msg.responseJSON.message, 'danger');
             $('#frm_product_save').prop('disabled', false);
         });
     });
-
-    $('.closemodel').click(()=>{
-    location.reload();
-    })
 
     $('#productEditForm').validator().on('submit', function(e){
         e.preventDefault();
