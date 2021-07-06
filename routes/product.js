@@ -476,6 +476,12 @@ router.post('/customer/product/insert', upload.single('productImage'), async (re
         filePath = req.file.path;
     }
 
+    const nameExists = await db.products.findOne({ productTitle: req.body.title });
+    if(nameExists) {
+        res.status(400).json({message: 'NFT title already exists. Please choose another title.'});
+        return;
+    }
+
     // Validate the body again schema
     const schemaValidate = validateJson('newProduct', doc);
     if(!schemaValidate.result){
@@ -917,6 +923,12 @@ router.post('/customer/product/update', upload.single('productImage'), async (re
         filePath = req.file.path;
     }
 
+    const nameExists = await db.products.findOne({ productTitle: req.body.title });
+    if(nameExists && nameExists.nftMetadataID !== product.nftMetadataID) {
+        res.status(400).json({message: 'NFT title already exists. Please choose another title.'});
+        return;
+    }
+
     // Validate the body again schema
     const schemaValidate = validateJson('editProduct', productDoc);
     if(!schemaValidate.result){
@@ -927,7 +939,7 @@ router.post('/customer/product/update', upload.single('productImage'), async (re
     // Remove productId from doc
     delete productDoc.productId;
 
-    if(filePath !== '' || product.productTitle !== req.body.title){
+    if(filePath !== ''){
         const op = {
             op_name: 'nft_metadata_update',
             fee_asset: config.peerplaysAssetID,
@@ -937,10 +949,6 @@ router.post('/customer/product/update', upload.single('productImage'), async (re
 
         if(filePath !== ''){
             op.base_uri = filePath;
-        }
-
-        if(product.productTitle !== req.body.title){
-            op.name = req.body.title;
         }
 
         const body = {

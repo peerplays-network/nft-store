@@ -125,70 +125,82 @@ $(document).ready(function (){
 
     $('#productNewForm').validator().on('submit', function(e){
         e.preventDefault();
-        $('#loder').show();
-        $('#productNewForm').css('opacity','0.5')
-        $('#frm_product_save').prop('disabled', true);
-       
-        if($('#productPermalink').val() === '' && $('#productTitle').val() !== ''){
-            $('#productPermalink').val(slugify($('#productTitle').val()));
-        }
-
-        var file = document.getElementById("productImage").files[0];
-
-        if(!file){
-            $('#loder').hide();
-            $('#productNewForm').css('opacity','1');
-            showNotification('Upload image', 'danger');
-            return;
-        }
-
-        var formData = new FormData();
-        formData.append("title", $('#productTitle').val());
-        formData.append("productDescription", $('#productDescription').val());
-        formData.append("productCategory", $('#category').val() || '');
-        formData.append("productPublished", $('#productPublished').val());
-        formData.append("productPermalink", $('#productPermalink').val());
-        formData.append("productImage",file);
-        
-        $.ajax({
-            method: 'POST',
-            url: '/customer/product/insert',
-            data: formData,
-            contentType: false,
-            processData: false
-        })
-        .done(function(msg){
-            $('#loder').hide();
-            $('#productNewForm').css('opacity','1')
-            showNotification(msg.message, 'success', false, '/customer/products/1');
-            document.getElementById("productNewForm").reset();
-            $('#frm_product_save').prop('disabled', false);
-        })
-        .fail(function(msg){
-            $('#loder').hide();
-            $('#productNewForm').css('opacity','1')
-            if(msg.responseJSON && msg.responseJSON.length > 0){
-                var errorMessages = validationErrors(msg.responseJSON);
-                $('#validationModalBody').html(errorMessages);
-                $('#validationModal').modal('show');
-                return;
-            }
-           
-            showNotification(msg.responseJSON.message, 'danger');
-            $('#frm_product_save').prop('disabled', false);
-        });
-    });
-
-    $('#productEditForm').validator().on('submit', function(e){
-        e.preventDefault();
-        if(parseInt($('#ppyBalance').val()) < parseInt($('#updateFee').val()) * $('#productQuantity').val()) {
+        if(parseInt($('#ppyBalance').val()) < parseInt($('#createFee').val())) {
             showNotification('Insufficient funds. Please add funds.', 'warning', false);
-            $('#nftMintModal').modal('hide');
-            var minFundsRequired = (parseInt($('#updateFee').val()) * $('#productQuantity').val() - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
+            var minFundsRequired = (parseInt($('#createFee').val()) - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
             $('#minFundsRequired').val(minFundsRequired);
             $('#amountToAdd').val(minFundsRequired);
             $('#addFundsModal').modal('show');
         } else {
+            $('#loder').show();
+            $('#productNewForm').css('opacity','0.5');
+            $('#frm_product_save').prop('disabled', true);
+          
+            if($('#productPermalink').val() === '' && $('#productTitle').val() !== ''){
+                $('#productPermalink').val(slugify($('#productTitle').val()));
+            }
+
+            var file = document.getElementById("productImage").files[0];
+
+            if(!file){
+                $('#loder').hide();
+                $('#productNewForm').css('opacity','1');
+                showNotification('Upload image', 'danger');
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append("title", $('#productTitle').val());
+            formData.append("productDescription", $('#productDescription').val());
+            formData.append("productCategory", $('#category').val() || '');
+            formData.append("productPublished", $('#productPublished').val());
+            formData.append("productPermalink", $('#productPermalink').val());
+            formData.append("productImage",file);
+            
+            $.ajax({
+                method: 'POST',
+                url: '/customer/product/insert',
+                data: formData,
+                contentType: false,
+                processData: false
+            })
+            .done(function(msg){
+                $('#loder').hide();
+                $('#productNewForm').css('opacity','1');
+                showNotification(msg.message, 'success', false, '/customer/products/1');
+                document.getElementById("productNewForm").reset();
+                $('#frm_product_save').prop('disabled', false);
+            })
+            .fail(function(msg){
+                $('#loder').hide();
+                $('#productNewForm').css('opacity','1');
+                if(msg.responseJSON && msg.responseJSON.length > 0){
+                    var errorMessages = validationErrors(msg.responseJSON);
+                    $('#validationModalBody').html(errorMessages);
+                    $('#validationModal').modal('show');
+                    $('#frm_product_save').prop('disabled', false);
+                    return;
+                }
+              
+                showNotification(msg.responseJSON.message, 'danger');
+                $('#frm_product_save').prop('disabled', false);
+            });
+        }
+    });
+
+    $('#productEditForm').validator().on('submit', function(e){
+        e.preventDefault();
+        if(parseInt($('#ppyBalance').val()) < parseInt($('#updateFee').val())) {
+            showNotification('Insufficient funds. Please add funds.', 'warning', false);
+            var minFundsRequired = (parseInt($('#updateFee').val()) - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
+            $('#minFundsRequired').val(minFundsRequired);
+            $('#amountToAdd').val(minFundsRequired);
+            $('#addFundsModal').modal('show');
+        } else {
+            $('#loder').show();
+            $('#productEditForm').css('opacity','0.5')
+            $('#productUpdate').prop('disabled', true);
+
             if($('#productPermalink').val() === '' && $('#productTitle').val() !== ''){
                 $('#productPermalink').val(slugify($('#productTitle').val()));
             }
@@ -219,17 +231,25 @@ $(document).ready(function (){
                 processData: false
             })
             .done(function(msg){
-                showNotification(msg.message, 'success', true ,'/customer/products/1');
+              $('#loder').hide();
+              $('#productEditForm').css('opacity','1');
+              showNotification(msg.message, 'success', true ,'/customer/products/1');
+              $('#productUpdate').prop('disabled', false);
             })
             .fail(function(msg){
+                $('#loder').hide();
+                $('#productEditForm').css('opacity','1');
+
                 if(msg.responseJSON && msg.responseJSON.length > 0){
                     var errorMessages = validationErrors(msg.responseJSON);
                     $('#validationModalBody').html(errorMessages);
                     $('#validationModal').modal('show');
+                    $('#productUpdate').prop('disabled', false);
                     return;
-                } else {
-                    showNotification(msg.responseJSON.message, 'danger');
                 }
+
+                showNotification(msg.responseJSON.message, 'danger');
+                $('#productUpdate').prop('disabled', false);
             });
         }
     });
