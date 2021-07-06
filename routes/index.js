@@ -995,7 +995,7 @@ router.post('/product/bid', async (req, res, next) => {
         });
     }catch(ex){
         console.error(ex);
-        res.status(400).json({ message: 'Error bidding on/buying NFTs' });
+        res.status(400).json({ message: 'You can\'t Bid from your own account' });
     }
 });
 
