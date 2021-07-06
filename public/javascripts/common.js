@@ -164,13 +164,6 @@ function showNotification(msg, type, reloadPage, redirect){
     $('#notify_message').addClass('alert-' + type);
     $('#notify_message').html(msg);
     $('#notify_message').slideDown(600).delay(2500).slideUp(600);
-     if(redirect){
-        window.location = redirect;
-        return;
-    }
-    if(reloadPage === true){
-        location.reload();
-    }
 }
 
 function slugify(str){
