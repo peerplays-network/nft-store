@@ -2,15 +2,6 @@
 /* globals showNotification, numeral, feather */
 $(document).ready(function (){
     $('#loder').hide();
-      // applies an product filter
-      $(document).on('click', '#btn_product_filter', function(e){
-        console.log('express cart lode');
-        if($('#product_filter').val() !== ''){
-            window.location.href = '/customer/products/filter/' + $('#product_filter').val();
-        }else{
-            showNotification('Please enter a keyword to filter', 'danger');
-        }
-    });
     $('a').click(function(){
         $('#loder').show();
         $('.main').css('opacity','0.5');
@@ -238,7 +229,8 @@ $(document).ready(function (){
     });
 
     $('.btn-delete-offer').on('click', function(){
-      if(confirm('Are you sure you want to delete this sell offer?')){
+      var message = `Are you sure you want to delete this sell offer? A fee of ${$('#sellCancelFee').val()} ${$('#assetSymbol').val()} will be charged.`;
+      if(confirm(message)){
           $.ajax({
               method: 'POST',
               url: '/customer/product/delete',
@@ -251,6 +243,9 @@ $(document).ready(function (){
               showNotification(msg.responseJSON.message, 'danger');
           });
       }
+
+      $('#loder').hide();
+      $('.main').css('opacity','1');
   });
 
     $(document).on('click', '.menu-btn', function(e){
@@ -486,12 +481,20 @@ $(document).ready(function (){
     $('#productButtons div button').on('click', function(e){
         if($(this).text() === 'Mint') {
             var productId = $(this).attr('data-id');
+            var fee = $('#mintFee').val();
             $('.modal-body #productId').val(productId);
+            $('.modal-body #mintFeePerUnit').val(fee);
             $('#nftMintModal').modal('show');
             $("#buttonMint").attr("disabled", false);
         } else if($(this).text() === 'Sell' || $(this).text() === 'Re-sell') {
             var productId = $(this).attr('data-id');
+            var fee = parseInt($('#sellFee').val());
+            var precision = parseInt($('#feeAssetPrecision').val());
+            var assetSymbol = $('#assetSymbol').val();
             $('.modal-body #sellProductId').val(productId);
+            $('.modal-body #sellFeePerUnit').val(fee);
+            $('.modal-body #sellingFee').text(`Fee: ${(fee / Math.pow(10, precision)).toFixed(precision)} ${assetSymbol}`);
+
             $('#sellNFTModal').modal('show');
             $('#saleEnd').datetimepicker({
                 uiLibrary: 'bootstrap4',
@@ -502,12 +505,44 @@ $(document).ready(function (){
         }
     });
 
+    $(document).on('change', '#productQuantity', function(e) {
+        var feePerUnit = parseInt($('#mintFeePerUnit').val());
+        var quantity = parseInt($('#productQuantity').val());
+
+        if(!quantity) return;
+
+        var precision = parseInt($('#feeAssetPrecision').val());
+        var assetSymbol = $('#assetSymbol').val();
+
+        var fee = (feePerUnit * quantity / Math.pow(10, precision)).toFixed(precision);
+        $('#mintingFee').text(`Fee: ${fee} ${assetSymbol}`);
+    });
+
+    $(document).on('change', '#productSellQuantity', function(e) {
+        var feePerUnit = parseInt($('#sellFeePerUnit').val());
+        var quantity = parseInt($('#productSellQuantity').val());
+
+        if(!quantity) return;
+
+        var precision = parseInt($('#feeAssetPrecision').val());
+        var assetSymbol = $('#assetSymbol').val();
+
+        var fee = (feePerUnit * quantity / Math.pow(10, precision)).toFixed(precision);
+        $('#sellingFee').text(`Fee: ${fee} ${assetSymbol}`);
+    });
+
     // Mint NFT
     $(document).on('click', '#buttonMint', function(e){
-        if(parseInt($('#ppyBalance').val()) < parseInt($('#mintFee').val()) * $('#productQuantity').val()) {
+        var quantity = parseInt($('#productQuantity').val());
+        if(!quantity || quantity === 0) {
+            showNotification('Quantity is required.', 'danger');
+            return;
+        }
+
+        if(parseInt($('#ppyBalance').val()) < parseInt($('#mintFee').val()) * quantity) {
             showNotification('Insufficient funds. Please add funds.', 'warning', false);
             $('#nftMintModal').modal('hide');
-            var minFundsRequired = (parseInt($('#mintFee').val()) * $('#productQuantity').val() - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
+            var minFundsRequired = (parseInt($('#mintFee').val()) * quantity - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
             $('#minFundsRequired').val(minFundsRequired);
             $('#amountToAdd').val(minFundsRequired);
             $('#addFundsModal').modal('show');
@@ -524,7 +559,7 @@ $(document).ready(function (){
                 url: '/customer/product/mint',
                 data: {
                     productId: $('#productId').val(),
-                    quantity: $('#productQuantity').val()
+                    quantity: quantity
                 }
             })
             .done(function(msg){
@@ -552,6 +587,8 @@ $(document).ready(function (){
 
     $(document).on('click','#productSellTypeCheckbox', function(e) {
         var assetSymbol = $('#assetSymbol').val();
+        var precision = $('#feeAssetPrecision').val();
+        var sellFeePerUnit = $('#sellFee').val();
         if($('#productSellTypeCheckbox').prop('checked')){
             const bidHtml = `<div class="form-group">
                                 <label for="productMinPrice" class="control-label">Min. Price (${assetSymbol}) *</label>
@@ -564,7 +601,8 @@ $(document).ready(function (){
                             <div class="form-group">
                                 <label for="saleEnd" class="control-label">Sale end date *</label>
                                 <input id="saleEnd" readonly />
-                            </div>`;
+                            </div>
+                            <div id="sellingFee">Fee: ${(sellFeePerUnit / Math.pow(10, precision)).toFixed(precision)} ${assetSymbol}</div>`;
             $('#sellNFTFormWrapper').html(bidHtml);
             $('#saleEnd').datetimepicker({
                 uiLibrary: 'bootstrap4',
@@ -584,7 +622,8 @@ $(document).ready(function (){
                                     <div class="form-group">
                                         <label for="saleEnd" class="control-label">Sale end date *</label>
                                         <input id="saleEnd" readonly />
-                                    </div>`;
+                                    </div>
+                                    <div id="sellingFee">Fee: 0 ${assetSymbol}</div>`;
             $('#sellNFTFormWrapper').html(fixedPriceHtml);
             $('#saleEnd').datetimepicker({
                 uiLibrary: 'bootstrap4',
@@ -612,7 +651,7 @@ $(document).ready(function (){
             return;
         }
 
-        if(!isBidding && !$('#productSellQuantity').val()) {
+        if(!isBidding && (!$('#productSellQuantity').val() || $('#productSellQuantity').val() == 0)) {
             showNotification('Quantity is required', 'danger', false);
             $('#productSellQuantity').focus();
             return;
@@ -630,8 +669,20 @@ $(document).ready(function (){
             return;
         }
 
-         $('#sellNFTModal').modal('hide');
-         $('#loder').show();
+        var quantity = isBidding ? 1 : parseInt($('#productSellQuantity').val());
+
+        if(parseInt($('#ppyBalance').val()) < parseInt($('#sellFee').val()) * quantity) {
+            showNotification('Insufficient funds. Please add funds.', 'warning', false);
+            $('#sellNFTModal').modal('hide');
+            var minFundsRequired = (parseInt($('#sellFee').val()) * quantity - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
+            $('#minFundsRequired').val(minFundsRequired);
+            $('#amountToAdd').val(minFundsRequired);
+            $('#addFundsModal').modal('show');
+            return;
+        }
+
+        $('#sellNFTModal').modal('hide');
+        $('#loder').show();
         $('.main').css('opacity','0.5')
 
         $.ajax({

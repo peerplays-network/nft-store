@@ -87,7 +87,7 @@ class PeerplaysService{
     return axios.get(blockchainDataUrl, { params }).then((res) => {
       return res.data;
     }).catch((err) => {
-      if(err.response.data){
+      if(err.response && err.response.data){
         throw new RestError(err.response.data.error, err.response.status);
       }else{
         throw err;
