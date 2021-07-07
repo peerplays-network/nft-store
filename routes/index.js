@@ -582,7 +582,8 @@ router.get('/product/:id/:offerId', async (req, res) => {
                 $or: [
                     { productTitle: { $regex: searchTerm, $options: 'i' } },
                     { productDescription: { $regex: searchTerm, $options: 'i' } }
-                ]
+                ],
+                productPublished: true
             }, getSort(), req);
             return data;
         }));
@@ -1101,7 +1102,8 @@ router.get('/search/:searchTerm?/:pageNum?', (req, res) => {
             $or: [
                 { productTitle: { $regex: searchTerm, $options: 'i' } },
                 { productDescription: { $regex: searchTerm, $options: 'i' } }
-            ]
+            ],
+            productPublished: true
         }, getSort(), req),
         getMenu(db)
     ])
@@ -1278,7 +1280,7 @@ router.get('/:page?', async (req, res, next) => {
     // if no page is specified, just render page 1 of the cart
     if(!req.params.page){
         Promise.all([
-            paginateProducts(true, db, 1, {}, getSort(), req),
+            paginateProducts(true, db, 1, {productPublished: true}, getSort(), req),
             getMenu(db)
         ])
             .then(async([results, menu]) => {

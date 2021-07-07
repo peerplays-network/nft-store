@@ -28,13 +28,13 @@
                     <label for="productPublished" class="control-label">{{ @root.__ "Status" }} *</label>
                     {{#if isOwner}}
                     <select class="form-control" id="productPublished">
-                        <option value="true"  {{selectState result.productPublished "true"}}>{{ @root.__ "Published" }}</option>
-                        <option value="false" {{selectState result.productPublished "false"}}>{{ @root.__ "Draft" }}</option>
+                        <option value="true"  {{selectState @root.result.productPublished "true"}}>{{ @root.__ "Published" }}</option>
+                        <option value="false" {{selectState @root.result.productPublished "false"}}>{{ @root.__ "Draft" }}</option>
                     </select>
                     {{else}}
                     <select class="form-control" id="productPublished" disabled>
-                        <option value="true"  {{selectState result.productPublished "true"}}>{{ @root.__ "Published" }}</option>
-                        <option value="false" {{selectState result.productPublished "false"}}>{{ @root.__ "Draft" }}</option>
+                        <option value="true"  {{selectState @root.result.productPublished "true"}}>{{ @root.__ "Published" }}</option>
+                        <option value="false" {{selectState @root.result.productPublished "false"}}>{{ @root.__ "Draft" }}</option>
                     </select>
                     {{/if}}
                 </div>

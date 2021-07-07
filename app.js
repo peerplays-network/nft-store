@@ -191,7 +191,7 @@ handlebars = handlebars.create({
             return '';
         },
         selectState: (state, value) => {
-            if(state === value){
+            if(state.toString() === value){
                 return 'selected';
             }
             return '';
