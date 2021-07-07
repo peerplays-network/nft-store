@@ -940,12 +940,11 @@ router.post('/product/addtocart', async (req, res, next) => {
 
 // Bid on NFT
 router.post('/product/bid', async (req, res, next) => {
-    if(!req.session.peerplaysAccountId){
+   if(!req.session.peerplaysAccountId){
         return res.status(400).json({
             message: 'You need to be logged in to bid on NFT'
         });
     }
-
     const db = req.app.db;
     const config = req.app.config;
 
@@ -987,15 +986,18 @@ router.post('/product/bid', async (req, res, next) => {
     let bidId;
 
     try{
+    if(req.session.peerplaysAccountId === offer.result[0].issuer){
         const { result } = await peerplaysService.sendOperations(body, req.session.peerIDAccessToken);
         bidId = result.trx.operation_results[0][1];
         return res.status(200).json({
             message: isBidding ? 'Bid placed successfully' : 'NFT bought successfully',
             bidId
         });
+    }
+    return res.status(400).json({ message: 'You can\'t Bid from your own account' });
     }catch(ex){
         console.error(ex);
-        res.status(400).json({ message: 'You can\'t Bid from your own account' });
+        res.status(400).json({ message: 'Error bidding on/buying NFTs' });
     }
 });
 
