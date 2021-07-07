@@ -106,21 +106,22 @@ $(document).ready(function (){
     });
 
     $('#validatePermalink').on('click',function(){
-        if($('#productPermalink').val() !== ''){
-            $.ajax({
-                method: 'POST',
-                url: '/admin/validatePermalink',
-                data: { permalink: $('#productPermalink').val(), docId: $('#productId').val() }
-            })
-            .done(function(msg){
-                showNotification(msg.message, 'success');
-            })
-            .fail(function(msg){
-                showNotification(msg.responseJSON.message, 'danger');
-            });
-        }else{
+        if(!$('#productPermalink').val() || $('#productPermalink').val().trim() === '') {
             showNotification('Please enter a permalink to validate', 'danger');
+            return;
         }
+
+        $.ajax({
+            method: 'POST',
+            url: '/admin/validatePermalink',
+            data: { permalink: $('#productPermalink').val(), docId: $('#productId').val() }
+        })
+        .done(function(msg){
+            showNotification(msg.message, 'success');
+        })
+        .fail(function(msg){
+            showNotification(msg.responseJSON.message, 'danger');
+        });
     })
 
     $('#productNewForm').validator().on('submit', function(e){
@@ -136,7 +137,7 @@ $(document).ready(function (){
             $('#productNewForm').css('opacity','0.5');
             $('#frm_product_save').prop('disabled', true);
           
-            if($('#productPermalink').val() === '' && $('#productTitle').val() !== ''){
+            if((!$('#productPermalink').val() || $('#productPermalink').val().trim() === '') && $('#productTitle').val() !== ''){
                 $('#productPermalink').val(slugify($('#productTitle').val()));
             }
 
@@ -540,27 +541,33 @@ $(document).ready(function (){
         }
     });
 
-    $(document).on('change', '#productQuantity', function(e) {
+    $(document).on('keyup', '#productQuantity', function(e) {
         var feePerUnit = parseInt($('#mintFeePerUnit').val());
         var quantity = parseInt($('#productQuantity').val());
+        var assetSymbol = $('#assetSymbol').val();
 
-        if(!quantity) return;
+        if(!quantity) {
+            $('#mintingFee').text(`Fee: 0 ${assetSymbol}`);
+            return;
+        }
 
         var precision = parseInt($('#feeAssetPrecision').val());
-        var assetSymbol = $('#assetSymbol').val();
 
         var fee = (feePerUnit * quantity / Math.pow(10, precision)).toFixed(precision);
         $('#mintingFee').text(`Fee: ${fee} ${assetSymbol}`);
     });
 
-    $(document).on('change', '#productSellQuantity', function(e) {
+    $(document).on('keyup', '#productSellQuantity', function(e) {
         var feePerUnit = parseInt($('#sellFeePerUnit').val());
         var quantity = parseInt($('#productSellQuantity').val());
+        var assetSymbol = $('#assetSymbol').val();
 
-        if(!quantity) return;
+        if(!quantity) {
+            $('#sellingFee').text(`Fee: 0 ${assetSymbol}`);
+            return;
+        }
 
         var precision = parseInt($('#feeAssetPrecision').val());
-        var assetSymbol = $('#assetSymbol').val();
 
         var fee = (feePerUnit * quantity / Math.pow(10, precision)).toFixed(precision);
         $('#sellingFee').text(`Fee: ${fee} ${assetSymbol}`);
