@@ -310,6 +310,7 @@ router.get('/checkout/payment/:ppyAmount', async (req, res) => {
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         helpers: req.handlebars.helpers,
+        pageUrl: config.baseUrl + req.originalUrl,
         showFooter: 'showFooter'
     });
 });
@@ -1127,6 +1128,7 @@ router.get('/search/:searchTerm?/:pageNum?', (req, res) => {
             totalProductCount: results.totalItems,
             pageNum: pageNum,
             paginateUrl: 'search',
+            pageUrl: config.baseUrl + req.originalUrl,
             config: config,
             menu: sortMenu(menu),
             helpers: req.handlebars.helpers,
@@ -1195,9 +1197,14 @@ router.get('/category/:cat/:pageNum?', (req, res) => {
 });
 
 // Language setup in cookie
-router.get('/lang/:locale', (req, res) => {
+router.get('/lang/:locale/:redirectUri', (req, res) => {
     res.cookie('locale', req.params.locale, { maxAge: 900000, httpOnly: true });
-    res.redirect('back');
+
+    if(req.params.redirectUri) {
+        res.redirect(req.params.redirectUri);
+    } else {
+        res.redirect('back');
+    }
 });
 
 // return sitemap
@@ -1260,6 +1267,7 @@ router.get('/page/:pageNum', (req, res, next) => {
                 productsPerPage: numberProducts,
                 totalProductCount: results.totalItems,
                 pageNum: req.params.pageNum,
+                pageUrl: config.baseUrl + req.originalUrl,
                 paginateUrl: 'page',
                 helpers: req.handlebars.helpers,
                 showFooter: 'showFooter',
@@ -1301,6 +1309,7 @@ router.get('/:page?', async (req, res, next) => {
                     productsPerPage: numberProducts,
                     totalProductCount: results.totalItems,
                     pageNum: 1,
+                    pageUrl: config.baseUrl + req.originalUrl,
                     paginateUrl: 'page',
                     helpers: req.handlebars.helpers,
                     showFooter: 'showFooter',
