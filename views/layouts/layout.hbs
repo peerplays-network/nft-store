@@ -208,7 +208,7 @@
                         </button>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
                             {{#availableLanguages}}
-                                <li><a class="dropdown-item" href="/lang/{{this}}">{{@root.__ this}}</a></li>
+                                <li><a class="dropdown-item" href="/lang/{{this}}/{{urlEncode @root.pageUrl}}">{{@root.__ this}}</a></li>
                             {{/availableLanguages}}
                         </div>
                     </div>

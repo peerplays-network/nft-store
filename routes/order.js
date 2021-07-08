@@ -16,6 +16,7 @@ const {
 const { restrict, checkAccess } = require('../lib/auth');
 const { indexOrders } = require('../lib/indexing');
 const router = express.Router();
+const config = require('../config/settings');
 
 // Show orders
 router.get('/admin/orders/:page?', restrict, async (req, res, next) => {
@@ -46,6 +47,7 @@ router.get('/admin/orders/:page?', restrict, async (req, res, next) => {
         session: req.session,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: config.baseUrl + req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
@@ -81,6 +83,7 @@ router.get('/admin/orders/bystatus/:orderstatus', restrict, async (req, res, nex
         session: req.session,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: config.baseUrl + req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
@@ -99,6 +102,7 @@ router.get('/admin/order/view/:id', restrict, async (req, res) => {
         messageType: clearSessionValue(req.session, 'messageType'),
         editor: true,
         admin: true,
+        pageUrl: config.baseUrl + req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
@@ -114,6 +118,7 @@ router.get('/admin/order/create', restrict, async (req, res) => {
         countryList: getCountryList(),
         editor: true,
         admin: true,
+        pageUrl: config.baseUrl + req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
@@ -236,6 +241,7 @@ router.get('/admin/orders/filter/:search', restrict, async (req, res, next) => {
         searchTerm: searchTerm,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: config.baseUrl + req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
