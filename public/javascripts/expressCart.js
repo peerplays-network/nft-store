@@ -958,12 +958,18 @@ $(document).ready(function (){
     });
 
     $(document).on('click', '.product-add-to-cart', function(e){
-        if(parseFloat($('#product_bid').val()) > parseFloat($('#maxPrice').val())){
+        var bidAmt = parseFloat($('#product_bid').val());
+        if(!bidAmt) {
+            showNotification('Bid amount is required', 'danger', false);
+            return;
+        }
+
+        if(bidAmt > parseFloat($('#maxPrice').val())){
             showNotification(`Exceeds maximum price: ${$('#maxPrice').val()}`, 'danger', false);
-        } else if(parseFloat($('#product_bid').val()) < parseFloat($('#minPrice').val())) {
+        } else if(bidAmt < parseFloat($('#minPrice').val())) {
             showNotification(`Below minimum price: ${$('#minPrice').val()}`, 'danger', false);
         } else {
-            var bidAmount = Math.round((parseFloat($('#product_bid').val()) + Number.EPSILON) * Math.pow(10, parseInt($('#addFundsAssetPrecision').val())));
+            var bidAmount = Math.round((bidAmt + Number.EPSILON) * Math.pow(10, parseInt($('#addFundsAssetPrecision').val())));
             if(parseInt($('#ppyBalance').val()) < bidAmount + parseInt($('#bidFee').val())) {
                 showNotification('Insufficient funds. Please add funds.', 'danger', false);
                 var minFundsRequired = (bidAmount + parseInt($('#bidFee').val()) - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
@@ -1083,6 +1089,11 @@ $(document).ready(function (){
     // product thumbnail image click
     $('.thumbnail-image').on('click', function(){
         $('#product-title-image').attr('src', $(this).attr('src'));
+    });
+
+    $('.nft-image-open').on('click', function(e) {
+        $('#fullSizeImage').attr('src', $(this).attr('src'));
+        $('#fullSizeImageModal').modal('show');
     });
 
     // resets the order filter
