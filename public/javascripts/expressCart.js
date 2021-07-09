@@ -147,6 +147,7 @@ $(document).ready(function (){
                 $('#loder').hide();
                 $('#productNewForm').css('opacity','1');
                 showNotification('Upload image', 'danger');
+                $('#frm_product_save').prop('disabled', false);
                 return;
             }
 
