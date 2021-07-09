@@ -959,10 +959,6 @@ router.post('/product/bid', async (req, res, next) => {
         return res.status(400).json({ message: 'Error placing bid. Please try again.' });
     }
 
-    if(req.session.peerplaysAccountId === product.owner){
-        return res.status(400).json({ message: 'You cannot bid on your own NFT' });
-    }
-
     const productPrice = Math.round((parseFloat(req.body.productPrice) + Number.EPSILON) * Math.pow(10, config.peerplaysAssetPrecision));
 
     const offer = await peerplaysService.getBlockchainData({
@@ -972,6 +968,14 @@ router.post('/product/bid', async (req, res, next) => {
     });
 
     const isBidding = offer.result[0].minimum_price.amount !== offer.result[0].maximum_price.amount;
+
+    if(req.session.peerplaysAccountId === product.owner){
+        return res.status(400).json({ message: isBidding ? 'You cannot bid on your own NFT' : 'You cannot buy your own NFT' });
+    }
+
+    if(offer && offer.result.length > 0 && offer.result[0].issuer && offer.result[0].issuer === req.session.peerplaysAccountId) {
+        return res.status(400).json({ message: isBidding ? 'You cannot bid on your own NFT' : 'You cannot buy your own NFT' });
+    }
 
     const body = {
         operations: [{
