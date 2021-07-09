@@ -588,7 +588,7 @@ $(document).ready(function (){
             $('#minFundsRequired').val(minFundsRequired);
             $('#amountToAdd').val(minFundsRequired);
             $('#addFundsModal').modal('show');
-        } else {
+        }else {
             $("#buttonMint").attr("disabled", true);
             $('#nftMintModal').modal('hide');
             $('#loder').show();
