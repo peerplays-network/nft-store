@@ -29,7 +29,7 @@ router.get('/admin/reviews/:page?', restrict, async (req, res, next) => {
         config: req.app.config,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
-        pageUrl: config.baseUrl + req.originalUrl,
+        pageUrl: req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
@@ -62,7 +62,7 @@ router.get('/admin/reviews/filter/:search', restrict, async (req, res, next) => 
         searchTerm: searchTerm,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
-        pageUrl: config.baseUrl + req.originalUrl,
+        pageUrl: req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });

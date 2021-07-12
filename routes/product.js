@@ -289,7 +289,7 @@ router.get('/customer/products/:page?', async (req, res, next) => {
         resultType: 'top',
         session: req.session,
         admin: false,
-        pageUrl: config.baseUrl + req.originalUrl,
+        pageUrl: req.originalUrl,
         config: req.app.config,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
@@ -405,7 +405,7 @@ router.get('/customer/products/filter/:search', async (req, res, next) => {
         balance,
         config: req.app.config,
         session: req.session,
-        pageUrl: config.baseUrl + req.originalUrl,
+        pageUrl: req.originalUrl,
         searchTerm: searchTerm,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
@@ -454,7 +454,7 @@ router.get('/customer/product/new', async (req, res) => {
         balance,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
-        pageUrl: config.baseUrl + req.originalUrl,
+        pageUrl: req.originalUrl,
         editor: true,
         helpers: req.handlebars.helpers,
         config: req.app.config
@@ -770,7 +770,7 @@ router.get('/customer/product/edit/:id', async (req, res) => {
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         config: req.app.config,
-        pageUrl: config.baseUrl + req.originalUrl,
+        pageUrl: req.originalUrl,
         editor: true,
         helpers: req.handlebars.helpers
     });
