@@ -63,7 +63,7 @@
                         </div>
                     {{else}}
                         <h4 class="product-price mp-0 text-center">
-                            {{currencySymbol @root.config.peerplaysAssetSymbol}} {{formatAmount minimum_price.amount}}
+                            {{currencySymbol @root.config.peerplaysAssetSymbol}} {{math (formatAmount bid_price.amount) '/' 100000}}
                         </h4>
                     {{/if}}
                 </div>
