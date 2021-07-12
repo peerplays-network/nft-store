@@ -82,7 +82,7 @@ router.get('/admin/login', async (req, res) => {
             message: clearSessionValue(req.session, 'message'),
             messageType: clearSessionValue(req.session, 'messageType'),
             helpers: req.handlebars.helpers,
-            pageUrl: config.baseUrl + req.originalUrl,
+            pageUrl: req.originalUrl,
             showFooter: 'showFooter'
         });
     }else{
@@ -170,7 +170,7 @@ router.get('/admin/setup', async (req, res) => {
             helpers: req.handlebars.helpers,
             message: clearSessionValue(req.session, 'message'),
             messageType: clearSessionValue(req.session, 'messageType'),
-            pageUrl: config.baseUrl + req.originalUrl,
+            pageUrl: req.originalUrl,
             showFooter: 'showFooter'
         });
         return;
@@ -299,7 +299,7 @@ router.get('/admin/dashboard', csrfProtection, restrict, async (req, res) => {
         messageType: clearSessionValue(req.session, 'messageType'),
         helpers: req.handlebars.helpers,
         config: req.app.config,
-        pageUrl: config.baseUrl + req.originalUrl,
+        pageUrl: req.originalUrl,
         csrfToken: req.csrfToken()
     });
 });
@@ -317,7 +317,7 @@ router.get('/admin/settings', csrfProtection, restrict, (req, res) => {
         config: req.app.config,
         footerHtml: typeof req.app.config.footerHtml !== 'undefined' ? escape.decode(req.app.config.footerHtml) : null,
         googleAnalytics: typeof req.app.config.googleAnalytics !== 'undefined' ? escape.decode(req.app.config.googleAnalytics) : null,
-        pageUrl: config.baseUrl + req.originalUrl,
+        pageUrl: req.originalUrl,
         csrfToken: req.csrfToken()
     });
 });
@@ -340,7 +340,7 @@ router.get('/admin/redemptions', restrict, checkAccess, async (req, res) => {
         redemptions,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
-        pageUrl: config.baseUrl + req.originalUrl,
+        pageUrl: req.originalUrl,
         showFooter: 'showFooter'
     });
     return;
@@ -390,7 +390,7 @@ router.get('/admin/settings/menu', csrfProtection, restrict, async (req, res) =>
         helpers: req.handlebars.helpers,
         config: req.app.config,
         menu: sortMenu(await getMenu(db)),
-        pageUrl: config.baseUrl + req.originalUrl,
+        pageUrl: req.originalUrl,
         csrfToken: req.csrfToken()
     });
 });
@@ -410,7 +410,7 @@ router.get('/admin/settings/pages', csrfProtection, restrict, async (req, res) =
         helpers: req.handlebars.helpers,
         config: req.app.config,
         menu: sortMenu(await getMenu(db)),
-        pageUrl: config.baseUrl + req.originalUrl,
+        pageUrl: req.originalUrl,
         csrfToken: req.csrfToken()
     });
 });
@@ -429,7 +429,7 @@ router.get('/admin/settings/pages/new', csrfProtection, restrict, checkAccess, a
         helpers: req.handlebars.helpers,
         config: req.app.config,
         menu: sortMenu(await getMenu(db)),
-        pageUrl: config.baseUrl + req.originalUrl,
+        pageUrl: req.originalUrl,
         csrfToken: req.csrfToken()
     });
 });
@@ -462,7 +462,7 @@ router.get('/admin/settings/pages/edit/:page', csrfProtection, restrict, checkAc
         helpers: req.handlebars.helpers,
         config: req.app.config,
         menu,
-        pageUrl: config.baseUrl + req.originalUrl,
+        pageUrl: req.originalUrl,
         csrfToken: req.csrfToken()
     });
 });
@@ -599,7 +599,7 @@ router.get('/admin/settings/discounts', csrfProtection, restrict, checkAccess, a
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         helpers: req.handlebars.helpers,
-        pageUrl: config.baseUrl + req.originalUrl,
+        pageUrl: req.originalUrl,
         csrfToken: req.csrfToken()
     });
 });
@@ -619,7 +619,7 @@ router.get('/admin/settings/discount/edit/:id', csrfProtection, restrict, checkA
         messageType: clearSessionValue(req.session, 'messageType'),
         helpers: req.handlebars.helpers,
         config: req.app.config,
-        pageUrl: config.baseUrl + req.originalUrl,
+        pageUrl: req.originalUrl,
         csrfToken: req.csrfToken()
     });
 });
@@ -688,7 +688,7 @@ router.get('/admin/settings/discount/new', csrfProtection, restrict, checkAccess
         messageType: clearSessionValue(req.session, 'messageType'),
         helpers: req.handlebars.helpers,
         config: req.app.config,
-        pageUrl: config.baseUrl + req.originalUrl,
+        pageUrl: req.originalUrl,
         csrfToken: req.csrfToken()
     });
 });
