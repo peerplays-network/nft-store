@@ -6,6 +6,7 @@ const {
 } = require('../lib/common');
 const { paginateData } = require('../lib/paginate');
 const router = express.Router();
+const config = require('../config/settings');
 
 router.get('/admin/reviews/:page?', restrict, async (req, res, next) => {
     let pageNum = 1;
@@ -28,6 +29,7 @@ router.get('/admin/reviews/:page?', restrict, async (req, res, next) => {
         config: req.app.config,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
@@ -60,6 +62,7 @@ router.get('/admin/reviews/filter/:search', restrict, async (req, res, next) => 
         searchTerm: searchTerm,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });

@@ -208,6 +208,13 @@ handlebars = handlebars.create({
             }
             return null;
         },
+        urlEncode: (value) => {
+            if(value) {
+                console.log(encodeURIComponent(value));
+                return encodeURIComponent(value);
+            }
+            return '';
+        },
         formatDate: (date, format) => {
             return moment(date).format(format);
         },
