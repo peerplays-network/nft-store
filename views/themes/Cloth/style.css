@@ -10,6 +10,11 @@
     background-color:#28a745;
     color: #fff !important;
 }
+.resell-nft {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
  .btnCancel a:focus{
     color: #28a745 !important;
