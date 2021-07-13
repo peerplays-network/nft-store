@@ -310,6 +310,7 @@ router.get('/checkout/payment/:ppyAmount', async (req, res) => {
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         helpers: req.handlebars.helpers,
+        pageUrl: req.originalUrl,
         showFooter: 'showFooter'
     });
 });
@@ -610,7 +611,7 @@ router.get('/product/:id/:offerId', async (req, res) => {
         metaDescription: `${config.cartTitle} - ${product.productTitle}`,
         config: config,
         session: req.session,
-        pageUrl: config.baseUrl + req.originalUrl,
+        pageUrl: req.originalUrl,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         helpers: req.handlebars.helpers,
@@ -958,10 +959,6 @@ router.post('/product/bid', async (req, res, next) => {
         return res.status(400).json({ message: 'Error placing bid. Please try again.' });
     }
 
-    if(req.session.peerplaysAccountId === product.owner){
-        return res.status(400).json({ message: 'You cannot bid on your own NFT' });
-    }
-
     const productPrice = Math.round((parseFloat(req.body.productPrice) + Number.EPSILON) * Math.pow(10, config.peerplaysAssetPrecision));
 
     const offer = await peerplaysService.getBlockchainData({
@@ -971,6 +968,14 @@ router.post('/product/bid', async (req, res, next) => {
     });
 
     const isBidding = offer.result[0].minimum_price.amount !== offer.result[0].maximum_price.amount;
+
+    if(req.session.peerplaysAccountId === product.owner){
+        return res.status(400).json({ message: isBidding ? 'You cannot bid on your own NFT' : 'You cannot buy your own NFT' });
+    }
+
+    if(offer && offer.result.length > 0 && offer.result[0].issuer && offer.result[0].issuer === req.session.peerplaysAccountId) {
+        return res.status(400).json({ message: isBidding ? 'You cannot bid on your own NFT' : 'You cannot buy your own NFT' });
+    }
 
     const body = {
         operations: [{
@@ -1127,6 +1132,7 @@ router.get('/search/:searchTerm?/:pageNum?', (req, res) => {
             totalProductCount: results.totalItems,
             pageNum: pageNum,
             paginateUrl: 'search',
+            pageUrl: req.originalUrl,
             config: config,
             menu: sortMenu(menu),
             helpers: req.handlebars.helpers,
@@ -1195,9 +1201,14 @@ router.get('/category/:cat/:pageNum?', (req, res) => {
 });
 
 // Language setup in cookie
-router.get('/lang/:locale', (req, res) => {
+router.get('/lang/:locale/:redirectUri', (req, res) => {
     res.cookie('locale', req.params.locale, { maxAge: 900000, httpOnly: true });
-    res.redirect('back');
+
+    if(req.params.redirectUri) {
+        res.redirect(req.params.redirectUri);
+    } else {
+        res.redirect('back');
+    }
 });
 
 // return sitemap
@@ -1260,6 +1271,7 @@ router.get('/page/:pageNum', (req, res, next) => {
                 productsPerPage: numberProducts,
                 totalProductCount: results.totalItems,
                 pageNum: req.params.pageNum,
+                pageUrl: req.originalUrl,
                 paginateUrl: 'page',
                 helpers: req.handlebars.helpers,
                 showFooter: 'showFooter',
@@ -1301,6 +1313,7 @@ router.get('/:page?', async (req, res, next) => {
                     productsPerPage: numberProducts,
                     totalProductCount: results.totalItems,
                     pageNum: 1,
+                    pageUrl: req.originalUrl,
                     paginateUrl: 'page',
                     helpers: req.handlebars.helpers,
                     showFooter: 'showFooter',

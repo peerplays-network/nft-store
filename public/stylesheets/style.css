@@ -48,6 +48,9 @@ svg {
 .page-header {
   padding-bottom: 5px;
 }
+.nft-image-open {
+  cursor: pointer;
+}
 .cart-contents-title {
   font-size: 18px;
   font-weight: 700;
@@ -551,6 +554,10 @@ a {
 }
 .help-block {
   color: #95a5a6;
+}
+.modal-dialog-image {
+  width: auto;
+  max-width: fit-content;
 }
 @media only screen and (min-width: 768px) {
   .pushy {
