@@ -27,8 +27,7 @@
             "type": "boolean"
         },
         "productPermalink": {
-            "type": "string",
-            "isNotEmpty": true
+            "type": "string"
         },
         "owner": {
             "type": "string",

@@ -17,6 +17,7 @@ const { indexCustomers } = require('../lib/indexing');
 const { validateJson } = require('../lib/schema');
 const { restrict } = require('../lib/auth');
 const PeerplaysService = require('../services/PeerplaysService');
+const config = require('../config/settings');
 const peerplaysService = new PeerplaysService();
 
 const apiLimiter = rateLimit({
@@ -35,6 +36,7 @@ router.get('/customer/setup', async (req, res) => {
       message: clearSessionValue(req.session, 'message'),
       messageType: clearSessionValue(req.session, 'messageType'),
       countryList: getCountryList(),
+      pageUrl: req.originalUrl,
       editor: true
   });
 });
@@ -257,7 +259,8 @@ router.get('/customer/account', async (req, res) => {
         messageType: clearSessionValue(req.session, 'messageType'),
         countryList: getCountryList(),
         config: req.app.config,
-        helpers: req.handlebars.helpers
+        helpers: req.handlebars.helpers,
+        pageUrl: req.originalUrl
     });
 });
 
@@ -510,6 +513,7 @@ router.get('/admin/customer/view/:id?', restrict, async (req, res) => {
         countryList: getCountryList(),
         config: req.app.config,
         editor: true,
+        pageUrl: req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
@@ -533,6 +537,7 @@ router.get('/admin/customers', restrict, async (req, res) => {
         helpers: req.handlebars.helpers,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: req.originalUrl,
         config: req.app.config
     });
 });
@@ -567,6 +572,7 @@ router.get('/admin/customers/filter/:search', restrict, async (req, res, next) =
         searchTerm: searchTerm,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
@@ -611,6 +617,7 @@ router.get('/customer/login', async (req, res, next) => {
         session: req.session,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
@@ -730,6 +737,7 @@ router.get('/customer/forgotten', (req, res) => {
         helpers: req.handlebars.helpers,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: req.originalUrl,
         showFooter: 'showFooter'
     });
 });
@@ -797,6 +805,7 @@ router.get('/customer/reset/:token', async (req, res) => {
         message: clearSessionValue(req.session, 'message'),
         message_type: clearSessionValue(req.session, 'message_type'),
         show_footer: 'show_footer',
+        pageUrl: req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
