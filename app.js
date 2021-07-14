@@ -210,7 +210,6 @@ handlebars = handlebars.create({
         },
         urlEncode: (value) => {
             if(value) {
-                console.log(encodeURIComponent(value));
                 return encodeURIComponent(value);
             }
             return '';
