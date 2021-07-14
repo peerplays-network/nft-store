@@ -856,7 +856,7 @@ $(document).ready(function (){
 
     $('#btnModalWithdrawFunds').validator().on('click', function(e) {
         e.preventDefault();
-        
+        $('#btnModalWithdrawFunds').prop('disabled', true);
         var precision = parseInt($('#withdrawFundsAssetPrecision').val());
         var amountToWithdraw = Math.round((parseFloat($('#amountToWithdraw').val()) + Number.EPSILON) * Math.pow(10, precision));
         var maxAmount = Math.round((parseFloat($('#maxAmountWithdrawn').val()) + Number.EPSILON) * Math.pow(10,precision));
@@ -876,9 +876,11 @@ $(document).ready(function (){
             })
             .done(function(msg){
                 showNotification(msg.message, 'success', true);
+                setTimeout(function(){ $('#btnModalWithdrawFunds').prop('disabled', false); }, 4000);
             })
             .fail(function(msg){
                 showNotification(msg.responseJSON.message, 'danger');
+                setTimeout(function(){ $('#btnModalWithdrawFunds').prop('disabled', false); }, 4000);
             });
         }
     });
