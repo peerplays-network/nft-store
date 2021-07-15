@@ -871,7 +871,7 @@ $(document).ready(function (){
         var transferFees = Math.round((parseFloat($('#transferFees').val()) + Number.EPSILON) * Math.pow(10, precision));
 
         if(amountToWithdraw > maxAmount - transferFees) {
-            showNotification('Select a lower amount', 'danger');
+            showNotification('Insuficient Balance', 'danger');
         }else if(!amountToWithdraw){
             showNotification('Enter amount in Amount to withdraw field', 'danger');
         }else {
