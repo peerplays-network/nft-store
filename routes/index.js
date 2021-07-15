@@ -969,11 +969,7 @@ router.post('/product/bid', async (req, res, next) => {
 
     const isBidding = offer.result[0].minimum_price.amount !== offer.result[0].maximum_price.amount;
 
-    if(req.session.peerplaysAccountId === product.owner){
-        return res.status(400).json({ message: isBidding ? 'You cannot bid on your own NFT' : 'You cannot buy your own NFT' });
-    }
-
-    if(offer && offer.result.length > 0 && offer.result[0].issuer && offer.result[0].issuer === req.session.peerplaysAccountId) {
+    if(offer && offer.result.length > 0 && offer.result[0].issuer && offer.result[0].issuer === req.session.peerplaysAccountId){
         return res.status(400).json({ message: isBidding ? 'You cannot bid on your own NFT' : 'You cannot buy your own NFT' });
     }
 
@@ -1204,9 +1200,9 @@ router.get('/category/:cat/:pageNum?', (req, res) => {
 router.get('/lang/:locale/:redirectUri', (req, res) => {
     res.cookie('locale', req.params.locale, { maxAge: 900000, httpOnly: true });
 
-    if(req.params.redirectUri) {
+    if(req.params.redirectUri){
         res.redirect(req.params.redirectUri);
-    } else {
+    }else{
         res.redirect('back');
     }
 });
@@ -1292,7 +1288,7 @@ router.get('/:page?', async (req, res, next) => {
     // if no page is specified, just render page 1 of the cart
     if(!req.params.page){
         Promise.all([
-            paginateProducts(true, db, 1, {productPublished: true}, getSort(), req),
+            paginateProducts(true, db, 1, { productPublished: true }, getSort(), req),
             getMenu(db)
         ])
             .then(async([results, menu]) => {
