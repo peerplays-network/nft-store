@@ -13,6 +13,9 @@
     /* border: 1px solid #afacac; */
     width: 100%;
 }
+.bold{
+    font-weight: bold;
+}
 .top-align-space {
     padding-top: 100px;
     padding-bottom: 100px;
