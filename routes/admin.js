@@ -123,6 +123,7 @@ router.get('/admin/login', async (req, res) => {
         req.session.needsSetup = false;
         res.render('login', {
             title: 'Login',
+            language: req.cookies.locale || config.defaultLocale,
             referringUrl: req.header('Referer'),
             config: req.app.config,
             message: clearSessionValue(req.session, 'message'),
@@ -230,6 +231,7 @@ router.get('/admin/setup', async (req, res) => {
         res.render('setup', {
             title: 'Setup',
             config: req.app.config,
+            language: req.cookies.locale || config.defaultLocale,
             helpers: req.handlebars.helpers,
             message: clearSessionValue(req.session, 'message'),
             messageType: clearSessionValue(req.session, 'messageType'),
@@ -379,6 +381,7 @@ router.get('/admin/dashboard', csrfProtection, restrict, async (req, res) => {
     res.render('dashboard', {
         title: 'Cart dashboard',
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         dashboardData,
         themes: getThemes(),
@@ -396,6 +399,7 @@ router.get('/admin/settings', csrfProtection, restrict, (req, res) => {
     res.render('settings', {
         title: 'Cart settings',
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         themes: getThemes(),
         message: clearSessionValue(req.session, 'message'),
@@ -423,6 +427,7 @@ router.get('/admin/redemptions', restrict, checkAccess, async (req, res) => {
     res.render('redemptions', {
         title: 'Redeem Requests',
         config: req.app.config,
+        language: req.cookies.locale || config.defaultLocale,
         helpers: req.handlebars.helpers,
         redemptions,
         admin: true,
@@ -474,6 +479,7 @@ router.get('/admin/settings/menu', csrfProtection, restrict, async (req, res) =>
     res.render('settings-menu', {
         title: 'Cart menu',
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
@@ -494,6 +500,7 @@ router.get('/admin/settings/pages', csrfProtection, restrict, async (req, res) =
         title: 'Static pages',
         pages: pages,
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
@@ -512,6 +519,7 @@ router.get('/admin/settings/pages/new', csrfProtection, restrict, checkAccess, a
     res.render('settings-page', {
         title: 'Static pages',
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         button_text: 'Create',
         message: clearSessionValue(req.session, 'message'),
@@ -546,6 +554,7 @@ router.get('/admin/settings/pages/edit/:page', csrfProtection, restrict, checkAc
         page: page,
         button_text: 'Update',
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
@@ -684,6 +693,7 @@ router.get('/admin/settings/discounts', csrfProtection, restrict, checkAccess, a
         title: 'Discount code',
         config: req.app.config,
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         discounts,
         admin: true,
         message: clearSessionValue(req.session, 'message'),
@@ -703,6 +713,7 @@ router.get('/admin/settings/discount/edit/:id', csrfProtection, restrict, checkA
     res.render('settings-discount-edit', {
         title: 'Discount code edit',
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         discount,
         message: clearSessionValue(req.session, 'message'),
@@ -773,6 +784,7 @@ router.get('/admin/settings/discount/new', csrfProtection, restrict, checkAccess
     res.render('settings-discount-new', {
         title: 'Discount code create',
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),

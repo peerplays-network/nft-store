@@ -31,6 +31,7 @@ router.get('/customer/setup', async (req, res) => {
   res.render('customer-create', {
       title: 'Register',
       config: req.app.config,
+      language: req.cookies.locale || config.defaultLocale,
       helpers: req.handlebars.helpers,
       session: req.session,
       message: clearSessionValue(req.session, 'message'),
@@ -212,7 +213,6 @@ router.post('/customer/save', async (req, res) => {
 router.get('/customer/account', async (req, res) => {
     const db = req.app.db;
     const config = req.app.config;
-
     if(!req.session.customerPresent){
         res.redirect('/customer/login');
         return;
@@ -258,6 +258,7 @@ router.get('/customer/account', async (req, res) => {
         session: req.session,
         orders,
         user,
+        language: req.cookies.locale || config.defaultLocale,
         balance: balance ? (balance.balance / Math.pow(10, config.peerplaysAssetPrecision)).toFixed(config.peerplaysAssetPrecision) : 0,
         transferFees,
         message: clearSessionValue(req.session, 'message'),
@@ -511,6 +512,7 @@ router.get('/admin/customer/view/:id?', restrict, async (req, res) => {
     return res.render('customer', {
         title: 'View customer',
         result: customer,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         session: req.session,
         message: clearSessionValue(req.session, 'message'),
@@ -537,6 +539,7 @@ router.get('/admin/customers', restrict, async (req, res) => {
     return res.render('customers', {
         title: 'Customers - List',
         admin: true,
+        language: req.cookies.locale || config.defaultLocale,
         customers: customers,
         session: req.session,
         helpers: req.handlebars.helpers,
@@ -571,6 +574,7 @@ router.get('/admin/customers/filter/:search', restrict, async (req, res, next) =
     return res.render('customers', {
         title: 'Customer results',
         customers: customers,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         config: req.app.config,
         session: req.session,
@@ -620,6 +624,7 @@ router.get('/customer/login', async (req, res, next) => {
         title: 'Customer login',
         config: req.app.config,
         session: req.session,
+        language: req.cookies.locale || config.deafultLocale,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         pageUrl: req.originalUrl,
@@ -743,6 +748,7 @@ router.get('/customer/forgotten', (req, res) => {
         title: 'Forgotten',
         route: 'customer',
         forgotType: 'customer',
+        language: req.cookies.locale || config.defaultLocale,
         config: req.app.config,
         helpers: req.handlebars.helpers,
         message: clearSessionValue(req.session, 'message'),
@@ -810,6 +816,7 @@ router.get('/customer/reset/:token', async (req, res) => {
     res.render('reset', {
         title: 'Reset password',
         token: req.params.token,
+        language: req.cookies.locale || config.defaultLocale,
         route: 'customer',
         config: req.app.config,
         message: clearSessionValue(req.session, 'message'),

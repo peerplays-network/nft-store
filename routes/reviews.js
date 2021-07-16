@@ -20,6 +20,7 @@ router.get('/admin/reviews/:page?', restrict, async (req, res, next) => {
     res.render('reviews', {
         title: 'Cart - Reviews',
         results: reviews.data,
+        language: req.cookies.locale || config.defaultLocale,
         totalItemCount: reviews.totalItems,
         pageNum,
         paginateUrl: 'admin/reviews',
@@ -57,6 +58,7 @@ router.get('/admin/reviews/filter/:search', restrict, async (req, res, next) => 
         results: results,
         resultType: 'filtered',
         admin: true,
+        language: req.cookies.locale || config.defaultLocale,
         config: req.app.config,
         session: req.session,
         searchTerm: searchTerm,

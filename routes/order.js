@@ -8,7 +8,7 @@ const {
     clearCustomer
 } = require('../lib/common');
 const {
-    paginateData,
+    paginateData
 } = require('../lib/paginate');
 const {
     emptyCart
@@ -40,6 +40,7 @@ router.get('/admin/orders/:page?', restrict, async (req, res, next) => {
         title: 'Cart',
         orders: orders.data,
         totalItemCount: orders.totalItems,
+        language: req.cookies.locale || config.defaultLocale,
         pageNum,
         paginateUrl: 'admin/orders',
         admin: true,
@@ -78,6 +79,7 @@ router.get('/admin/orders/bystatus/:orderstatus', restrict, async (req, res, nex
         orders: orders,
         admin: true,
         filteredOrders: true,
+        language: req.cookies.locale || config.defaultLocale,
         filteredStatus: req.params.orderstatus,
         config: req.app.config,
         session: req.session,
@@ -97,6 +99,7 @@ router.get('/admin/order/view/:id', restrict, async (req, res) => {
         title: 'View order',
         result: order,
         config: req.app.config,
+        language: req.cookies.locale || config.defaultLocale,
         session: req.session,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
@@ -113,6 +116,7 @@ router.get('/admin/order/create', restrict, async (req, res) => {
         title: 'Create order',
         config: req.app.config,
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         countryList: getCountryList(),
@@ -236,6 +240,7 @@ router.get('/admin/orders/filter/:search', restrict, async (req, res, next) => {
         title: 'Order results',
         orders: orders,
         admin: true,
+        language: req.cookies.locale || config.defaultLocale,
         config: req.app.config,
         session: req.session,
         searchTerm: searchTerm,
