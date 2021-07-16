@@ -28,7 +28,23 @@ $(document).ready(function (){
 
         $('#offcanvasClose').hide();
     }
+    $(document).on('click', '#btnAddFunds', function(e) {
+        $('#minFundsRequired').val(0);
+        $('#amountToAdd').val(0);
+        $('#addFundsModal').modal('show');
+    });
+    $('#buttonAddFunds').validator().on('click', function(e) {
+        e.preventDefault();
+        var precision = parseInt($('#addFundsAssetPrecision').val());
+        var amountToAdd = Math.round((parseFloat($('#amountToAdd').val()) + Number.EPSILON) * Math.pow(10, precision));
+        var minAmount = Math.round((parseFloat($('#minFundsRequired').val()) + Number.EPSILON) * Math.pow(10,precision));
 
+        if(amountToAdd < minAmount) {
+            showNotification('Add more funds', 'danger');
+        } else {
+            window.location.replace(`/checkout/payment/${(amountToAdd/Math.pow(10, precision)).toFixed(precision)}`);
+        }
+    });
     $('#userSetupForm').validator().on('submit', function(e){
         if(!e.isDefaultPrevented()){
             e.preventDefault();
@@ -692,18 +708,7 @@ $(document).ready(function (){
         }
     });
 
-    $('#buttonAddFunds').validator().on('click', function(e) {
-        e.preventDefault();
-        var precision = parseInt($('#addFundsAssetPrecision').val());
-        var amountToAdd = Math.round((parseFloat($('#amountToAdd').val()) + Number.EPSILON) * Math.pow(10, precision));
-        var minAmount = Math.round((parseFloat($('#minFundsRequired').val()) + Number.EPSILON) * Math.pow(10,precision));
-
-        if(amountToAdd < minAmount) {
-            showNotification('Add more funds', 'danger');
-        } else {
-            window.location.replace(`/checkout/payment/${(amountToAdd/Math.pow(10, precision)).toFixed(precision)}`);
-        }
-    });
+    
 
     $('#btnModalWithdrawFunds').validator().on('click', function(e) {
         e.preventDefault();
@@ -835,12 +840,9 @@ $(document).ready(function (){
         }
     });
 
-    $(document).on('click', '#btnAddFunds', function(e) {
-        $('#minFundsRequired').val(0);
-        $('#amountToAdd').val(0);
-        $('#addFundsModal').modal('show');
-    });
+  
 
+  
     $(document).on('click', '#btnWithdrawFunds', function(e) {
         $('#maxAmountWithdrawn').val($(this).attr('data-balance'));
         $('#transferFees').val($(this).attr('data-fees'));
