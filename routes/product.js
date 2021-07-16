@@ -284,6 +284,7 @@ router.get('/customer/products/:page?', async (req, res, next) => {
 
     res.render('products', {
         title: 'My NFTs',
+        language: req.cookies.locale || config.defaultLocale,
         results: products.data,
         purchases,
         totalItemCount: products.totalItems,
@@ -405,6 +406,7 @@ router.get('/customer/products/filter/:search', async (req, res, next) => {
     res.render('products', {
         title: 'Results',
         results: results,
+        language: req.cookies.locale || config.defaultLocale,
         resultType: 'filtered',
         admin: req.session.isAdmin || false,
         mintFee,
@@ -454,6 +456,7 @@ router.get('/customer/product/new', async (req, res) => {
     res.render('product-new', {
         title: 'New NFT',
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         productTitle: clearSessionValue(req.session, 'productTitle'),
         productDescription: clearSessionValue(req.session, 'productDescription'),
         productPermalink: clearSessionValue(req.session, 'productPermalink'),
@@ -770,6 +773,7 @@ router.get('/customer/product/edit/:id', async (req, res) => {
         title: 'Edit product',
         result: product,
         admin: false,
+        language: req.cookies.locale || config.defaultLocale,
         session: req.session,
         updateFee,
         updateFeeFloat,

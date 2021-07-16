@@ -115,11 +115,11 @@
                       <tr>
                           <td colspan="4">
                               <div class="row justify-content-center top-pad-8" id="productButtons">
-                                  <div class="col-sm-4 justify-content-between {{eqHidden this.sellOffersCount this.mintedCount}}">
+                                  <div class="col-sm-4 justify-content-between {{eqClass this.sellOffersCount this.mintedCount 'd-none' 'd-flex'}}">
                                       <button class="btn btn-outline-success" data-id="{{_id}}">Mint</button>
                                       <button class="btn btn-outline-success" data-id="{{_id}}">Sell</button>
                                   </div>
-                                  <div class="col-sm-4 justify-content-center {{neqHidden this.sellOffersCount this.mintedCount}}">
+                                  <div class="col-sm-4 justify-content-center {{neqClass this.sellOffersCount this.mintedCount 'd-none' 'd-flex'}}">
                                       <button class="btn btn-outline-success" data-id="{{_id}}">Mint</button>
                                   </div>
                             </div>
@@ -201,7 +201,7 @@
                         {{/if}}
                         {{#unless @root.admin}}
                         <div class="row justify-content-center top-pad-8" id="productButtons">
-                            <div class="col-sm-4 justify-content-between {{eqHidden this.sellOffersCount this.mintedCount}}">
+                            <div class="col-sm-4 justify-content-between {{eqClass this.sellOffersCount this.mintedCount 'd-none' 'd-flex'}}">
                                 <button class="btn btn-outline-success" data-id="{{_id}}">Re-sell</button>
                             </div>
                         </div>

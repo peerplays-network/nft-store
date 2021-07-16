@@ -20,6 +20,7 @@ router.get('/admin/users', restrict, async (req, res) => {
         title: 'Users',
         users: users,
         admin: true,
+        language: req.cookies.locale || config.defaultLocale,
         config: req.app.config,
         isAdmin: req.session.isAdmin,
         helpers: req.handlebars.helpers,
@@ -67,6 +68,7 @@ router.get('/admin/user/edit/:id', restrict, async (req, res) => {
         user: user,
         admin: true,
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         pageUrl: req.originalUrl,
@@ -80,6 +82,7 @@ router.get('/admin/user/new', restrict, (req, res) => {
     res.render('user-new', {
         title: 'User - New',
         admin: true,
+        language: req.cookies.locale || config.defaultLocale,
         session: req.session,
         helpers: req.handlebars.helpers,
         message: clearSessionValue(req.session, 'message'),
