@@ -285,6 +285,7 @@ $(document).ready(function (){
 
     // applies an product filter
     $(document).on('click', '#btn_product_filter', function(e){
+        console.log('express cart lode');
         if($('#product_filter').val() !== ''){
             window.location.href = '/customer/products/filter/' + $('#product_filter').val();
         }else{

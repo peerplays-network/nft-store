@@ -247,6 +247,9 @@ body .popover {
   display: inline-block;
   width: 10%;
 }
+.nft-image-open {
+  cursor: pointer;
+}
 /*
  * Content
  */

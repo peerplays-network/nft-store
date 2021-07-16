@@ -17,6 +17,7 @@ const { indexCustomers } = require('../lib/indexing');
 const { validateJson } = require('../lib/schema');
 const { restrict } = require('../lib/auth');
 const PeerplaysService = require('../services/PeerplaysService');
+const config = require('../config/settings');
 const peerplaysService = new PeerplaysService();
 
 const apiLimiter = rateLimit({
@@ -30,11 +31,13 @@ router.get('/customer/setup', async (req, res) => {
   res.render('customer-create', {
       title: 'Register',
       config: req.app.config,
+      language: req.cookies.locale || config.defaultLocale,
       helpers: req.handlebars.helpers,
       session: req.session,
       message: clearSessionValue(req.session, 'message'),
       messageType: clearSessionValue(req.session, 'messageType'),
       countryList: getCountryList(),
+      pageUrl: req.originalUrl,
       editor: true
   });
 });
@@ -100,8 +103,8 @@ router.post('/customer/create', async (req, res) => {
             email: req.body.email,
             password: req.body.password
         });
-    } catch(ex) {
-        if(ex.message && ex.message.email && ex.message.email === "Email already exists") {
+    }catch(ex){
+        if(ex.message && ex.message.email && ex.message.email === 'Email already exists'){
             peerIdUser = await new PeerplaysService().signIn({
                 login: req.body.email,
                 password: req.body.password
@@ -109,9 +112,9 @@ router.post('/customer/create', async (req, res) => {
         }else{
             console.error(ex.message);
             if(typeof ex.message === 'string'){
-                res.status(400).json({ message: 'PeerID Sign-up error: ' + ex.message });
+                res.status(400).json({ message: `PeerID Sign-up error: ${ex.message}` });
             }else{
-                res.status(400).json({ message: 'PeerID Sign-up error: ' + Object.values(ex.message) });
+                res.status(400).json({ message: `PeerID Sign-up error: ${Object.values(ex.message)}` });
             }
             return;
         }
@@ -153,13 +156,18 @@ router.post('/customer/create', async (req, res) => {
             req.session.peerIDAccessToken = customerReturn.peerIDAccessToken;
             req.session.peerIDTokenExpires = customerReturn.peerIDTokenExpires;
 
+            delete req.session.user;
+            delete req.session.usersName;
+            delete req.session.userId;
+            delete req.session.isAdmin;
+
             // Return customer oject
             res.status(200).json({ message: 'Customer created successfully', customerReturn: customerReturn });
         });
     }catch(ex){
         console.error(colors.red('Failed to insert customer: ', ex));
         res.status(400).json({
-            message: 'Customer creation failed: ' + ex.message
+            message: `Customer creation failed: ${ex.message}`
         });
     }
 });
@@ -205,7 +213,6 @@ router.post('/customer/save', async (req, res) => {
 router.get('/customer/account', async (req, res) => {
     const db = req.app.db;
     const config = req.app.config;
-
     if(!req.session.customerPresent){
         res.redirect('/customer/login');
         return;
@@ -230,15 +237,15 @@ router.get('/customer/account', async (req, res) => {
         balance = account.result[0][1].balances.find((bal) => bal.asset_type === config.peerplaysAssetID);
 
         const object200 = await peerplaysService.getBlockchainData({
-            api: "database",
-            method: "get_objects",
-            "params[0][]": "2.0.0",
+            api: 'database',
+            method: 'get_objects',
+            'params[0][]': '2.0.0',
             params: false
         });
 
         const currentFees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 0);
         transferFees = (currentFees[1].fee / Math.pow(10, config.peerplaysAssetPrecision)).toFixed(config.peerplaysAssetPrecision);
-    } catch(err) {
+    }catch(err){
         console.log(err);
         res.status(400).json({
             message: 'Error fetching user\'s balance or fees'
@@ -251,13 +258,15 @@ router.get('/customer/account', async (req, res) => {
         session: req.session,
         orders,
         user,
+        language: req.cookies.locale || config.defaultLocale,
         balance: balance ? (balance.balance / Math.pow(10, config.peerplaysAssetPrecision)).toFixed(config.peerplaysAssetPrecision) : 0,
         transferFees,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         countryList: getCountryList(),
         config: req.app.config,
-        helpers: req.handlebars.helpers
+        helpers: req.handlebars.helpers,
+        pageUrl: req.originalUrl
     });
 });
 
@@ -266,7 +275,7 @@ router.post('/customer/redeem', async (req, res) => {
     const db = req.app.db;
     const config = req.app.config;
 
-    if(!req.body.amount || parseFloat(req.body.amount) <= 0) {
+    if(!req.body.amount || parseFloat(req.body.amount) <= 0){
         res.status(400).json({
             message: 'Amount should be greater than 0'
         });
@@ -275,13 +284,13 @@ router.post('/customer/redeem', async (req, res) => {
 
     const adminUser = await db.users.findOne({ isOwner: true });
 
-    if(!req.session.peerplaysAccountId) {
+    if(!req.session.peerplaysAccountId){
         res.status(400).json({
             message: 'Account information missing. Please login again.'
         });
     }
 
-    if(!adminUser || !adminUser.peerplaysAccountId) {
+    if(!adminUser || !adminUser.peerplaysAccountId){
         res.status(400).json({
            message: 'App configured incorrectly. Please try again after some time.'
         });
@@ -299,7 +308,7 @@ router.post('/customer/redeem', async (req, res) => {
     }];
 
     try{
-        const peerplaysResult = await peerplaysService.sendOperations({operations}, req.session.peerIDAccessToken);
+        const peerplaysResult = await peerplaysService.sendOperations({ operations }, req.session.peerIDAccessToken);
         const amt = (peerplaysResult.result.trx.operations[0][1].amount.amount / Math.pow(10, config.peerplaysAssetPrecision)).toFixed(config.peerplaysAssetPrecision);
 
         const redeemObj = {
@@ -317,13 +326,13 @@ router.post('/customer/redeem', async (req, res) => {
         const newRedemption = await db.redemption.insertOne(redeemObj);
 
         res.status(200).json({ message: 'Amount withdrawn successfully', newRedemption });
-    }catch(err) {
+    }catch(err){
         console.log(err);
-        if(err.message) {
+        if(err.message){
             res.status(400).json({
                 message: err.message
             });
-        } else {
+        }else{
             res.status(400).json({
                 message: 'Some error occurred.'
             });
@@ -503,6 +512,7 @@ router.get('/admin/customer/view/:id?', restrict, async (req, res) => {
     return res.render('customer', {
         title: 'View customer',
         result: customer,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         session: req.session,
         message: clearSessionValue(req.session, 'message'),
@@ -510,6 +520,7 @@ router.get('/admin/customer/view/:id?', restrict, async (req, res) => {
         countryList: getCountryList(),
         config: req.app.config,
         editor: true,
+        pageUrl: req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
@@ -528,11 +539,13 @@ router.get('/admin/customers', restrict, async (req, res) => {
     return res.render('customers', {
         title: 'Customers - List',
         admin: true,
+        language: req.cookies.locale || config.defaultLocale,
         customers: customers,
         session: req.session,
         helpers: req.handlebars.helpers,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: req.originalUrl,
         config: req.app.config
     });
 });
@@ -561,12 +574,14 @@ router.get('/admin/customers/filter/:search', restrict, async (req, res, next) =
     return res.render('customers', {
         title: 'Customer results',
         customers: customers,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         config: req.app.config,
         session: req.session,
         searchTerm: searchTerm,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
@@ -609,8 +624,10 @@ router.get('/customer/login', async (req, res, next) => {
         title: 'Customer login',
         config: req.app.config,
         session: req.session,
+        language: req.cookies.locale || config.deafultLocale,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
@@ -650,8 +667,8 @@ router.post('/customer/login_action', async (req, res) => {
             password: req.body.loginPassword
         });
 
-        if(new Date(accessToken.result.expires) <= new Date()) {
-            accessToken = await new PeerplaysService().refreshAccessToken({refresh_token: accessToken.result.refresh_token});
+        if(new Date(accessToken.result.expires) <= new Date()){
+            accessToken = await new PeerplaysService().refreshAccessToken({ refresh_token: accessToken.result.refresh_token });
         }
 
         const customerObj = {
@@ -707,6 +724,11 @@ router.post('/customer/login_action', async (req, res) => {
         req.session.peerIDAccessToken = accessToken.result.token;
         req.session.peerIDTokenExpires = accessToken.result.expires;
 
+        delete req.session.user;
+        delete req.session.usersName;
+        delete req.session.userId;
+        delete req.session.isAdmin;
+
         res.status(200).json({
             message: 'Successfully logged in',
             customer: customer
@@ -726,10 +748,12 @@ router.get('/customer/forgotten', (req, res) => {
         title: 'Forgotten',
         route: 'customer',
         forgotType: 'customer',
+        language: req.cookies.locale || config.defaultLocale,
         config: req.app.config,
         helpers: req.handlebars.helpers,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: req.originalUrl,
         showFooter: 'showFooter'
     });
 });
@@ -792,11 +816,13 @@ router.get('/customer/reset/:token', async (req, res) => {
     res.render('reset', {
         title: 'Reset password',
         token: req.params.token,
+        language: req.cookies.locale || config.defaultLocale,
         route: 'customer',
         config: req.app.config,
         message: clearSessionValue(req.session, 'message'),
         message_type: clearSessionValue(req.session, 'message_type'),
         show_footer: 'show_footer',
+        pageUrl: req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
