@@ -248,6 +248,72 @@ $(document).ready(function (){
         }
     });
 
+    $('#productEditForm').validator().on('submit', function(e){
+        e.preventDefault();
+        if(parseInt($('#ppyBalance').val()) < parseInt($('#updateFee').val())){
+            showNotification('Insufficient funds. Please add funds.', 'danger', false);
+            var minFundsRequired = (parseInt($('#updateFee').val()) - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
+            $('#minFundsRequired').val(minFundsRequired);
+            $('#amountToAdd').val(minFundsRequired);
+            $('#addFundsModal').modal('show');
+        }else{
+            $('#loder').show();
+            $('#productEditForm').css('opacity', '0.5');
+            $('#productUpdate').prop('disabled', true);
+
+            if($('#productPermalink').val() === '' && $('#productTitle').val() !== ''){
+                $('#productPermalink').val(slugify($('#productTitle').val()));
+            }
+
+            let file;
+            if(document.getElementById('productImage').files){
+                file = document.getElementById('productImage').files[0];
+            }
+
+            var formData = new FormData();
+            formData.append('title', $('#productTitle').val());
+            formData.append('productID', $('#productID').val());
+            formData.append('nftMetadataID', $('#nftMetadataID').val());
+            formData.append('productDescription', $('#productDescription').val());
+            formData.append('productCategory', $('#category').val());
+            formData.append('productPublished', $('#productPublished').val());
+            formData.append('productPermalink', $('#productPermalink').val());
+
+            if(file){
+                formData.append('productImage', file);
+            }
+
+            $.ajax({
+                method: 'POST',
+                url: '/customer/product/update',
+                data: formData,
+                contentType: false,
+                processData: false
+            })
+            .done(function(msg){
+              $('#loder').hide();
+              $('#productEditForm').css('opacity', '1');
+              showNotification(msg.message, 'success', true, '/customer/products/1');
+              $('#productUpdate').prop('disabled', false);
+            })
+            .fail(function(msg){
+                $('#loder').hide();
+                $('#productEditForm').css('opacity', '1');
+
+                if(msg.responseJSON && msg.responseJSON.length > 0){
+                    var errorMessages = validationErrors(msg.responseJSON);
+                    $('#validationModalBody').html(errorMessages);
+                    $('#validationModal').modal('show');
+                    $('#productUpdate').prop('disabled', false);
+                    return;
+                }
+
+                showNotification(msg.responseJSON.message, 'danger');
+                $('#productUpdate').prop('disabled', false);
+            });
+        }
+    });
+
     $('.btn-delete-review').on('click', function(){
         if(confirm('Are you sure you want to delete this review?')){
             $.ajax({
