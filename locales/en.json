@@ -175,7 +175,7 @@
 	"Shipping options": "Shipping options",
 	"Proceed to payment": "Proceed to payment",
 	"Return to information": "Return to information",
-	"Search shop": "Search shop",
+	"Search shop": "Search NFT",
 	"Dashboard": "Dashboard",
 	"Create order": "Create order",
 	"Order shipping amount": "Order shipping amount",
@@ -242,5 +242,6 @@
   "Transfer fees": "Withdrawal fee",
   "Customer Name": "Customer Name",
   "Customer Email": "Customer Email",
-  "Request Date": "Request Date"
+  "Request Date": "Request Date",
+  "NFTs purchased": "NFTs purchased"
 }

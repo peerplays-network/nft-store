@@ -206,9 +206,9 @@
                         <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {{{feather 'globe'}}}
                         </button>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
                             {{#availableLanguages}}
-                                <li><a class="dropdown-item" href="/lang/{{this}}">{{@root.__ this}}</a></li>
+                              <li><a class="dropdown-item {{eqClass @root.language this 'bold' ''}}" href="/lang/{{this}}/{{urlEncode @root.pageUrl}}">{{@root.__ this}}</a></li>
                             {{/availableLanguages}}
                         </div>
                     </div>
@@ -302,6 +302,7 @@
         {{> partials/sellNFTModal}}
         {{> partials/addFundsModal}}
         {{> partials/withdrawFundsModal}}
+        {{> partials/fullSizeImageModal}}
         {{#if @root.config.modules.enabled.reviews}}
         {{> partials/reviewModal}}
         {{/if}}

@@ -41,20 +41,22 @@ const PeerplaysService = require('../services/PeerplaysService');
 const peerplaysService = new PeerplaysService();
 
 const getAllBidOffers = async (start = 0) => {
-  const bidOffers = [];
-  const { result } = await peerplaysService.getBlockchainData({
-      api: 'database',
-      method: 'list_offers',
-      params: [`1.29.${start}`, 100]
-  });
+    const bidOffers = [];
+    const { result } = await peerplaysService.getBlockchainData({
+        api: 'database',
+        method: 'list_offers',
+        params: [`1.29.${start}`, 100]
+    });
 
-  bidOffers.push(...result);
+    bidOffers.push(...result);
 
-  if(result.length < 100){
-      return bidOffers;
-  }
-      bidOffers.push(await getAllBidOffers(start + 100));
-      return bidOffers;
+    if(result.length < 100){
+        return bidOffers;
+    }
+
+    const newStart = parseInt(result[99].id.split('.')[2]) + 1;
+    bidOffers.push(...await getAllBidOffers(newStart));
+    return bidOffers;
 };
 
 // Google products
@@ -161,6 +163,7 @@ router.get('/payment/:orderId', async (req, res, next) => {
         title: 'Payment complete',
         config: req.app.config,
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         result: order,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
@@ -195,6 +198,7 @@ router.get('/checkout/information', async (req, res, next) => {
         title: 'Checkout - Information',
         config: req.app.config,
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         paymentType,
         cartClose: false,
         page: 'checkout-information',
@@ -240,6 +244,7 @@ router.get('/checkout/shipping', async (req, res, next) => {
         config: req.app.config,
         session: req.session,
         cartClose: false,
+        language: req.cookies.locale || config.defaultLocale,
         cartReadOnly: true,
         page: 'checkout-shipping',
         countryList,
@@ -256,6 +261,7 @@ router.get('/checkout/cart', (req, res) => {
     res.render(`${config.themeViews}checkout-cart`, {
         title: 'Checkout - Cart',
         page: req.query.path,
+        language: req.cookies.locale || config.defaultLocale,
         config,
         session: req.session,
         message: clearSessionValue(req.session, 'message'),
@@ -300,6 +306,7 @@ router.get('/checkout/payment/:ppyAmount', async (req, res) => {
         config: req.app.config,
         paymentConfig: getPaymentConfig(),
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         paymentPage: true,
         imagePath,
         paymentType: '',
@@ -310,6 +317,7 @@ router.get('/checkout/payment/:ppyAmount', async (req, res) => {
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         helpers: req.handlebars.helpers,
+        pageUrl: req.originalUrl,
         showFooter: 'showFooter'
     });
 });
@@ -327,6 +335,7 @@ router.get('/blockonomics_payment', (req, res, next) => {
         config: req.app.config,
         paymentConfig: getPaymentConfig(),
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         paymentPage: true,
         paymentType,
         cartClose: true,
@@ -433,7 +442,7 @@ router.get('/product/:id/:offerId', async (req, res) => {
         return;
     }
 
-    let metadata, offer, balance, fee, bids;
+    let metadata, offer, balance, fee, bids, bidFee;
 
     try{
         metadata = await peerplaysService.getBlockchainData({
@@ -448,15 +457,17 @@ router.get('/product/:id/:offerId', async (req, res) => {
         });
 
         const bidOffers = await getAllBidOffers();
-        // eslint-disable-next-line no-prototype-builtins
-        bids = bidOffers.filter((bid) => bid.item_ids[0] === offer.result[0].item_ids[0] && bid.hasOwnProperty('bidder'));
-        await Promise.all(bids.map(async (bid) => {
-          const bidder = await db.customers.findOne({ peerplaysAccountId: bid.bidder });
-          bid.bidder = bidder;
-          bid.bid_price.amount = bid.bid_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
-        }));
+        if(bidOffers && bidOffers.length > 0){
+            // eslint-disable-next-line no-prototype-builtins
+            bids = bidOffers.filter((bid) => bid.item_ids && bid.item_ids.length > 0 && offer.result[0] && offer.result[0].item_ids.length > 0 && bid.item_ids[0] === offer.result[0].item_ids[0] && bid.hasOwnProperty('bidder'));
+            await Promise.all(bids.map(async (bid) => {
+              const bidder = await db.customers.findOne({ peerplaysAccountId: bid.bidder });
+              bid.bidder = bidder;
+              bid.bid_price.amount = bid.bid_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
+            }));
 
-        bids = bids.sort((a, b) => b.bid_price.amount - a.bid_price.amount);
+            bids = bids.sort((a, b) => b.bid_price.amount - a.bid_price.amount);
+        }
 
         if(req.session.peerplaysAccountId){
             const account = await peerplaysService.getBlockchainData({
@@ -475,6 +486,8 @@ router.get('/product/:id/:offerId', async (req, res) => {
 
             const bidFees = object200.result[0].parameters.current_fees.parameters.find((fees) => fees[0] === 89);
             fee = bidFees[1].fee;
+
+            bidFee = (fee / Math.pow(10, config.peerplaysAssetPrecision)).toFixed(config.peerplaysAssetPrecision);
 
             const assetBalance = account.result[0][1].balances.find((bal) => bal.asset_type === config.peerplaysAssetID);
             balance = assetBalance ? assetBalance.balance : 0;
@@ -496,17 +509,19 @@ router.get('/product/:id/:offerId', async (req, res) => {
     }
 
     product.offerId = req.params.offerId;
-    product.minimum_price = offer.result[0].minimum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
+    if(offer.result[0] && offer.result[0].item_ids.length > 0){
+        product.minimum_price = offer.result[0].minimum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
 
-    product.maximum_price = offer.result[0].maximum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
+        product.maximum_price = offer.result[0].maximum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
 
-    product.is_bidding = product.minimum_price !== product.maximum_price;
+        product.is_bidding = product.minimum_price !== product.maximum_price;
 
-    if(bids && bids.length > 0){
-        if(bids[0].bid_price.amount === product.maximum_price){
-            product.minimum_price = product.maximum_price;
-        }else if(bids[0].bid_price.amount < product.maximum_price){
-            product.minimum_price = Math.round((bids[0].bid_price.amount * Math.pow(10, config.peerplaysAssetPrecision) + (product.maximum_price * Math.pow(10, config.peerplaysAssetPrecision) - bids[0].bid_price.amount * Math.pow(10, config.peerplaysAssetPrecision)) / 100)) / Math.pow(10, config.peerplaysAssetPrecision);
+        if(bids && bids.length > 0){
+            if(bids[0].bid_price.amount === product.maximum_price){
+                product.minimum_price = product.maximum_price;
+            }else if(bids[0].bid_price.amount < product.maximum_price){
+                product.minimum_price = Math.round((bids[0].bid_price.amount * Math.pow(10, config.peerplaysAssetPrecision) + (product.maximum_price * Math.pow(10, config.peerplaysAssetPrecision) - bids[0].bid_price.amount * Math.pow(10, config.peerplaysAssetPrecision)) / 100)) / Math.pow(10, config.peerplaysAssetPrecision);
+            }
         }
     }
 
@@ -576,7 +591,8 @@ router.get('/product/:id/:offerId', async (req, res) => {
                 $or: [
                     { productTitle: { $regex: searchTerm, $options: 'i' } },
                     { productDescription: { $regex: searchTerm, $options: 'i' } }
-                ]
+                ],
+                productPublished: true
             }, getSort(), req);
             return data;
         }));
@@ -596,13 +612,15 @@ router.get('/product/:id/:offerId', async (req, res) => {
         title: product.productTitle,
         result: product,
         relatedProducts,
+        language: req.cookies.locale || config.defaultLocale,
         balance,
         fee,
+        bidFee,
         productDescription: stripHtml(product.productDescription),
         metaDescription: `${config.cartTitle} - ${product.productTitle}`,
         config: config,
         session: req.session,
-        pageUrl: config.baseUrl + req.originalUrl,
+        pageUrl: req.originalUrl,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         helpers: req.handlebars.helpers,
@@ -952,6 +970,18 @@ router.post('/product/bid', async (req, res, next) => {
 
     const productPrice = Math.round((parseFloat(req.body.productPrice) + Number.EPSILON) * Math.pow(10, config.peerplaysAssetPrecision));
 
+    const offer = await peerplaysService.getBlockchainData({
+        api: 'database',
+        method: 'get_objects',
+        'params[0][]': req.body.offerId
+    });
+
+    const isBidding = offer.result[0].minimum_price.amount !== offer.result[0].maximum_price.amount;
+
+    if(offer && offer.result.length > 0 && offer.result[0].issuer && offer.result[0].issuer === req.session.peerplaysAccountId){
+        return res.status(400).json({ message: isBidding ? 'You cannot bid on your own NFT' : 'You cannot buy your own NFT' });
+    }
+
     const body = {
         operations: [{
             op_name: 'bid',
@@ -971,12 +1001,12 @@ router.post('/product/bid', async (req, res, next) => {
         const { result } = await peerplaysService.sendOperations(body, req.session.peerIDAccessToken);
         bidId = result.trx.operation_results[0][1];
         return res.status(200).json({
-            message: req.body.isBidding ? 'NFT successfully added to Cart.' : 'NFT bought successfully',
+            message: isBidding ? 'Bid placed successfully' : 'NFT bought successfully',
             bidId
         });
     }catch(ex){
         console.error(ex);
-        res.status(400).json({ message: 'You can not bid your own NFTs' });
+        res.status(400).json({ message: 'Error bidding on/buying NFTs' });
     }
 });
 
@@ -1082,7 +1112,8 @@ router.get('/search/:searchTerm?/:pageNum?', (req, res) => {
             $or: [
                 { productTitle: { $regex: searchTerm, $options: 'i' } },
                 { productDescription: { $regex: searchTerm, $options: 'i' } }
-            ]
+            ],
+            productPublished: true
         }, getSort(), req),
         getMenu(db)
     ])
@@ -1096,6 +1127,7 @@ router.get('/search/:searchTerm?/:pageNum?', (req, res) => {
         res.render(`${config.themeViews}index`, {
             title: 'Results',
             results: results.data,
+            language: req.cookies.locale || config.defaultLocale,
             filtered: true,
             session: req.session,
             metaDescription: `${req.app.config.cartTitle} - Search term: ${searchTerm}`,
@@ -1106,6 +1138,7 @@ router.get('/search/:searchTerm?/:pageNum?', (req, res) => {
             totalProductCount: results.totalItems,
             pageNum: pageNum,
             paginateUrl: 'search',
+            pageUrl: req.originalUrl,
             config: config,
             menu: sortMenu(menu),
             helpers: req.handlebars.helpers,
@@ -1152,6 +1185,7 @@ router.get('/category/:cat/:pageNum?', (req, res) => {
                 title: `Category: ${searchTerm}`,
                 results: results.data,
                 filtered: true,
+                language: req.cookies.locale || config.defaultLocale,
                 session: req.session,
                 searchTerm: searchTerm,
                 metaDescription: `${req.app.config.cartTitle} - Category: ${searchTerm}`,
@@ -1174,9 +1208,14 @@ router.get('/category/:cat/:pageNum?', (req, res) => {
 });
 
 // Language setup in cookie
-router.get('/lang/:locale', (req, res) => {
+router.get('/lang/:locale/:redirectUri', (req, res) => {
     res.cookie('locale', req.params.locale, { maxAge: 900000, httpOnly: true });
-    res.redirect('back');
+
+    if(req.params.redirectUri){
+        res.redirect(req.params.redirectUri);
+    }else{
+        res.redirect('back');
+    }
 });
 
 // return sitemap
@@ -1232,6 +1271,7 @@ router.get('/page/:pageNum', (req, res, next) => {
                 title: 'Shop',
                 results: results.data,
                 session: req.session,
+                language: req.cookies.locale || config.defaultLocale,
                 message: clearSessionValue(req.session, 'message'),
                 messageType: clearSessionValue(req.session, 'messageType'),
                 metaDescription: `${req.app.config.cartTitle} - Products page: ${req.params.pageNum}`,
@@ -1239,6 +1279,7 @@ router.get('/page/:pageNum', (req, res, next) => {
                 productsPerPage: numberProducts,
                 totalProductCount: results.totalItems,
                 pageNum: req.params.pageNum,
+                pageUrl: req.originalUrl,
                 paginateUrl: 'page',
                 helpers: req.handlebars.helpers,
                 showFooter: 'showFooter',
@@ -1259,7 +1300,7 @@ router.get('/:page?', async (req, res, next) => {
     // if no page is specified, just render page 1 of the cart
     if(!req.params.page){
         Promise.all([
-            paginateProducts(true, db, 1, {}, getSort(), req),
+            paginateProducts(true, db, 1, { productPublished: true }, getSort(), req),
             getMenu(db)
         ])
             .then(async([results, menu]) => {
@@ -1272,6 +1313,7 @@ router.get('/:page?', async (req, res, next) => {
                 res.render(`${config.themeViews}index`, {
                     title: `${config.cartTitle} - Shop`,
                     theme: config.theme,
+                    language: req.cookies.locale || config.defaultLocale,
                     results: results.data,
                     session: req.session,
                     message: clearSessionValue(req.session, 'message'),
@@ -1280,6 +1322,7 @@ router.get('/:page?', async (req, res, next) => {
                     productsPerPage: numberProducts,
                     totalProductCount: results.totalItems,
                     pageNum: 1,
+                    pageUrl: req.originalUrl,
                     paginateUrl: 'page',
                     helpers: req.handlebars.helpers,
                     showFooter: 'showFooter',
@@ -1302,6 +1345,7 @@ router.get('/:page?', async (req, res, next) => {
                 title: page.pageName,
                 page: page,
                 searchTerm: req.params.page,
+                language: req.cookies.locale || config.defaultLocale,
                 session: req.session,
                 message: clearSessionValue(req.session, 'message'),
                 messageType: clearSessionValue(req.session, 'messageType'),

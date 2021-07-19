@@ -12,6 +12,8 @@ const csrf = require('csurf');
 const util = require('util');
 const stream = require('stream');
 const PeerplaysService = require('../services/PeerplaysService');
+const peerplaysService = new PeerplaysService();
+const config = require('../config/settings');
 const { validateJson } = require('../lib/schema');
 const {
     clearSessionValue,
@@ -35,6 +37,10 @@ const {
     deleteMenu,
     orderMenu
 } = require('../lib/menu');
+const {
+  getSort,
+  paginateProducts
+} = require('../lib/paginate');
 const ObjectId = require('mongodb').ObjectID;
 const router = express.Router();
 const csrfProtection = csrf({ cookie: true });
@@ -42,6 +48,47 @@ const csrfProtection = csrf({ cookie: true });
 // Regex
 const emailRegex = /\S+@\S+\.\S+/;
 const numericRegex = /^\d*\.?\d*$/;
+
+const getAllOfferHistory = async (start = 0) => {
+  const offerHistories = [];
+  const { result } = await peerplaysService.getBlockchainData({
+      api: 'database',
+      method: 'list_offer_history',
+      params: [`2.24.${start}`, 100]
+  });
+
+  const params = [];
+
+  for(let i = 0; i < result.length; i++){
+      params.push(...result[i].item_ids);
+  }
+
+  const nfts = await peerplaysService.getBlockchainData({
+      api: 'database',
+      method: 'get_objects',
+      'params[0][]': params
+  });
+
+  if(nfts){
+      for(let i = 0; i < result.length; i++){
+          result[i].nft_metadata_ids = nfts.result.filter((nft) => result[i].item_ids.includes(nft.id)).map(({ nft_metadata_id }) => nft_metadata_id);
+
+          result[i].minimum_price.amount = result[i].minimum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
+          result[i].maximum_price.amount = result[i].maximum_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
+      }
+  }
+
+  offerHistories.push(...result);
+
+  if(result.length < 100){
+      return offerHistories;
+  }
+
+  const newStart = parseInt(result[99].id.split('.')[2]) + 1;
+
+  offerHistories.push(...await getAllOfferHistory(newStart));
+  return offerHistories;
+};
 
 // Admin section
 router.get('/admin', restrict, (req, res, next) => {
@@ -76,11 +123,13 @@ router.get('/admin/login', async (req, res) => {
         req.session.needsSetup = false;
         res.render('login', {
             title: 'Login',
+            language: req.cookies.locale || config.defaultLocale,
             referringUrl: req.header('Referer'),
             config: req.app.config,
             message: clearSessionValue(req.session, 'message'),
             messageType: clearSessionValue(req.session, 'messageType'),
             helpers: req.handlebars.helpers,
+            pageUrl: req.originalUrl,
             showFooter: 'showFooter'
         });
     }else{
@@ -104,7 +153,7 @@ router.post('/admin/login_action', async (req, res) => {
     bcrypt.compare(req.body.password, user.userPassword)
         .then(async (result) => {
             if(result){
-                const accessToken = await new PeerplaysService().loginAndJoinApp({
+                const accessToken = await peerplaysService.loginAndJoinApp({
                     login: req.body.email,
                     password: req.body.password
                 });
@@ -117,7 +166,7 @@ router.post('/admin/login_action', async (req, res) => {
                 };
 
                 if(!user.peerplaysAccountId) {
-                    peerIdUser = await new PeerplaysService().signIn({
+                    peerIdUser = await peerplaysService.signIn({
                         login: req.body.email,
                         password: req.body.password
                     });
@@ -144,6 +193,23 @@ router.post('/admin/login_action', async (req, res) => {
                 req.session.usersName = user.usersName;
                 req.session.userId = user._id.toString();
                 req.session.isAdmin = user.isAdmin;
+
+                delete req.session.customerPresent;
+                delete req.session.customerId;
+                delete req.session.customerEmail;
+                delete req.session.customerCompany;
+                delete req.session.customerFirstname;
+                delete req.session.customerLastname;
+                delete req.session.customerAddress1;
+                delete req.session.customerAddress2;
+                delete req.session.customerCountry;
+                delete req.session.customerState;
+                delete req.session.customerPostcode;
+                delete req.session.customerPhone;
+                delete req.session.peerplaysAccountId;
+                delete req.session.peerIDAccessToken;
+                delete req.session.peerIDTokenExpires;
+
                 res.status(200).json({ message: 'Login successful' });
                 return;
             }
@@ -165,9 +231,11 @@ router.get('/admin/setup', async (req, res) => {
         res.render('setup', {
             title: 'Setup',
             config: req.app.config,
+            language: req.cookies.locale || config.defaultLocale,
             helpers: req.handlebars.helpers,
             message: clearSessionValue(req.session, 'message'),
             messageType: clearSessionValue(req.session, 'messageType'),
+            pageUrl: req.originalUrl,
             showFooter: 'showFooter'
         });
         return;
@@ -201,13 +269,13 @@ router.post('/admin/setup_action', async (req, res) => {
     if(userCount === 0){
         let peerIdUser;
         try{
-            peerIdUser = await new PeerplaysService().register({
+            peerIdUser = await peerplaysService.register({
                 email: req.body.userEmail,
                 password: req.body.userPassword
             });
         }catch(ex) {
             if(ex.message.email && ex.message.email === "Email already exists") {
-                peerIdUser = await new PeerplaysService().signIn({
+                peerIdUser = await peerplaysService.signIn({
                     login: req.body.userEmail,
                     password: req.body.userPassword
                 });
@@ -223,7 +291,7 @@ router.post('/admin/setup_action', async (req, res) => {
         }
         // email is ok to be used.
         try{
-            const accessToken = await new PeerplaysService().loginAndJoinApp({
+            const accessToken = await peerplaysService.loginAndJoinApp({
                 login: req.body.userEmail,
                 password: req.body.userPassword
             });
@@ -250,45 +318,70 @@ router.post('/admin/setup_action', async (req, res) => {
 router.get('/admin/dashboard', csrfProtection, restrict, async (req, res) => {
     const db = req.app.db;
 
+    let productsSold = [], topProducts = [];
+    const products = await paginateProducts(true, db, 1, {productPublished: true}, getSort(), req);
+    const allProductsInDB = await db.products.find({}).toArray();
+    const nftMetadataIds = allProductsInDB.map(({nftMetadataID}) => nftMetadataID);
+
+    const metadatas = await peerplaysService.getBlockchainData({
+        api: 'database',
+        method: 'get_objects',
+        'params[0][]': nftMetadataIds
+    });
+
+    if(nftMetadataIds && nftMetadataIds.length > 0) {
+        const offerHistories = await getAllOfferHistory();
+
+        if(offerHistories && offerHistories.length > 0) {
+            productsSold = offerHistories.filter((offer) => offer.result === 'Expired' && offer.nft_metadata_ids ? offer.nft_metadata_ids.some((id) => nftMetadataIds.includes(id)) : false);
+        }
+
+        for(let i = 0; i < productsSold.length; i++) {
+            productsSold[i].data = allProductsInDB.find((nft) => nft.nftMetadataID === productsSold[i].nft_metadata_ids[0]);
+
+            productsSold[i].metadata = metadatas.result.find((meta) => meta.id === productsSold[i].data.nftMetadataID);
+            productsSold[i].nftIds = productsSold[i].item_ids.join();
+
+            if(productsSold[i].hasOwnProperty('bidder')) {
+                const bidder = await db.customers.findOne({peerplaysAccountId: productsSold[i].bidder});
+                productsSold[i].bidder = `${bidder.firstName} ${bidder.lastName}`;
+                productsSold[i].bid_price.amount = productsSold[i].bid_price.amount / Math.pow(10, config.peerplaysAssetPrecision);
+            }
+
+            if(productsSold[i].metadata && productsSold[i].metadata.base_uri.includes('/uploads/')){
+                productsSold[i].base_uri = `${req.protocol}://${req.get('host')}/imgs${productsSold[i].metadata.base_uri.split('/uploads')[1]}`;
+            }else{
+                productsSold[i].base_uri = productsSold[i].metadata.base_uri;
+            }
+        }
+
+        topProducts = Object.values(productsSold.reduce((obj, nft) => {
+            obj[nft.item_ids[0]] = {
+                ...nft,
+                count: obj[nft.item_ids[0]] ? obj[nft.item_ids[0]].count + 1 : 1
+            };
+            return obj;
+        }, {}));
+
+        topProducts = topProducts.sort((a,b) => b.count - a.count).slice(0, 5);
+    }
+
     // Collate data for dashboard
     const dashboardData = {
-        productsCount: await db.products.countDocuments({
-            productPublished: true
-        }),
-        ordersCount: await db.orders.countDocuments({}),
-        ordersAmount: await db.orders.aggregate([{ $match: {} },
-            { $group: { _id: null, sum: { $sum: '$orderTotal' } }
-        }]).toArray(),
-        productsSold: await db.orders.aggregate([{ $match: {} },
-            { $group: { _id: null, sum: { $sum: '$orderProductCount' } }
-        }]).toArray(),
-        topProducts: await db.orders.aggregate([
-            { $project: { _id: 0 } },
-            { $project: { o: { $objectToArray: '$orderProducts' } } },
-            { $unwind: '$o' },
-            { $group: {
-                    _id: '$o.v.title',
-                    productImage: { $last: '$o.v.productImage' },
-                    count: { $sum: '$o.v.quantity' }
-            } },
-            { $sort: { count: -1 } },
-            { $limit: 5 }
-        ]).toArray()
+        productsCount: products.data? products.data.length : 0,
+        // ordersCount: await db.orders.countDocuments({}),
+        // ordersAmount: await db.orders.aggregate([{ $match: {} },
+        //     { $group: { _id: null, sum: { $sum: '$orderTotal' } }
+        // }]).toArray(),
+        productsSold,
+        productsSoldCount: productsSold.length,
+        topProducts
     };
-
-    // Fix aggregate data
-    if(dashboardData.ordersAmount.length > 0){
-        dashboardData.ordersAmount = dashboardData.ordersAmount[0].sum;
-    }
-    if(dashboardData.productsSold.length > 0){
-        dashboardData.productsSold = dashboardData.productsSold[0].sum;
-    }else{
-        dashboardData.productsSold = 0;
-    }
 
     res.render('dashboard', {
         title: 'Cart dashboard',
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         dashboardData,
         themes: getThemes(),
@@ -296,6 +389,7 @@ router.get('/admin/dashboard', csrfProtection, restrict, async (req, res) => {
         messageType: clearSessionValue(req.session, 'messageType'),
         helpers: req.handlebars.helpers,
         config: req.app.config,
+        pageUrl: req.originalUrl,
         csrfToken: req.csrfToken()
     });
 });
@@ -305,6 +399,7 @@ router.get('/admin/settings', csrfProtection, restrict, (req, res) => {
     res.render('settings', {
         title: 'Cart settings',
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         themes: getThemes(),
         message: clearSessionValue(req.session, 'message'),
@@ -313,6 +408,7 @@ router.get('/admin/settings', csrfProtection, restrict, (req, res) => {
         config: req.app.config,
         footerHtml: typeof req.app.config.footerHtml !== 'undefined' ? escape.decode(req.app.config.footerHtml) : null,
         googleAnalytics: typeof req.app.config.googleAnalytics !== 'undefined' ? escape.decode(req.app.config.googleAnalytics) : null,
+        pageUrl: req.originalUrl,
         csrfToken: req.csrfToken()
     });
 });
@@ -331,10 +427,12 @@ router.get('/admin/redemptions', restrict, checkAccess, async (req, res) => {
     res.render('redemptions', {
         title: 'Redeem Requests',
         config: req.app.config,
+        language: req.cookies.locale || config.defaultLocale,
         helpers: req.handlebars.helpers,
         redemptions,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: req.originalUrl,
         showFooter: 'showFooter'
     });
     return;
@@ -378,12 +476,14 @@ router.get('/admin/settings/menu', csrfProtection, restrict, async (req, res) =>
     res.render('settings-menu', {
         title: 'Cart menu',
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         helpers: req.handlebars.helpers,
         config: req.app.config,
         menu: sortMenu(await getMenu(db)),
+        pageUrl: req.originalUrl,
         csrfToken: req.csrfToken()
     });
 });
@@ -397,12 +497,14 @@ router.get('/admin/settings/pages', csrfProtection, restrict, async (req, res) =
         title: 'Static pages',
         pages: pages,
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         helpers: req.handlebars.helpers,
         config: req.app.config,
         menu: sortMenu(await getMenu(db)),
+        pageUrl: req.originalUrl,
         csrfToken: req.csrfToken()
     });
 });
@@ -414,6 +516,7 @@ router.get('/admin/settings/pages/new', csrfProtection, restrict, checkAccess, a
     res.render('settings-page', {
         title: 'Static pages',
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         button_text: 'Create',
         message: clearSessionValue(req.session, 'message'),
@@ -421,6 +524,7 @@ router.get('/admin/settings/pages/new', csrfProtection, restrict, checkAccess, a
         helpers: req.handlebars.helpers,
         config: req.app.config,
         menu: sortMenu(await getMenu(db)),
+        pageUrl: req.originalUrl,
         csrfToken: req.csrfToken()
     });
 });
@@ -447,12 +551,14 @@ router.get('/admin/settings/pages/edit/:page', csrfProtection, restrict, checkAc
         page: page,
         button_text: 'Update',
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         helpers: req.handlebars.helpers,
         config: req.app.config,
         menu,
+        pageUrl: req.originalUrl,
         csrfToken: req.csrfToken()
     });
 });
@@ -584,11 +690,13 @@ router.get('/admin/settings/discounts', csrfProtection, restrict, checkAccess, a
         title: 'Discount code',
         config: req.app.config,
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         discounts,
         admin: true,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         helpers: req.handlebars.helpers,
+        pageUrl: req.originalUrl,
         csrfToken: req.csrfToken()
     });
 });
@@ -602,12 +710,14 @@ router.get('/admin/settings/discount/edit/:id', csrfProtection, restrict, checkA
     res.render('settings-discount-edit', {
         title: 'Discount code edit',
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         discount,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         helpers: req.handlebars.helpers,
         config: req.app.config,
+        pageUrl: req.originalUrl,
         csrfToken: req.csrfToken()
     });
 });
@@ -671,11 +781,13 @@ router.get('/admin/settings/discount/new', csrfProtection, restrict, checkAccess
     res.render('settings-discount-new', {
         title: 'Discount code create',
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         admin: true,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         helpers: req.handlebars.helpers,
         config: req.app.config,
+        pageUrl: req.originalUrl,
         csrfToken: req.csrfToken()
     });
 });

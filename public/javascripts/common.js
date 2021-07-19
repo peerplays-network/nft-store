@@ -166,6 +166,7 @@ function showNotification(msg, type, reloadPage, redirect){
     $('#notify_message').slideDown(600).delay(2500).slideUp(600, function(){
         if(redirect){
             window.location = redirect;
+            return;
         }
         if(reloadPage === true){
             location.reload();

@@ -13,6 +13,9 @@
     /* border: 1px solid #afacac; */
     width: 100%;
 }
+.bold{
+    font-weight: bold;
+}
 .top-align-space {
     padding-top: 100px;
     padding-bottom: 100px;
@@ -241,3 +244,30 @@
     top: 10px;
     padding-left: 10px;
 }
+ /* table css */
+
+ .product-information {
+     width: 100%;
+ }
+
+ .table-first-child {
+    width: 30%;
+ }
+ .table-sec-child {
+    width: 25%;
+ }
+ .table-third-child {
+    width: 25%;
+ }
+ .table-fourth-child {
+    width: 20%;
+ }
+
+ .table-bottom-space-none .table  {
+    margin-bottom: 0px;
+    border: 1px solid #dee2e6;
+    background-color: #fff;
+ }
+ .cus-border-table {
+    border: 1px solid #dee2e6;
+ }
