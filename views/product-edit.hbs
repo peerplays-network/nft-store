@@ -6,7 +6,12 @@
                 {{#if isOwner}}
                 <div class="float-right mt-1 mr-1">
                     <button id="productUpdate" class="btn btn-outline-success">{{ @root.__ "Save product" }}</button>
-                </div>
+                    <a class="btn btn-outline-success btnCancel" href="/customer/products">Cancel</a>
+               </div>
+                 {{else}}
+                 <div class="float-right mt-1 mr-1">
+                     <a class="btn btn-outline-success btnCancel" href="/customer/products">Back</a>
+               </div>
                 {{/if}}
                 <h2>{{ @root.__ "Edit product" }}</h2>
             </div>
