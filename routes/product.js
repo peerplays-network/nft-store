@@ -702,7 +702,7 @@ router.post('/customer/product/sell', async (req, res) => {
 
 // render the editor
 router.get('/customer/product/edit/:id', async (req, res) => {
-    if(!req.session.peerplaysAccountId){
+    if(!req.session.isAdmin && !req.session.peerplaysAccountId){
         res.redirect('/customer/login');
         return;
     }
@@ -710,6 +710,7 @@ router.get('/customer/product/edit/:id', async (req, res) => {
     const db = req.app.db;
 
     const product = await db.products.findOne({ _id: getId(req.params.id) });
+
     if(!product){
         // If API request, return json
         if(req.apiAuthenticated){
@@ -751,7 +752,7 @@ router.get('/customer/product/edit/:id', async (req, res) => {
     const account = await peerplaysService.getBlockchainData({
         api: 'database',
         method: 'get_full_accounts',
-        'params[0][]': req.session.peerplaysAccountId,
+        'params[0][]': product.owner,
         params: true
     });
 
@@ -772,7 +773,7 @@ router.get('/customer/product/edit/:id', async (req, res) => {
     res.render('product-edit', {
         title: 'Edit product',
         result: product,
-        admin: false,
+        admin: req.session.isAdmin || false,
         language: req.cookies.locale || config.defaultLocale,
         session: req.session,
         updateFee,
@@ -905,10 +906,12 @@ router.get('/customer/product/edit/:id', async (req, res) => {
 // });
 
 // Update an existing product form action
-router.post('/customer/product/update', upload.single('productImage'), async (req, res) => {
+router.post('/customer/product/update', upload.single('productImage'), restrict, checkAccess, async (req, res) => {
     const db = req.app.db;
 
     const product = await db.products.findOne({ _id: getId(req.body.productID) });
+
+    const customer = await db.customers.findOne({ peerplaysAccountId: product.owner });
 
     if(!product){
         res.status(400).json({ message: 'Failed to update product' });
@@ -932,7 +935,7 @@ router.post('/customer/product/update', upload.single('productImage'), async (re
         // eslint-disable-next-line eqeqeq
         productPublished: req.body.productPublished == 'true',
         productPermalink: req.body.productPermalink,
-        owner: req.session.peerplaysAccountId
+        owner: product.owner
     };
 
     if(req.file){
@@ -959,7 +962,7 @@ router.post('/customer/product/update', upload.single('productImage'), async (re
         const op = {
             op_name: 'nft_metadata_update',
             fee_asset: config.peerplaysAssetID,
-            owner: req.session.peerplaysAccountId,
+            owner: product.owner,
             nft_metadata_id: req.body.nftMetadataID
         };
 
@@ -972,7 +975,7 @@ router.post('/customer/product/update', upload.single('productImage'), async (re
         };
 
         try{
-            await peerplaysService.sendOperations(body, req.session.peerIDAccessToken);
+            await peerplaysService.sendOperations(body, customer.peerIDAccessToken);
         }catch(ex){
             console.error(ex);
             res.status(400).json({ message: ex.message });
