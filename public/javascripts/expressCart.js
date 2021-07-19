@@ -32,8 +32,7 @@ $(document).ready(function (){
     $('[data-dismiss=modal]').on('click', function (e) {
         var $t = $(this),
             target = $t[0].href || $t.data("target") || $t.parents('.modal') || [];
-    
-        $(target).find('form').trigger('reset');
+         $(target).find('form').trigger('reset');
     });
 
     $('#userSetupForm').validator().on('submit', function(e){
@@ -450,10 +449,15 @@ $(document).ready(function (){
     });
 
     $('#productButtons div button').on('click', function(e){
-        if($(this).text() === 'Mint') {
+        $('#productQuantity').val(0);
+        $('#productMinPrice').val(0);
+        $('#productMaxPrice').val(0);
+        $('#saleEnd').val('');
+
+         if($(this).text() === 'Mint') {
             var productId = $(this).attr('data-id');
             var fee = $('#mintFee').val();
-            $('.modal-body #productId').val(productId);
+           $('.modal-body #productId').val(productId);
             $('.modal-body #mintFeePerUnit').val(fee);
             $('#nftMintModal').modal('show');
             $("#buttonMint").attr("disabled", false);
@@ -556,6 +560,7 @@ $(document).ready(function (){
 
                 showNotification(msg.responseJSON.message, 'danger');
                 $("#buttonMint").attr("disabled", false);
+                
             });
 
             $('#productQuantity').val(0);
