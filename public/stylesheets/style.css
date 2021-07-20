@@ -559,6 +559,10 @@ a {
   width: auto;
   max-width: fit-content;
 }
+.full-size-image {
+  max-width: 100%;
+  max-height: 100%;
+}
 @media only screen and (min-width: 768px) {
   .pushy {
     width: 700px;
