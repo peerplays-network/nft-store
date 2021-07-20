@@ -284,6 +284,8 @@ router.get('/checkout/cartdata', (req, res) => {
 router.get('/checkout/payment/:ppyAmount', async (req, res) => {
     const config = req.app.config;
 
+    const imagePath = `${req.protocol}://${req.get('host')}`;
+
     req.session.cart = {
       ppyAmount: req.params.ppyAmount
     };
@@ -306,6 +308,7 @@ router.get('/checkout/payment/:ppyAmount', async (req, res) => {
         paymentConfig: getPaymentConfig(),
         session: req.session,
         language: req.cookies.locale || config.defaultLocale,
+        imagePath,
         paymentPage: true,
         paymentType: '',
         cartClose: true,

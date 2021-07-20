@@ -31,9 +31,11 @@ $(document).ready(function (){
         $(document).on('submit', '#stripe-payment-form', function(e){
             e.preventDefault();
 
+            $('#paymentProcess').prop('disabled', true);
             stripe.createToken(card).then(function(response){
                 if(response.error){
                     showNotification('Failed to complete transaction', 'danger', true);
+                    setTimeout(function(){ $('#paymentProcess').prop('disabled', false); }, 4000);
                 }else{
                     $.ajax({
                         type: 'POST',
@@ -43,8 +45,10 @@ $(document).ready(function (){
                         }
                     }).done((response) => {
                         showNotification(response.message, 'success', false, '/');
+                        $('#paymentProcess').prop('disabled', false);
                     }).fail((response) => {
                         showNotification(response.message, 'danger', true);
+                        setTimeout(function(){ $('#paymentProcess').prop('disabled', false); }, 4000);
                     });
                 }
             });
