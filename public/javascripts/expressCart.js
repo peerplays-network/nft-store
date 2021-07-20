@@ -38,6 +38,7 @@ $(document).ready(function (){
         var precision = parseInt($('#addFundsAssetPrecision').val());
         var amountToAdd = Math.round((parseFloat($('#amountToAdd').val()) + Number.EPSILON) * Math.pow(10, precision));
         var minAmount = Math.round((parseFloat($('#minFundsRequired').val()) + Number.EPSILON) * Math.pow(10,precision));
+    })
 
     $('[data-dismiss=modal]').on('click', function (e) {
         var $t = $(this),
