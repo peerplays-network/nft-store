@@ -286,3 +286,6 @@
  .cus-border-table {
     border: 1px solid #dee2e6;
  }
+ .w-40{
+     width: 70% !important;
+ }
