@@ -803,7 +803,12 @@ $(document).ready(function (){
 
     $('#btnModalWithdrawFunds').validator().on('click', function(e) {
         e.preventDefault();
-        
+
+        $('#loder').show();
+        $('#account-main').css('opacity','0.5');
+        $('#withdrawFundsModal').css('opacity','0.5');
+        $('#btnModalWithdrawFunds').prop('disabled', true);
+
         var precision = parseInt($('#withdrawFundsAssetPrecision').val());
         var amountToWithdraw = Math.round((parseFloat($('#amountToWithdraw').val()) + Number.EPSILON) * Math.pow(10, precision));
         var maxAmount = Math.round((parseFloat($('#maxAmountWithdrawn').val()) + Number.EPSILON) * Math.pow(10,precision));
@@ -811,8 +816,16 @@ $(document).ready(function (){
 
         if(amountToWithdraw > maxAmount - transferFees) {
             showNotification('Insuficient Balance', 'danger');
+            $('#loder').hide();
+            $('#account-main').css('opacity','1');
+            $('#withdrawFundsModal').css('opacity','1');
+            setTimeout(function(){$('#btnModalWithdrawFunds').prop('disabled', false);},4000);
         }else if(!amountToWithdraw){
             showNotification('Enter amount in Amount to withdraw field', 'danger');
+            $('#loder').hide();
+            $('#account-main').css('opacity','1');
+            $('#withdrawFundsModal').css('opacity','1');
+            setTimeout(function(){$('#btnModalWithdrawFunds').prop('disabled', false);},4000);
         }else {
             $.ajax({
                 method: 'POST',
@@ -823,9 +836,17 @@ $(document).ready(function (){
             })
             .done(function(msg){
                 showNotification(msg.message, 'success', true);
+                $('#loder').hide();
+                $('#account-main').css('opacity','1');
+                $('#withdrawFundsModal').css('opacity','1');
+                $('#btnModalWithdrawFunds').prop('disabled', false);
             })
             .fail(function(msg){
                 showNotification(msg.responseJSON.message, 'danger');
+                $('#loder').hide();
+                $('#account-main').css('opacity','1');
+                $('#withdrawFundsModal').css('opacity','1');
+                setTimeout(function(){$('#btnModalWithdrawFunds').prop('disabled', false);},4000);
             });
         }
     });
