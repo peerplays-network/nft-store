@@ -950,8 +950,13 @@ router.post('/product/addtocart', async (req, res, next) => {
 // Bid on NFT
 router.post('/product/bid', async (req, res, next) => {
     if(!req.session.peerplaysAccountId){
+    if(req.body.isBidding){
         return res.status(400).json({
             message: 'You need to be logged in to bid on NFT'
+        });
+    }
+        return res.status(400).json({
+            message: 'You need to be logged in to buy on NFT'
         });
     }
 
