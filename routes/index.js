@@ -949,17 +949,6 @@ router.post('/product/addtocart', async (req, res, next) => {
 
 // Bid on NFT
 router.post('/product/bid', async (req, res, next) => {
-    if(!req.session.peerplaysAccountId){
-    if(req.body.isBidding){
-        return res.status(400).json({
-            message: 'You need to be logged in to bid on NFT'
-        });
-    }
-        return res.status(400).json({
-            message: 'You need to be logged in to buy on NFT'
-        });
-    }
-
     const db = req.app.db;
     const config = req.app.config;
 
@@ -980,6 +969,17 @@ router.post('/product/bid', async (req, res, next) => {
     });
 
     const isBidding = offer.result[0].minimum_price.amount !== offer.result[0].maximum_price.amount;
+
+    if(!req.session.peerplaysAccountId){
+        if(isBidding){
+            return res.status(400).json({
+                message: 'You need to be logged in to bid on NFT'
+            });
+        }
+        return res.status(400).json({
+            message: 'You need to be logged in to buy on NFT'
+        });
+    }
 
     if(offer && offer.result.length > 0 && offer.result[0].issuer && offer.result[0].issuer === req.session.peerplaysAccountId){
         return res.status(400).json({ message: isBidding ? 'You cannot bid on your own NFT' : 'You cannot buy your own NFT' });

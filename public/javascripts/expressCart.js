@@ -898,14 +898,7 @@ $(document).ready(function (){
     });
 
     $(document).on('click', '.product-add-to-cart', function(e){
-        if($('#product_bid').val()){
-            var isBidding = true;
-            var bidAmt = parseFloat($('#product_bid').val());
-        }else{
-            var isBidding = false;
-            var bidAmt = parseFloat($('#product_buy').val());
-        }
-
+        var bidAmt = parseFloat($('#product_bid').val());
         if(!bidAmt) {
             showNotification('Bid amount is required', 'danger', false);
             return;
@@ -928,7 +921,6 @@ $(document).ready(function (){
                     method: 'POST',
                     url: '/product/bid',
                     data: {
-                        isBidding:isBidding,
                         productId: $('#productId').val(),
                         offerId: $('#offerId').val(),
                         productPrice: parseFloat($('#product_bid').val()).toFixed(parseInt($('#addFundsAssetPrecision').val()))
