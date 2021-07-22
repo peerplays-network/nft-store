@@ -44,12 +44,12 @@ $(document).ready(function (){
                             token: response.token.id
                         }
                     }).done((response) => {
-                        showNotification(response.message, 'success', false, '/');
+                        showNotification(response.message, 'success', false, window.history.back());
                         $('#paymentProcess').prop('disabled', false);
                     }).fail((response) => {
                         showNotification(response.message, 'danger', true);
                         setTimeout(function(){ $('#paymentProcess').prop('disabled', false); }, 4000);
-                    });
+                       });
                 }
             });
         });
