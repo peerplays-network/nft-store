@@ -532,6 +532,16 @@ a {
   padding: 0px;
   height: 70px;
 }
+
+li.next a{
+  background-color: black !important;
+}
+li.previous.disabled.page-item.active a,li.next.disabled.page-item.active a{
+background-color: black !important;
+}
+li.page-item.active a{
+  background-color: gray !important;
+}
 .pagination > li > a {
   background-color: #000000 !important;
 }
