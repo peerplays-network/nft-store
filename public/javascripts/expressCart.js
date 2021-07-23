@@ -452,6 +452,8 @@ $(document).ready(function (){
         $('#productQuantity').val(0);
         $('#productMinPrice').val(0);
         $('#productMaxPrice').val(0);
+        $('#mintingFee').html('Fee: '+ 0 );
+
         $('#saleEnd').val('');
 
          if($(this).text() === 'Mint') {
