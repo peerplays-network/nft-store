@@ -176,8 +176,13 @@ $(document).ready(function (){
                 $('#productNewForm').css('opacity','1');
                 if(msg.responseJSON && msg.responseJSON.length > 0){
                     var errorMessages = validationErrors(msg.responseJSON);
-                    $('#validationModalBody').html(errorMessages);
-                    $('#validationModal').modal('show');
+                      msg.responseJSON.forEach((value)=>{
+                        if(value.params.limit === 25){
+                            $('#descriptionError').html(value.message);
+                        }else{
+                            $('#titleError').html(value.message);
+                        }
+                    })
                     $('#frm_product_save').prop('disabled', false);
                     return;
                 }
@@ -242,8 +247,13 @@ $(document).ready(function (){
 
                 if(msg.responseJSON && msg.responseJSON.length > 0){
                     var errorMessages = validationErrors(msg.responseJSON);
-                    $('#validationModalBody').html(errorMessages);
-                    $('#validationModal').modal('show');
+                    msg.responseJSON.forEach((value)=>{
+                        if(value.params.limit === 25){
+                            $('#descriptionError').html(value.message);
+                        }else{
+                            $('#titleError').html(value.message);
+                        }
+                    })
                     $('#productUpdate').prop('disabled', false);
                     return;
                 }
