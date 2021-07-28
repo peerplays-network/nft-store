@@ -5,6 +5,7 @@ const colors = require('colors');
 const bcrypt = require('bcryptjs');
 const { validateJson } = require('../lib/schema');
 const router = express.Router();
+const config = require('../config/settings');
 
 router.get('/admin/users', restrict, async (req, res) => {
     const db = req.app.db;
@@ -19,10 +20,12 @@ router.get('/admin/users', restrict, async (req, res) => {
         title: 'Users',
         users: users,
         admin: true,
+        language: req.cookies.locale || config.defaultLocale,
         config: req.app.config,
         isAdmin: req.session.isAdmin,
         helpers: req.handlebars.helpers,
         session: req.session,
+        pageUrl: req.originalUrl,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType')
     });
@@ -65,8 +68,10 @@ router.get('/admin/user/edit/:id', restrict, async (req, res) => {
         user: user,
         admin: true,
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: req.originalUrl,
         helpers: req.handlebars.helpers,
         config: req.app.config
     });
@@ -77,10 +82,12 @@ router.get('/admin/user/new', restrict, (req, res) => {
     res.render('user-new', {
         title: 'User - New',
         admin: true,
+        language: req.cookies.locale || config.defaultLocale,
         session: req.session,
         helpers: req.handlebars.helpers,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: req.originalUrl,
         config: req.app.config
     });
 });

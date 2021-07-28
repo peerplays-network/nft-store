@@ -208,6 +208,12 @@ handlebars = handlebars.create({
             }
             return null;
         },
+        urlEncode: (value) => {
+            if(value) {
+                return encodeURIComponent(value);
+            }
+            return '';
+        },
         formatDate: (date, format) => {
             return moment(date).format(format);
         },
@@ -324,11 +330,11 @@ handlebars = handlebars.create({
                 <use xlink:href="/dist/feather-sprite.svg#${icon}"/>
             </svg>`;
         },
-        eqHidden: (lvalue, rvalue) => {
-            return lvalue === rvalue ? 'd-none' : 'd-flex';
+        eqClass: (lvalue, rvalue, trueval, falseval) => {
+            return lvalue === rvalue ? trueval : falseval;
         },
-        neqHidden: (lvalue, rvalue) => {
-            return lvalue !== rvalue ? 'd-none' : 'd-flex';
+        neqClass: (lvalue, rvalue, trueval, falseval) => {
+            return lvalue !== rvalue ? trueval : falseval;
         }
     }
 });

@@ -3,7 +3,7 @@
     <form class="form-horizontal bg-light m-4" id="productEditForm" data-toggle="validator">
         <div class="col-12">
             <div class="page-header mt-2">
-                {{#if isOwner}}
+                {{#if session.isAdmin}}
                 <div class="float-right mt-1 mr-1">
                     <button id="productUpdate" class="btn btn-outline-success">{{ @root.__ "Save product" }}</button>
                     <a class="btn btn-outline-success btnCancel" href="/customer/products">Cancel</a>
@@ -20,7 +20,7 @@
         <div class="col-12">
             <div class="form-group">
                 <label for="productTitle" class="control-label">{{ @root.__ "Product title" }} *</label>
-                {{#if isOwner}}
+                {{#if session.isAdmin}}
                 <input type="text" id="productTitle" class="form-control" minlength="5" maxlength="200" value="{{result.productTitle}}" required />
                 {{else}}
                 <input type="text" id="productTitle" class="form-control" minlength="5" maxlength="200" value="{{result.productTitle}}" disabled/>
@@ -31,7 +31,7 @@
             <div class="col-sm-3">
                 <div class="form-group">
                     <label for="productPublished" class="control-label">{{ @root.__ "Status" }} *</label>
-                    {{#if isOwner}}
+                    {{#if session.isAdmin}}
                     <select class="form-control" id="productPublished">
                         <option value="true"  {{selectState @root.result.productPublished "true"}}>{{ @root.__ "Published" }}</option>
                         <option value="false" {{selectState @root.result.productPublished "false"}}>{{ @root.__ "Draft" }}</option>
@@ -47,7 +47,7 @@
             <div class="col-sm-3">
                 <div class="form-group">
                     <label for="category" class="control-label">{{ @root.__ "Product Brand" }} *</label>
-                    {{#if isOwner}}
+                    {{#if session.isAdmin}}
                     <select class="form-control" id="category" name="category" required>
                         <option value="" disabled selected>Select Category</option>
                         {{#each config.categories}}
@@ -68,7 +68,7 @@
         <div class="col-12">
             <div class="form-group">
                 <label for="productDescription" class="control-label">{{ @root.__ "Product description" }} *</label>
-                {{#if isOwner}}
+                {{#if session.isAdmin}}
                 <textarea minlength="5" rows="10" id="productDescription" class="form-control" required >{{result.productDescription}}</textarea>
                 {{else}}
                 <textarea minlength="5" rows="10" id="productDescription" class="form-control" disabled >{{result.productDescription}}</textarea>
@@ -78,7 +78,7 @@
         <div class="col-12">
             <div class="form-group">
                 <label class="control-label">Permalink</label>
-                {{#if isOwner}}
+                {{#if session.isAdmin}}
                 <div class="input-group">
                     <input type="text" class="form-control" id="productPermalink" placeholder="Permalink for the article" value={{result.productPermalink}}>
                     <div class="input-group-append">
@@ -102,9 +102,9 @@
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="col-sm-6">
-                            <img src="{{result.base_uri}}" class="product-main-image img-fluid">
+                            <img src="{{result.base_uri}}" class="product-main-image img-fluid nft-image-open">
                         </div>
-                        {{#if isOwner}}
+                        {{#if session.isAdmin}}
                         <div class="form-group">
                             <input class="form-control-file mt-2" type="file" id="productImage" name="productImage" accept="image/*"/>
                         </div>
@@ -115,7 +115,7 @@
         </div>
         {{#if config.commission}}
         <div class="col-12">
-            {{#if isOwner}}
+            {{#if session.isAdmin}}
             <div class="txt-danger" >Fee: {{updateFeeFloat}} {{config.peerplaysAssetSymbol}}</div>
             {{/if}}
             <div>A commission of {{config.commission}}% will be deducted from the sale price.</div>

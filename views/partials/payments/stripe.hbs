@@ -1,6 +1,6 @@
 <div id="stripe-form">
     <input type="hidden" id="stripePublicKey" value="{{@root.paymentConfig.stripe.publicKey}}">
-    <span class="mb-2">{{@root.paymentConfig.stripe.description}} <img src="{{@root.paymentConfig.stripe.stripeLogoURL}}" alt="Stripe" class="stripe-logo"></span>
+    <span class="mb-2">{{@root.paymentConfig.stripe.description}} <img src="{{@root.imagePath}}{{@root.paymentConfig.stripe.stripeLogoURL}}" alt="Stripe" class="stripe-logo"></span>
     <form id="stripe-payment-form">
       <div id="card-element"></div>
       <button class="btn btn-outline-success mt-2" id="paymentProcess">Process Payment</button>

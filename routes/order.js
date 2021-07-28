@@ -8,7 +8,7 @@ const {
     clearCustomer
 } = require('../lib/common');
 const {
-    paginateData,
+    paginateData
 } = require('../lib/paginate');
 const {
     emptyCart
@@ -16,6 +16,7 @@ const {
 const { restrict, checkAccess } = require('../lib/auth');
 const { indexOrders } = require('../lib/indexing');
 const router = express.Router();
+const config = require('../config/settings');
 
 // Show orders
 router.get('/admin/orders/:page?', restrict, async (req, res, next) => {
@@ -39,6 +40,7 @@ router.get('/admin/orders/:page?', restrict, async (req, res, next) => {
         title: 'Cart',
         orders: orders.data,
         totalItemCount: orders.totalItems,
+        language: req.cookies.locale || config.defaultLocale,
         pageNum,
         paginateUrl: 'admin/orders',
         admin: true,
@@ -46,6 +48,7 @@ router.get('/admin/orders/:page?', restrict, async (req, res, next) => {
         session: req.session,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
@@ -76,11 +79,13 @@ router.get('/admin/orders/bystatus/:orderstatus', restrict, async (req, res, nex
         orders: orders,
         admin: true,
         filteredOrders: true,
+        language: req.cookies.locale || config.defaultLocale,
         filteredStatus: req.params.orderstatus,
         config: req.app.config,
         session: req.session,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
@@ -94,11 +99,13 @@ router.get('/admin/order/view/:id', restrict, async (req, res) => {
         title: 'View order',
         result: order,
         config: req.app.config,
+        language: req.cookies.locale || config.defaultLocale,
         session: req.session,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         editor: true,
         admin: true,
+        pageUrl: req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
@@ -109,11 +116,13 @@ router.get('/admin/order/create', restrict, async (req, res) => {
         title: 'Create order',
         config: req.app.config,
         session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
         countryList: getCountryList(),
         editor: true,
         admin: true,
+        pageUrl: req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });
@@ -231,11 +240,13 @@ router.get('/admin/orders/filter/:search', restrict, async (req, res, next) => {
         title: 'Order results',
         orders: orders,
         admin: true,
+        language: req.cookies.locale || config.defaultLocale,
         config: req.app.config,
         session: req.session,
         searchTerm: searchTerm,
         message: clearSessionValue(req.session, 'message'),
         messageType: clearSessionValue(req.session, 'messageType'),
+        pageUrl: req.originalUrl,
         helpers: req.handlebars.helpers
     });
 });

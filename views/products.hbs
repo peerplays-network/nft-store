@@ -39,7 +39,7 @@
                     </tr>
                       {{#each results}}
                     <tr>
-                        <td> <img src="{{this.base_uri}}" class="sidebar-addon"/></td>
+                        <td> <img src="{{this.base_uri}}" class="sidebar-addon nft-image-open"/></td>
                         <td><a href="/customer/product/edit/{{this._id}}">{{this.productTitle}}</a></td>
                         <td>{{this.mintedCount}}</td>
                         <td class="text-center">{{this.sellOffersCount}}</td>
@@ -58,9 +58,11 @@
                                     <th>
                                         <strong>Sale end date</strong>
                                     </th>
+                                    {{#unless @root.admin}}
                                     <th class="text-center">
                                         <strong>Actions</strong>
                                     </th>
+                                    {{/unless}}
                                 </tr>
                                 {{#each sellOffers}}
                                 <tr>
@@ -79,9 +81,11 @@
                                             {{this.offer_expiration_date}}
                                         </span>
                                     </td>
+                                    {{#unless @root.admin}}
                                     <td class="text-center">
                                         <a class="text-danger btn-delete-offer" data-id={{this.id}}> {{{feather 'trash-2'}}}</a>
                                     </td>
+                                    {{/unless}}
                                 </tr>
                                 {{#if bids}}
                                 <tr>
@@ -107,19 +111,21 @@
                     </tr>
                   
                      {{/if}}
+                     {{#unless @root.admin}}
                       <tr>
                           <td colspan="4">
                               <div class="row justify-content-center top-pad-8" id="productButtons">
-                                  <div class="col-sm-4 justify-content-between {{eqHidden this.sellOffersCount this.mintedCount}}">
+                                  <div class="col-sm-4 justify-content-between {{eqClass this.sellOffersCount this.mintedCount 'd-none' 'd-flex'}}">
                                       <button class="btn btn-outline-success" data-id="{{_id}}">Mint</button>
                                       <button class="btn btn-outline-success" data-id="{{_id}}">Sell</button>
                                   </div>
-                                  <div class="col-sm-4 justify-content-center {{neqHidden this.sellOffersCount this.mintedCount}}">
+                                  <div class="col-sm-4 justify-content-center {{neqClass this.sellOffersCount this.mintedCount 'd-none' 'd-flex'}}">
                                       <button class="btn btn-outline-success" data-id="{{_id}}">Mint</button>
                                   </div>
                             </div>
                         </td>
                     </tr>
+                    {{/unless}}
                     {{/each}}
                 </table>
             </div>
@@ -129,6 +135,7 @@
         </div>
     </div>
     {{!--Recent purchases--}}
+    {{#unless admin}}
     {{#if purchases}}
     <div class="bg-light m-4">
         <div class="col-sm-12">
@@ -144,7 +151,7 @@
                     <li class="list-group-item">
                         <div class="d-flex mb-2">
                             <div class="col-sm-6 col-md-4">
-                                <img src="{{this.base_uri}}" class="sidebar-addon"/>
+                                <img src="{{this.base_uri}}" class="sidebar-addon nft-image-open"/>
                             </div>
                             <div class="col-sm-6 col-md-4"><a href="/customer/product/edit/{{this._id}}">{{this.productTitle}}</a></div>
                         </div>
@@ -155,7 +162,9 @@
                                     <strong>Min. Price</strong>
                                     <strong>Max. Price</strong>
                                     <strong>Sale end date</strong>
+                                    {{#unless @root.admin}}
                                     <strong>Actions</strong>
+                                    {{/unless}}
                                 </div>
                             </li>
                             {{#each sellOffers}}
@@ -164,7 +173,9 @@
                                     <div>{{this.minimum_price.amount}} {{@root.config.peerplaysAssetSymbol}}</div>
                                     <div>{{this.maximum_price.amount}} {{@root.config.peerplaysAssetSymbol}}</div>
                                     <div>{{this.offer_expiration_date}}</div>
+                                    {{#unless @root.admin}}
                                     <div><a class="text-danger btn-delete-offer" data-id={{this.id}}> {{{feather 'trash-2'}}}</a></div>
+                                    {{/unless}}
                                 </div>
                                 {{#if bids}}
                                 <ul class="list-group m-3">
@@ -188,11 +199,13 @@
                             {{/each}}
                         </ul>
                         {{/if}}
+                        {{#unless @root.admin}}
                         <div class="row justify-content-center top-pad-8" id="productButtons">
-                            <div class="col-sm-4 justify-content-between {{eqHidden this.sellOffersCount this.mintedCount}}">
+                            <div class="col-sm-4 justify-content-between {{eqClass this.sellOffersCount this.mintedCount 'd-none' 'd-flex'}}">
                                 <button class="btn btn-outline-success" data-id="{{_id}}">Re-sell</button>
                             </div>
                         </div>
+                        {{/unless}}
                     </li>
                     {{/each}}
                 </ul>
@@ -203,6 +216,7 @@
         </div>
     </div>
     {{/if}}
+    {{/unless}}
 </div>
  <div class="spinner-border text-primary" style="position: fixed;left:50%;top:50%;" id="loder" role="status">
             <span class="sr-only">Loading...</span>
