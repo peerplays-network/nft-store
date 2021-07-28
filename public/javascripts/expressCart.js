@@ -199,24 +199,32 @@ $(document).ready(function (){
     });
 
     $('.btn-delete-offer').on('click', function(){
-      var message = `Are you sure you want to delete this sell offer? A fee of ${$('#sellCancelFee').val()} ${$('#assetSymbol').val()} will be charged.`;
-      if(confirm(message)){
-          $.ajax({
-              method: 'POST',
-              url: '/customer/product/delete',
-              data: { offerId: $(this).attr('data-id') }
-          })
-          .done(function(msg){
-              showNotification(msg.message, 'success', true);
-          })
-          .fail(function(msg){
-              showNotification(msg.responseJSON.message, 'danger');
-          });
-      }
+        var message = `Are you sure you want to delete this sell offer? A fee of ${$('#sellCancelFee').val()} ${$('#assetSymbol').val()} will be charged.`;
+        if(confirm(message)){
+            if(parseInt($('#ppyBalance').val()) < parseInt($('#sellCancelFee').val() * Math.pow(10, parseInt($('#addFundsAssetPrecision').val())))) {
+                showNotification('Insufficient funds. Please add funds.', 'danger', false);
+                var minFundsRequired = (parseInt($('#sellCancelFee').val()) * Math.pow(10, parseInt($('#addFundsAssetPrecision').val())) - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
+                $('#minFundsRequired').val(minFundsRequired);
+                $('#amountToAdd').val(minFundsRequired);
+                $('#addFundsModal').modal('show');
+            } else {
+                $.ajax({
+                    method: 'POST',
+                    url: '/customer/product/delete',
+                    data: { offerId: $(this).attr('data-id') }
+                })
+                .done(function(msg){
+                    showNotification(msg.message, 'success', true);
+                })
+                .fail(function(msg){
+                    showNotification(msg.responseJSON.message, 'danger');
+                });
+            }
+        }
 
-      $('#loder').hide();
-      $('.main').css('opacity','1');
-  });
+        $('#loder').hide();
+        $('.main').css('opacity','1');
+    });
 
     $(document).on('click', '.menu-btn', function(e){
         e.preventDefault();
