@@ -350,6 +350,37 @@ router.get('/blockonomics_payment', (req, res, next) => {
     });
 });
 
+router.get('/confirm-email', async (req, res, next) => {
+    const config = res.app.config;
+    const db = req.app.db;
+    const token = req.query.token;
+
+    let peerIdUser;
+    try{
+        peerIdUser = await peerplaysService.confirmEmail(token);
+    }catch(ex){
+        return res.status(400).json({ message: `PeerID Sign-up error: ${ex.message}` });
+    }
+
+    const customer = db.customers.findOne({ email: peerIdUser.result.email });
+
+    if(!customer){
+        return res.send(400).json({ message: 'User not found' });
+    }
+
+    // show bitcoin address and wait for payment, subscribing to wss
+    res.render('confirm-email', {
+        title: 'Confirm Email',
+        config: req.app.config,
+        session: req.session,
+        language: req.cookies.locale || config.defaultLocale,
+        message: clearSessionValue(req.session, 'message'),
+        messageType: clearSessionValue(req.session, 'messageType'),
+        helpers: req.handlebars.helpers,
+        showFooter: 'showFooter'
+    });
+});
+
 router.post('/checkout/adddiscountcode', async (req, res) => {
     const config = req.app.config;
     const db = req.app.db;
