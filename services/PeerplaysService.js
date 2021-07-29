@@ -94,6 +94,19 @@ class PeerplaysService{
       }
     });
   }
+
+  async confirmEmail(token){
+    const confirmEmailUrl = `${config.peeridUrl}auth/confirm-email/${token}`;
+    return axios.get(confirmEmailUrl).then((res) => {
+      return res.data;
+    }).catch((err) => {
+      if(err.response && err.response.data){
+        throw new RestError(err.response.data.error, err.response.status);
+      }else{
+        throw err;
+      }
+    });
+  }
 }
 
 module.exports = PeerplaysService;

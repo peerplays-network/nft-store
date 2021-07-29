@@ -101,7 +101,8 @@ router.post('/customer/create', async (req, res) => {
     try{
         peerIdUser = await new PeerplaysService().register({
             email: req.body.email,
-            password: req.body.password
+            password: req.body.password,
+            redirect_uri: `${req.headers.origin}/confirm-email`
         });
     }catch(ex){
         if(ex.message && ex.message.email && ex.message.email === 'Email already exists'){
