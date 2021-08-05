@@ -807,7 +807,7 @@ $(document).ready(function (){
         } else if( amountToAdd == 0){
             showNotification('Amount is required', 'danger'); 
         } else {
-            window.location.replace(`/checkout/payment/${(amountToAdd/Math.pow(10, precision)).toFixed(precision)}`);
+            window.location.replace(`/checkout/payment/${(amountToAdd/Math.pow(10, precision)).toFixed(precision)}?pageUrl=${window.location.pathname}`);
         }
     });
 
