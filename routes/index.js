@@ -7,12 +7,10 @@ const moment = require('moment');
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
-const ObjectId = require('mongodb').ObjectID;
 const {
     getId,
     hooker,
     clearSessionValue,
-    getImages,
     addSitemapProducts,
     getCountryList
 } = require('../lib/common');
@@ -29,9 +27,7 @@ const {
     updateSubscriptionCheck
 } = require('../lib/cart');
 const {
-    createReview,
-    getRatingHtml
-} = require('../lib/modules/reviews-basic');
+    createReview } = require('../lib/modules/reviews-basic');
 const {
     sortMenu,
     getMenu
@@ -60,7 +56,7 @@ const getAllBidOffers = async (start = 0) => {
 };
 
 // Google products
-router.get('/googleproducts.xml', async (req, res, next) => {
+router.get('/googleproducts.xml', async (req, res) => {
     let productsFile = '';
     try{
         productsFile = fs.readFileSync(path.join('bin', 'googleproducts.xml'));
@@ -72,7 +68,7 @@ router.get('/googleproducts.xml', async (req, res, next) => {
 });
 
 // These is the customer facing routes
-router.get('/payment/:orderId', async (req, res, next) => {
+router.get('/payment/:orderId', async (req, res) => {
     const db = req.app.db;
     const config = req.app.config;
 
@@ -173,11 +169,11 @@ router.get('/payment/:orderId', async (req, res, next) => {
     });
 });
 
-router.get('/emptycart', async (req, res, next) => {
+router.get('/emptycart', async (req, res) => {
     emptyCart(req, res, '');
 });
 
-router.get('/checkout/information', async (req, res, next) => {
+router.get('/checkout/information', async (req, res) => {
     const config = req.app.config;
 
     // if there is no items in the cart then render a failure
@@ -210,7 +206,7 @@ router.get('/checkout/information', async (req, res, next) => {
     });
 });
 
-router.get('/checkout/shipping', async (req, res, next) => {
+router.get('/checkout/shipping', async (req, res) => {
     const config = req.app.config;
 
     // if there is no items in the cart then render a failure
@@ -284,8 +280,9 @@ router.get('/checkout/cartdata', (req, res) => {
 router.get('/checkout/payment/:ppyAmount', async (req, res) => {
     const config = req.app.config;
 
+    req.session.pageUrl = req.originalUrl.split('=')[req.originalUrl.split('=').length - 1];
+    // eslint-disable-next-line no-unused-vars
     const imagePath = `${req.protocol}://${req.get('host')}`;
-
     req.session.cart = {
       ppyAmount: req.params.ppyAmount
     };
@@ -323,7 +320,7 @@ router.get('/checkout/payment/:ppyAmount', async (req, res) => {
     });
 });
 
-router.get('/blockonomics_payment', (req, res, next) => {
+router.get('/blockonomics_payment', (req, res) => {
     const config = req.app.config;
     let paymentType = '';
     if(req.session.cartSubscription){
@@ -662,7 +659,7 @@ router.get('/product/:id/:offerId', async (req, res) => {
 });
 
 // Gets the current cart
-router.get('/cart/retrieve', async (req, res, next) => {
+router.get('/cart/retrieve', async (req, res) => {
     const db = req.app.db;
 
     // Get the cart from the DB using the session id
@@ -677,7 +674,7 @@ router.get('/cart/retrieve', async (req, res, next) => {
 });
 
 // Updates a single product quantity
-router.post('/product/updatecart', async (req, res, next) => {
+router.post('/product/updatecart', async (req, res) => {
     const db = req.app.db;
     const config = req.app.config;
     const cartItem = req.body;
@@ -790,7 +787,7 @@ router.post('/product/updatecart', async (req, res, next) => {
 });
 
 // Remove single product from cart
-router.post('/product/removefromcart', async (req, res, next) => {
+router.post('/product/removefromcart', async (req, res) => {
     const db = req.app.db;
 
     // Check for item in cart
@@ -820,12 +817,12 @@ router.post('/product/removefromcart', async (req, res, next) => {
 });
 
 // Totally empty the cart
-router.post('/product/emptycart', async (req, res, next) => {
+router.post('/product/emptycart', async (req, res) => {
     emptyCart(req, res, 'json');
 });
 
 // Add item to cart
-router.post('/product/addtocart', async (req, res, next) => {
+router.post('/product/addtocart', async (req, res) => {
     const db = req.app.db;
     const config = req.app.config;
     let productQuantity = req.body.productQuantity ? parseInt(req.body.productQuantity) : 1;
@@ -982,7 +979,7 @@ router.post('/product/addtocart', async (req, res, next) => {
 });
 
 // Bid on NFT
-router.post('/product/bid', async (req, res, next) => {
+router.post('/product/bid', async (req, res) => {
     const db = req.app.db;
     const config = req.app.config;
 
@@ -1048,7 +1045,7 @@ router.post('/product/bid', async (req, res, next) => {
 });
 
 // Totally empty the cart
-router.post('/product/addreview', async (req, res, next) => {
+router.post('/product/addreview', async (req, res) => {
     const config = req.app.config;
 
     // Check if module enabled
@@ -1256,7 +1253,7 @@ router.get('/lang/:locale/:redirectUri', (req, res) => {
 });
 
 // return sitemap
-router.get('/sitemap.xml', (req, res, next) => {
+router.get('/sitemap.xml', (req, res) => {
     const sm = require('sitemap');
     const config = req.app.config;
 
@@ -1288,7 +1285,7 @@ router.get('/sitemap.xml', (req, res, next) => {
     });
 });
 
-router.get('/page/:pageNum', (req, res, next) => {
+router.get('/page/:pageNum', (req, res) => {
     const db = req.app.db;
     const config = req.app.config;
     const numberProducts = config.productsPerPage ? config.productsPerPage : 6;
