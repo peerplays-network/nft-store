@@ -15,13 +15,6 @@ services:
       - mongodb
     depends_on:
       - mongodb
-  mongodb:
-    image: mongo:4.4
-    container_name: "nft-store-mongodb"
-    volumes:
-      - nft-store-mongo-data:/data/db
-    ports:
-      - 27017:27017
 volumes:
   nft-store-uploads-data:
   nft-store-mongo-data:
