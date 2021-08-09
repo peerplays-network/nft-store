@@ -301,9 +301,12 @@ $(document).ready(function (){
                 $('#productEditForm').css('opacity', '1');
 
                 if(msg.responseJSON && msg.responseJSON.length > 0){
-                    var errorMessages = validationErrors(msg.responseJSON);
-                    $('#validationModalBody').html(errorMessages);
-                    $('#validationModal').modal('show');
+                    msg.responseJSON.forEach((value) => {
+                      switch(value.dataPath){
+                        case '/productDescription': $('#descriptionError').html(value.message); break;
+                        case '/productTitle': $('#titleError').html(value.message); break;
+                      }
+                    });
                     $('#productUpdate').prop('disabled', false);
                     return;
                 }

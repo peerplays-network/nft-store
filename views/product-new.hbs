@@ -22,12 +22,14 @@
             <div class="form-group">
                 <label for="productTitle" class="control-label">{{ @root.__ "Product title" }} *</label>
                 <input type="text" id="productTitle" class="form-control" minlength="5" maxlength="200" value="{{productTitle}}" required/>
+                <div id="titleError"></div>
             </div>
         </div>
         <div class="col-12">
             <div class="form-group" id="editor-wrapper">
                 <label for="editor" class="control-label">{{ @root.__ "Product description" }} *</label>
                 <textarea minlength="25" rows="10" id="productDescription" class="form-control" required>{{productDescription}}</textarea>
+                <div id="descriptionError"></div>
             </div>
         </div>
         <div class="row ml-0 mr-0 justify-content-between">
@@ -40,6 +42,7 @@
                         <option value="{{this}}">{{this}}</option>
                         {{/each}}
                     </select>
+                    <div id="categoryError"></div>
                 </div>
             </div>
             <div class="col-sm-4">

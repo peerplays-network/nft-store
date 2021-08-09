@@ -4,12 +4,12 @@ $(document).ready(function (){
     $('#loder').hide();
     $('a').click(function(){
         $('#loder').show();
-        $('.main').css('opacity','0.5');
-        $('.index-main').css('opacity','0.5');
+        $('.main').css('opacity', '0.5');
+        $('.index-main').css('opacity', '0.5');
      });
      $('li a').click(function(){
         $('#loder').show();
-        $('.account-main').css('opacity','0.5');
+        $('.account-main').css('opacity', '0.5');
      });
     if($(window).width() < 768){
         $('.menu-side').on('click', function(e){
@@ -29,9 +29,9 @@ $(document).ready(function (){
         $('#offcanvasClose').hide();
     }
 
-    $('[data-dismiss=modal]').on('click', function (e) {
-        var $t = $(this),
-            target = $t[0].href || $t.data("target") || $t.parents('.modal') || [];
+    $('[data-dismiss=modal]').on('click', function (e){
+        var $t = $(this);
+            var target = $t[0].href || $t.data('target') || $t.parents('.modal') || [];
          $(target).find('form').trigger('reset');
     });
 
@@ -55,23 +55,22 @@ $(document).ready(function (){
             });
         }
     });
-    
-   
+
     $('#createCustomer').validator().on('click', function(e){
         e.preventDefault();
         $('#loder').show();
-        $('#customer-form').css('opacity','0.5')
-        $('#createCustomer').css('opacity','0.5')
-        if($('#password').val() != $('#frm_userPassword_confirm').val()) {
-            $('#customer-form').validator('validate')
+        $('#customer-form').css('opacity', '0.5');
+        $('#createCustomer').css('opacity', '0.5');
+        // eslint-disable-next-line eqeqeq
+        if($('#password').val() != $('#frm_userPassword_confirm').val()){
+            $('#customer-form').validator('validate');
             $('#loder').hide();
-            $('#customer-form').css('opacity','1')
-            $('#createCustomer').css('opacity','1')
+            $('#customer-form').css('opacity', '1');
+            $('#createCustomer').css('opacity', '1');
              showNotification('Password and Confirm Password should be same.', 'danger');
             return;
         }
         if($('#customer-form').validator('validate').has('.has-error').length === 0){
-            
              $.ajax({
                 method: 'POST',
                 url: '/customer/create',
@@ -86,26 +85,26 @@ $(document).ready(function (){
                     postcode: $('#postcode').val(),
                     phone: $('#phone').val(),
                     password: $('#password').val(),
-                    confirmpassword:$('#frm_userPassword_confirm').val()
+                    confirmpassword: $('#frm_userPassword_confirm').val()
                 }
             })
             .done(function(msg){
                  $('#loder').hide();
-                $('#customer-form').css('opacity','1')
-                $('#createCustomer').css('opacity','1')
+                $('#customer-form').css('opacity', '1');
+                $('#createCustomer').css('opacity', '1');
                 showNotification(msg.message, 'success', true, '/');
             })
             .fail(function(msg){
                  $('#loder').hide();
-                $('#customer-form').css('opacity','1')
-                $('#createCustomer').css('opacity','1')
-                showNotification(msg.responseJSON[0]?.message || msg.responseJSON?.message, 'danger');
+                $('#customer-form').css('opacity', '1');
+                $('#createCustomer').css('opacity', '1');
+                showNotification(msg.responseJSON[0].message || msg.responseJSON.message, 'danger');
             });
         }
     });
 
-    $('#validatePermalink').on('click',function(){
-        if(!$('#productPermalink').val() || $('#productPermalink').val().trim() === '') {
+    $('#validatePermalink').on('click', function(){
+        if(!$('#productPermalink').val() || $('#productPermalink').val().trim() === ''){
             showNotification('Please enter a permalink to validate', 'danger');
             return;
         }
@@ -121,43 +120,43 @@ $(document).ready(function (){
         .fail(function(msg){
             showNotification(msg.responseJSON.message, 'danger');
         });
-    })
+    });
 
     $('#productNewForm').validator().on('submit', function(e){
         e.preventDefault();
-        if(parseInt($('#ppyBalance').val()) < parseInt($('#createFee').val())) {
+        if(parseInt($('#ppyBalance').val()) < parseInt($('#createFee').val())){
             showNotification('Insufficient funds. Please add funds.', 'danger', false);
             var minFundsRequired = (parseInt($('#createFee').val()) - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
             $('#minFundsRequired').val(minFundsRequired);
             $('#amountToAdd').val(minFundsRequired);
             $('#addFundsModal').modal('show');
-        } else {
+        }else{
             $('#loder').show();
-            $('#productNewForm').css('opacity','0.5');
+            $('#productNewForm').css('opacity', '0.5');
             $('#frm_product_save').prop('disabled', true);
-          
+
             if((!$('#productPermalink').val() || $('#productPermalink').val().trim() === '') && $('#productTitle').val() !== ''){
                 $('#productPermalink').val(slugify($('#productTitle').val()));
             }
 
-            var file = document.getElementById("productImage").files[0];
+            var file = document.getElementById('productImage').files[0];
 
             if(!file){
                 $('#loder').hide();
-                $('#productNewForm').css('opacity','1');
+                $('#productNewForm').css('opacity', '1');
                 showNotification('Upload image', 'danger');
                 $('#frm_product_save').prop('disabled', false);
                 return;
             }
 
             var formData = new FormData();
-            formData.append("title", $('#productTitle').val());
-            formData.append("productDescription", $('#productDescription').val());
-            formData.append("productCategory", $('#category').val() || '');
-            formData.append("productPublished", $('#productPublished').val());
-            formData.append("productPermalink", $('#productPermalink').val());
-            formData.append("productImage",file);
-            
+            formData.append('title', $('#productTitle').val());
+            formData.append('productDescription', $('#productDescription').val());
+            formData.append('productCategory', $('#category').val() || '');
+            formData.append('productPublished', $('#productPublished').val());
+            formData.append('productPermalink', $('#productPermalink').val());
+            formData.append('productImage', file);
+
             $.ajax({
                 method: 'POST',
                 url: '/customer/product/insert',
@@ -167,22 +166,26 @@ $(document).ready(function (){
             })
             .done(function(msg){
                 $('#loder').hide();
-                $('#productNewForm').css('opacity','1');
+                $('#productNewForm').css('opacity', '1');
                 showNotification(msg.message, 'success', false, '/customer/products/1');
-                document.getElementById("productNewForm").reset();
+                document.getElementById('productNewForm').reset();
                 $('#frm_product_save').prop('disabled', false);
             })
             .fail(function(msg){
                 $('#loder').hide();
-                $('#productNewForm').css('opacity','1');
+                $('#productNewForm').css('opacity', '1');
                 if(msg.responseJSON && msg.responseJSON.length > 0){
-                    var errorMessages = validationErrors(msg.responseJSON);
-                    $('#validationModalBody').html(errorMessages);
-                    $('#validationModal').modal('show');
+                    msg.responseJSON.forEach((value) => {
+                      switch(value.dataPath){
+                        case '/productDescription': $('#descriptionError').html(value.message); break;
+                        case '/productCategory': $('#categoryError').html(value.message); break;
+                        case '/productTitle': $('#titleError').html(value.message); break;
+                      }
+                    });
                     $('#frm_product_save').prop('disabled', false);
                     return;
                 }
-              
+
                 showNotification(msg.responseJSON.message, 'danger');
                 $('#frm_product_save').prop('disabled', false);
             });
@@ -190,10 +193,10 @@ $(document).ready(function (){
     });
 
         // applies an product filter
-    $(document).on('click', '#btn_product_filter', function (e) {
-        if ($('#product_filter').val() !== '') {
+    $(document).on('click', '#btn_product_filter', function (e){
+        if($('#product_filter').val() !== ''){
             window.location.href = '/customer/products/filter/' + $('#product_filter').val();
-        } else {
+        }else{
             showNotification('Please enter a keyword to filter', 'danger');
         }
     });
@@ -201,13 +204,13 @@ $(document).ready(function (){
     $('.btn-delete-offer').on('click', function(){
         var message = `Are you sure you want to delete this sell offer? A fee of ${$('#sellCancelFee').val()} ${$('#assetSymbol').val()} will be charged.`;
         if(confirm(message)){
-            if(parseInt($('#ppyBalance').val()) < parseInt($('#sellCancelFee').val() * Math.pow(10, parseInt($('#addFundsAssetPrecision').val())))) {
+            if(parseInt($('#ppyBalance').val()) < parseInt($('#sellCancelFee').val() * Math.pow(10, parseInt($('#addFundsAssetPrecision').val())))){
                 showNotification('Insufficient funds. Please add funds.', 'danger', false);
                 var minFundsRequired = (parseInt($('#sellCancelFee').val()) * Math.pow(10, parseInt($('#addFundsAssetPrecision').val())) - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
                 $('#minFundsRequired').val(minFundsRequired);
                 $('#amountToAdd').val(minFundsRequired);
                 $('#addFundsModal').modal('show');
-            } else {
+            }else{
                 $.ajax({
                     method: 'POST',
                     url: '/customer/product/delete',
@@ -223,7 +226,7 @@ $(document).ready(function (){
         }
 
         $('#loder').hide();
-        $('.main').css('opacity','1');
+        $('.main').css('opacity', '1');
     });
 
     $(document).on('click', '.menu-btn', function(e){
@@ -424,12 +427,11 @@ $(document).ready(function (){
     });
 
     $('#customerloginForm').on('click', function(e){
-       
         if(!e.isDefaultPrevented()){
             e.preventDefault();
             $('#loder').show();
-            $('#login-form').css('opacity','0.5')
-          
+            $('#login-form').css('opacity', '0.5');
+
              $.ajax({
                 method: 'POST',
                 url: '/customer/login_action',
@@ -445,7 +447,7 @@ $(document).ready(function (){
             })
             .fail(function(msg){
                 $('#loder').hide();
-                $('#login-form').css('opacity','1')
+                $('#login-form').css('opacity', '1');
                 showNotification(msg.responseJSON.message, 'danger');
             });
         }
@@ -460,20 +462,22 @@ $(document).ready(function (){
         $('#productQuantity').val(0);
         $('#productMinPrice').val(0);
         $('#productMaxPrice').val(0);
-        $('#mintingFee').html('Fee: '+ 0 );
+        $('#mintingFee').html('Fee: ' + 0);
 
         $('#saleEnd').val('');
 
-         if($(this).text() === 'Mint') {
-            var productId = $(this).attr('data-id');
-            var fee = $('#mintFee').val();
+        let productId, fee;
+
+        if($(this).text() === 'Mint'){
+            productId = $(this).attr('data-id');
+            fee = $('#mintFee').val();
            $('.modal-body #productId').val(productId);
             $('.modal-body #mintFeePerUnit').val(fee);
             $('#nftMintModal').modal('show');
-            $("#buttonMint").attr("disabled", false);
-        } else if($(this).text() === 'Sell' || $(this).text() === 'Re-sell') {
-            var productId = $(this).attr('data-id');
-            var fee = parseInt($('#sellFee').val());
+            $('#buttonMint').attr('disabled', false);
+        }else if($(this).text() === 'Sell' || $(this).text() === 'Re-sell'){
+            productId = $(this).attr('data-id');
+            fee = parseInt($('#sellFee').val());
             var precision = parseInt($('#feeAssetPrecision').val());
             var assetSymbol = $('#assetSymbol').val();
             $('.modal-body #sellProductId').val(productId);
@@ -490,12 +494,12 @@ $(document).ready(function (){
         }
     });
 
-    $(document).on('keyup', '#productQuantity', function(e) {
+    $(document).on('keyup', '#productQuantity', function(e){
         var feePerUnit = parseInt($('#mintFeePerUnit').val());
         var quantity = parseInt($('#productQuantity').val());
         var assetSymbol = $('#assetSymbol').val();
 
-        if(!quantity) {
+        if(!quantity){
             $('#mintingFee').text(`Fee: 0 ${assetSymbol}`);
             return;
         }
@@ -506,12 +510,12 @@ $(document).ready(function (){
         $('#mintingFee').text(`Fee: ${fee} ${assetSymbol}`);
     });
 
-    $(document).on('keyup', '#productSellQuantity', function(e) {
+    $(document).on('keyup', '#productSellQuantity', function(e){
         var feePerUnit = parseInt($('#sellFeePerUnit').val());
         var quantity = parseInt($('#productSellQuantity').val());
         var assetSymbol = $('#assetSymbol').val();
 
-        if(!quantity) {
+        if(!quantity){
             $('#sellingFee').text(`Fee: 0 ${assetSymbol}`);
             return;
         }
@@ -525,23 +529,23 @@ $(document).ready(function (){
     // Mint NFT
     $(document).on('click', '#buttonMint', function(e){
         var quantity = parseInt($('#productQuantity').val());
-        if(!quantity || quantity === 0) {
+        if(!quantity || quantity === 0){
             showNotification('Quantity is required.', 'danger');
             return;
         }
 
-        if(parseInt($('#ppyBalance').val()) < parseInt($('#mintFee').val()) * quantity) {
+        if(parseInt($('#ppyBalance').val()) < parseInt($('#mintFee').val()) * quantity){
             showNotification('Insufficient funds. Please add funds.', 'danger', false);
             $('#nftMintModal').modal('hide');
             var minFundsRequired = (parseInt($('#mintFee').val()) * quantity - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
             $('#minFundsRequired').val(minFundsRequired);
             $('#amountToAdd').val(minFundsRequired);
             $('#addFundsModal').modal('show');
-        }else {
-            $("#buttonMint").attr("disabled", true);
+        }else{
+            $('#buttonMint').attr('disabled', true);
             $('#nftMintModal').modal('hide');
             $('#loder').show();
-            $('.main').css('opacity','0.5');
+            $('.main').css('opacity', '0.5');
 
             $.ajax({
                 method: 'POST',
@@ -553,13 +557,13 @@ $(document).ready(function (){
             })
             .done(function(msg){
                 $('#loder').hide();
-                $('.main').css('opacity','1');
-                $("#buttonMint").attr("disabled", false);
+                $('.main').css('opacity', '1');
+                $('#buttonMint').attr('disabled', false);
                 showNotification(msg.message, 'success', true);
             })
             .fail(function(msg){
                 $('#loder').hide();
-                $('.main').css('opacity','1');
+                $('.main').css('opacity', '1');
                 if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
                     showNotification(msg.responseJSON.message, 'danger', false, '/customer/products');
                 }
@@ -569,15 +573,14 @@ $(document).ready(function (){
                 }
 
                 showNotification(msg.responseJSON.message, 'danger');
-                $("#buttonMint").attr("disabled", false);
-                
+                $('#buttonMint').attr('disabled', false);
             });
 
             $('#productQuantity').val(0);
         }
     });
 
-    $(document).on('click','#productSellTypeCheckbox', function(e) {
+    $(document).on('click', '#productSellTypeCheckbox', function(e){
         var assetSymbol = $('#assetSymbol').val();
         var precision = $('#feeAssetPrecision').val();
         var sellFeePerUnit = $('#sellFee').val();
@@ -602,7 +605,7 @@ $(document).ready(function (){
                 modal: true,
                 showOtherMonths: true
             });
-        } else {
+        }else{
             const fixedPriceHtml = `<div class="form-group">
                                         <label for="productSellQuantity" class="control-label">Quantity *</label>
                                         <input type="number" id="productSellQuantity" class="form-control" min="0" step="1" onkeypress="return isNumberKey(event)" value="0" required/>
@@ -627,47 +630,49 @@ $(document).ready(function (){
     });
 
     // Sell NFT
-   
+
     $(document).on('click', '#buttonSell', function(e){
         const isBidding = $('#productSellTypeCheckbox').prop('checked');
 
-        if(isBidding && !$('#productMinPrice').val()) {
+        if(isBidding && !$('#productMinPrice').val()){
             showNotification('Minimum price is required', 'danger', false);
             $('#productMinPrice').focus();
             return;
         }
 
-        if(isBidding && !$('#productMaxPrice').val()) {
+        if(isBidding && !$('#productMaxPrice').val()){
             showNotification('Maximum price is required', 'danger', false);
             $('#productMaxPrice').focus();
             return;
         }
 
-        if(isBidding && $('#productMaxPrice').val() == 0) {
+        // eslint-disable-next-line eqeqeq
+        if(isBidding && $('#productMaxPrice').val() == 0){
             showNotification('Maximum price cannot be zero', 'danger', false);
             $('#productMaxPrice').focus();
             return;
         }
 
-        if(isBidding && parseFloat($('#productMaxPrice').val()) < parseFloat($('#productMinPrice').val())) {
+        if(isBidding && parseFloat($('#productMaxPrice').val()) < parseFloat($('#productMinPrice').val())){
             showNotification('Minimum price should be lower than maximum price', 'danger', false);
             $('#productMinPrice').focus();
             return;
         }
 
-        if(!isBidding && (!$('#productSellQuantity').val() || $('#productSellQuantity').val() == 0)) {
+        // eslint-disable-next-line eqeqeq
+        if(!isBidding && (!$('#productSellQuantity').val() || $('#productSellQuantity').val() == 0)){
             showNotification('Quantity is required', 'danger', false);
             $('#productSellQuantity').focus();
             return;
         }
 
-        if(!isBidding && !$('#productPrice').val()) {
+        if(!isBidding && !$('#productPrice').val()){
             showNotification('NFT price is required', 'danger', false);
             $('#productPrice').focus();
             return;
         }
 
-        if(!$('#saleEnd').val()) {
+        if(!$('#saleEnd').val()){
             showNotification('Sale end date is required', 'danger', false);
             $('#saleEnd').focus();
             return;
@@ -675,7 +680,7 @@ $(document).ready(function (){
 
         var quantity = isBidding ? 1 : parseInt($('#productSellQuantity').val());
 
-        if(parseInt($('#ppyBalance').val()) < parseInt($('#sellFee').val()) * quantity) {
+        if(parseInt($('#ppyBalance').val()) < parseInt($('#sellFee').val()) * quantity){
             showNotification('Insufficient funds. Please add funds.', 'danger', false);
             $('#sellNFTModal').modal('hide');
             var minFundsRequired = (parseInt($('#sellFee').val()) * quantity - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
@@ -687,7 +692,7 @@ $(document).ready(function (){
 
         $('#sellNFTModal').modal('hide');
         $('#loder').show();
-        $('.main').css('opacity','0.5')
+        $('.main').css('opacity', '0.5');
 
         $.ajax({
             method: 'POST',
@@ -703,12 +708,11 @@ $(document).ready(function (){
         .done(function(msg){
             showNotification(msg.message, 'success', true);
             $('#loder').hide();
-            $('.main').css('opacity','1');
-            
+            $('.main').css('opacity', '1');
         })
         .fail(function(msg){
             $('#loder').hide();
-            $('.main').css('opacity','1');
+            $('.main').css('opacity', '1');
             if(msg.responseJSON.message === 'You need to be logged in to Mint NFT'){
                 showNotification(msg.responseJSON.message, 'danger', false, '/customer/login');
             }
@@ -719,7 +723,7 @@ $(document).ready(function (){
 
                 showNotification(msg.responseJSON.message, 'danger');
             });
-        
+
         $('#productSellQuantity').val(0);
         $('#productMinPrice').val(0);
         $('#productMaxPrice').val(0);
@@ -791,72 +795,73 @@ $(document).ready(function (){
         }
     });
 
-    $('#buttonAddFunds').validator().on('click', function(e) {
+    $('#buttonAddFunds').validator().on('click', function(e){
         e.preventDefault();
         var precision = parseInt($('#addFundsAssetPrecision').val());
         var amountToAdd = Math.round((parseFloat($('#amountToAdd').val()) + Number.EPSILON) * Math.pow(10, precision));
-        var minAmount = Math.round((parseFloat($('#minFundsRequired').val()) + Number.EPSILON) * Math.pow(10,precision));
+        var minAmount = Math.round((parseFloat($('#minFundsRequired').val()) + Number.EPSILON) * Math.pow(10, precision));
 
-        if(!amountToAdd) {
+        if(!amountToAdd){
           showNotification('Amount is required', 'danger');
           return;
         }
 
-        if(amountToAdd < minAmount) {
+        if(amountToAdd < minAmount){
             showNotification('Add more funds', 'danger');
-        } else if( amountToAdd == 0){
-            showNotification('Amount is required', 'danger'); 
-        } else {
-            window.location.replace(`/checkout/payment/${(amountToAdd/Math.pow(10, precision)).toFixed(precision)}?pageUrl=${window.location.pathname}`);
+        // eslint-disable-next-line eqeqeq
+        }else if(amountToAdd == 0){
+            showNotification('Amount is required', 'danger');
+        }else{
+            window.location.replace(`/checkout/payment/${(amountToAdd / Math.pow(10, precision)).toFixed(precision)}?pageUrl=${window.location.pathname}`);
         }
     });
 
-    $('#btnModalWithdrawFunds').validator().on('click', function(e) {
+    $('#btnModalWithdrawFunds').validator().on('click', function(e){
         e.preventDefault();
 
         $('#loder').show();
-        $('#account-main').css('opacity','0.5');
-        $('#withdrawFundsModal').css('opacity','0.5');
+        $('#account-main').css('opacity', '0.5');
+        $('#withdrawFundsModal').css('opacity', '0.5');
         $('#btnModalWithdrawFunds').prop('disabled', true);
 
         var precision = parseInt($('#withdrawFundsAssetPrecision').val());
         var amountToWithdraw = Math.round((parseFloat($('#amountToWithdraw').val()) + Number.EPSILON) * Math.pow(10, precision));
-        var maxAmount = Math.round((parseFloat($('#maxAmountWithdrawn').val()) + Number.EPSILON) * Math.pow(10,precision));
+        var maxAmount = Math.round((parseFloat($('#maxAmountWithdrawn').val()) + Number.EPSILON) * Math.pow(10, precision));
         var transferFees = Math.round((parseFloat($('#transferFees').val()) + Number.EPSILON) * Math.pow(10, precision));
 
-        if(amountToWithdraw > maxAmount - transferFees) {
+        if(amountToWithdraw > maxAmount - transferFees){
             showNotification('Insuficient Balance', 'danger');
             $('#loder').hide();
-            $('#account-main').css('opacity','1');
-            $('#withdrawFundsModal').css('opacity','1');
-            setTimeout(function(){$('#btnModalWithdrawFunds').prop('disabled', false);},4000);
+            $('#account-main').css('opacity', '1');
+            $('#withdrawFundsModal').css('opacity', '1');
+            setTimeout(function(){ $('#btnModalWithdrawFunds').prop('disabled', false); }, 4000);
         }else if(!amountToWithdraw){
             showNotification('Enter amount in Amount to withdraw field', 'danger');
             $('#loder').hide();
-            $('#account-main').css('opacity','1');
-            $('#withdrawFundsModal').css('opacity','1');
-            setTimeout(function(){$('#btnModalWithdrawFunds').prop('disabled', false);},4000);
-        }else {
+            $('#account-main').css('opacity', '1');
+            $('#withdrawFundsModal').css('opacity', '1');
+            setTimeout(function(){ $('#btnModalWithdrawFunds').prop('disabled', false); }, 4000);
+        }else{
             $.ajax({
                 method: 'POST',
                 url: '/customer/redeem',
                 data: {
-                    amount: amountToWithdraw,
+                    amount: amountToWithdraw
                 }
             })
             .done(function(msg){
                 showNotification(msg.message, 'success', true);
                 $('#loder').hide();
-                $('#account-main').css('opacity','1');
-                $('#withdrawFundsModal').css('opacity','1');
+                $('#account-main').css('opacity', '1');
+                $('#withdrawFundsModal').css('opacity', '1');
                 $('#btnModalWithdrawFunds').prop('disabled', false);
             })
             .fail(function(msg){
                 showNotification(msg.responseJSON.message, 'danger');
                 $('#loder').hide();
-                $('#account-main').css('opacity','1');
-                $('#withdrawFundsModal').css('opacity','1');
-                setTimeout(function(){$('#btnModalWithdrawFunds').prop('disabled', false);},4000);
+                $('#account-main').css('opacity', '1');
+                $('#withdrawFundsModal').css('opacity', '1');
+                setTimeout(function(){ $('#btnModalWithdrawFunds').prop('disabled', false); }, 4000);
             });
         }
     });
@@ -919,7 +924,7 @@ $(document).ready(function (){
                 productVariant: $('#productVariant-' + $(this).attr('data-id')).val()
             }
         })
-		    .done(function(msg){
+        .done(function(msg){
             updateCartDiv();
             showNotification(msg.message, 'success');
         })
@@ -930,24 +935,24 @@ $(document).ready(function (){
 
     $(document).on('click', '.product-add-to-cart', function(e){
         var bidAmt = parseFloat($('#product_bid').val());
-        if(!bidAmt) {
+        if(!bidAmt){
             showNotification('Bid amount is required', 'danger', false);
             return;
         }
 
         if(bidAmt > parseFloat($('#maxPrice').val())){
             showNotification(`Exceeds maximum price: ${$('#maxPrice').val()}`, 'danger', false);
-        } else if(bidAmt < parseFloat($('#minPrice').val())) {
+        }else if(bidAmt < parseFloat($('#minPrice').val())){
             showNotification(`Below minimum price: ${$('#minPrice').val()}`, 'danger', false);
-        } else {
+        }else{
             var bidAmount = Math.round((bidAmt + Number.EPSILON) * Math.pow(10, parseInt($('#addFundsAssetPrecision').val())));
-            if(parseInt($('#ppyBalance').val()) < bidAmount + parseInt($('#bidFee').val())) {
+            if(parseInt($('#ppyBalance').val()) < bidAmount + parseInt($('#bidFee').val())){
                 showNotification('Insufficient funds. Please add funds.', 'danger', false);
                 var minFundsRequired = (bidAmount + parseInt($('#bidFee').val()) - parseInt($('#ppyBalance').val())) / Math.pow(10, parseInt($('#addFundsAssetPrecision').val()));
                 $('#minFundsRequired').val(minFundsRequired);
                 $('#amountToAdd').val(minFundsRequired);
                 $('#addFundsModal').modal('show');
-            } else {
+            }else{
                 $.ajax({
                     method: 'POST',
                     url: '/product/bid',
@@ -967,19 +972,17 @@ $(document).ready(function (){
         }
     });
 
-    $(document).on('click', '#btnAddFunds', function(e) {
+    $(document).on('click', '#btnAddFunds', function(e){
         $('#minFundsRequired').val(0);
         $('#amountToAdd').val(0);
         $('#addFundsModal').modal('show');
     });
 
-    $(document).on('click', '#btnWithdrawFunds', function(e) {
+    $(document).on('click', '#btnWithdrawFunds', function(e){
         $('#maxAmountWithdrawn').val($(this).attr('data-balance'));
         $('#transferFees').val($(this).attr('data-fees'));
         $('#withdrawFundsModal').modal('show');
     });
-
-  
 
     $('.cart-product-quantity').on('keyup', function(e){
         checkMaxQuantity(e, $('.cart-product-quantity'));
@@ -1062,7 +1065,7 @@ $(document).ready(function (){
         $('#product-title-image').attr('src', $(this).attr('src'));
     });
 
-    $('.nft-image-open').on('click', function(e) {
+    $('.nft-image-open').on('click', function(e){
         $('#fullSizeImage').attr('src', $(this).attr('src'));
         $('#fullSizeImageModal').modal('show');
     });
@@ -1166,7 +1169,7 @@ function checkMinMaxPrice(e, element){
           e.preventDefault();
           element.val(qty.slice(0, -1));
           showNotification(`Exceeds maximum price: ${$('#maxPrice').val()}`, 'danger', false);
-      } else if(parseFloat($(e.target).val()) < parseFloat($('#minPrice').val())) {
+      }else if(parseFloat($(e.target).val()) < parseFloat($('#minPrice').val())){
           const qty = element.val();
           e.preventDefault();
           element.val(qty.slice(0, -1));
@@ -1375,8 +1378,7 @@ function validationErrors(errors){
 }
 
 function isNumberKey(evt){
-    var charCode = (evt.which) ? evt.which : evt.keyCode
-    if (charCode > 31 && (charCode < 48 || charCode > 57))
-        return false;
+    var charCode = (evt.which) ? evt.which : evt.keyCode;
+    if(charCode > 31 && (charCode < 48 || charCode > 57)){ return false; }
     return true;
 }
