@@ -23,7 +23,7 @@
     "databaseConnectionString": "mongodb://mongodb:27017/expresscart",
     "theme": "Cloth",
     "trackStock": false,
-    "orderHook": "",
+    "orderHook": "",    
     "availableLanguages": [
         "en",
         "it"

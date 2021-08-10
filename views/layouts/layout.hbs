@@ -32,6 +32,10 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gijgo/1.9.13/combined/css/gijgo.min.css" integrity="sha256-bH0WSMuCFoG/dxeox/5aOWmaZl729yDg4ylckwSRTfU=" crossorigin="anonymous" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tokenfield/0.12.0/css/bootstrap-tokenfield.min.css" integrity="sha256-4qBzeX420hElp9/FzsuqUNqVobcClz1BjnXoxUDSYQ0=" crossorigin="anonymous" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css"
+    />
         <link rel="stylesheet" href="/stylesheets/codemirror-style.min.css">
         <link rel="stylesheet" href="/stylesheets/style{{config.env}}.css">
         {{#if admin}}
@@ -225,7 +229,9 @@
                         </div>
                     </div>
                     {{else}}
-                        <li class="nav-item ml-3"><a href="/customer/account" class="btn">{{{feather 'user'}}}</a></li>
+                    <div class="space-remove">
+                        <li class="nav-item"><a href="/customer/account" class="btn">{{{feather 'user'}}}</a></li>
+                    </div>
                     {{/if}}
                     {{#if @root.session.cart}}
                         {{!-- <li class="nav-item"><a href="/checkout/cart" class="btn menu-btn">{{{feather 'shopping-cart'}}} {{ @root.__ "Cart" }} <span class="badge badge-danger" id="cart-count">{{@root.session.totalCartItems}}</span></a></li> --}}
@@ -262,14 +268,15 @@
             {{/ifCond}}
         {{/unless}}
         <div id="myDIV">
-		<div class="container" id="container">
+		<div class="container remove" id="container">
             <div id="loginclass">
-                <div class="row h-100">
+                <div class="row s-layout h-100">
                     {{{body}}}
                 </div>
             </div>
         </div>
         </div>
+        
 		<input type="hidden" id="input_notify_message" value="{{message}}">
 		<input type="hidden" id="input_notify_messageType" value="{{messageType}}">
         <input type="hidden" id="cartCheckout" value="{{checkout}}">
