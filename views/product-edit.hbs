@@ -22,6 +22,7 @@
                 <label for="productTitle" class="control-label">{{ @root.__ "Product title" }} *</label>
                 {{#if session.isAdmin}}
                 <input type="text" id="productTitle" class="form-control" minlength="5" maxlength="200" value="{{result.productTitle}}" required />
+                <div id="titleError"></div>
                 {{else}}
                 <input type="text" id="productTitle" class="form-control" minlength="5" maxlength="200" value="{{result.productTitle}}" disabled/>
                 {{/if}}
@@ -70,6 +71,7 @@
                 <label for="productDescription" class="control-label">{{ @root.__ "Product description" }} *</label>
                 {{#if session.isAdmin}}
                 <textarea minlength="5" rows="10" id="productDescription" class="form-control" required >{{result.productDescription}}</textarea>
+                <div id="descriptionError"></div>
                 {{else}}
                 <textarea minlength="5" rows="10" id="productDescription" class="form-control" disabled >{{result.productDescription}}</textarea>
                 {{/if}}

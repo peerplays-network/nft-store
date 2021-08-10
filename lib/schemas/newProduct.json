@@ -37,7 +37,7 @@
     "errorMessage": {
         "properties": {
             "productPublished": "Should be either true or false",
-            "productCategory": "Category should be selected"
+            "productCategory": "Category not selected"
         }
     },
     "required": [
