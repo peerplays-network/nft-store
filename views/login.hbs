@@ -3,11 +3,10 @@
 	<div class="row top-align-space h-100 mobile-direction">
 		<div class="col-lg-6 left-right-align">
 			<form class="form-signin"  method="post" role="form" data-toggle="validator">
-				<input type="hidden" name="frm_referringUrl" value="{{referringUrl}}">
+				<input type="hidden" name="frm_referringUrl" value="{{referringUrl}}"/>
 				<h2 class="form-signin-heading heading-title-text-color pt-5">{{ @root.__ "Please sign in" }}</h2>
 				<div class="bottom-space pt-4">
 					{{!-- <input type="email" id="email" name="email" class="form-control" placeholder="email address" required autofocus> --}}
-
 					 <div class="form-group has-search email-img d-flex align-items-center">
 						 <img class="form-control-feedback" src="/images/email.png" alt="email"/>
 						<input type="email" id="email" name="email" class="form-control" placeholder="email address" required autofocus>
