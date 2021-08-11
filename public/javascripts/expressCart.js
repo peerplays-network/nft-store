@@ -810,11 +810,10 @@ $(document).ready(function (){
 
         if(amountToAdd < minAmount){
             showNotification('Add more funds', 'danger');
-        // eslint-disable-next-line eqeqeq
-        }else if(amountToAdd == 0){
-            showNotification('Amount is required', 'danger');
-        }else{
-            window.location.replace(`/checkout/payment/${(amountToAdd / Math.pow(10, precision)).toFixed(precision)}?pageUrl=${window.location.pathname}`);
+        } else if( amountToAdd == 0){
+            showNotification('Amount is required', 'danger'); 
+        } else {
+            window.location.replace(`/checkout/payment/${(amountToAdd/Math.pow(10, precision)).toFixed(precision)}?pageUrl=${window.location.pathname}`);
         }
     });
 
