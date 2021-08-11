@@ -1,7 +1,7 @@
 /* login page css */
 
 .login-fullscreen {
-    min-height: calc(100vh - 70px);
+    min-height: calc(100vh - 80px);
     display: flex;
     align-items: center;
 }
@@ -286,3 +286,31 @@
  .cus-border-table {
     border: 1px solid #dee2e6;
  }
+
+
+ /* error style */
+.error-message {
+    border: 2px solid #B92D00;
+  }
+  .error-message-box {
+      display: none;
+      margin-top: 1.25rem;
+      border-top: 2px solid #B92D00;
+  }
+  .information-wrong span {
+      color: #B92D00;
+      font-size: 16px;
+      font-weight: 600;
+  }
+  .information-wrong {
+      padding-top: 10px;
+  }
+  .information-wrong {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+  }
+  .information-wrong i {
+      color: #B92D00;
+      font-size: 18px;
+  }
