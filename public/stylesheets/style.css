@@ -860,3 +860,80 @@ a {
 .space-remove .nav-item {
   padding: 0rem 1rem !important;
 }
+
+.customer-box {
+  width: 100%;
+  background-color: #fff;
+  box-shadow: 0 3px 15px 2px #0000001a;
+  border: 1px solid #d1d1d1;
+  border-radius: 6px;
+}
+.title-box h5 {
+  color: #757575;
+  font-size: 25px;
+  margin: 0;
+  text-transform: capitalize;
+}
+ .title-box{
+  padding: 25px 25px 15px 25px;
+  border-bottom: 1px solid #d1d1d1;
+}
+.account-details {
+  padding: 25px;
+}
+.details-style p {
+  font-size: 16px;
+  color: #131313;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+.details-style span {
+  font-size: 14px;
+  color: #131313;
+}
+.details-style {
+  margin-bottom: 20px;
+}
+.modal-button-alignment .add-fun-button {
+  background-color: #75ae4a;
+}
+.modal-button-alignment .same-button-style {
+  min-width: 140px;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  height: 50px;
+}
+
+.modal-button-alignment .withdraw-button {
+  background-color: #3d9ad4;
+  margin-left: 1.25rem;
+}
+.company-logo {
+  position: absolute;
+  top: .5rem;
+  left: 1rem;
+}
+.company-logo h1 {
+  font-size: 25px;
+  color: #084AC2;
+  user-select: none;
+  cursor: pointer;
+}
+
+@media (min-width:0px) and (max-width:767px) {
+  .company-logo {
+    display: none;
+  }
+  .s-layout{
+    width: auto;
+  }
+  .flex-mobile{
+    display: flex;
+  }
+}
+.company-logo a:hover {
+  text-decoration: none;
+}
