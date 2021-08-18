@@ -1,5 +1,5 @@
 <div class="modal fade" id="sellNFTModal" tabindex="-1" role="dialog" aria-labelledby="sellNFTModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-cus-design" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title text-danger" id="sellNFTModalLabel">Sell NFT</h5>
@@ -14,30 +14,46 @@
                     <input type="hidden" id="assetSymbol" value="{{config.peerplaysAssetSymbol}}">
                     <div class="form-group">
                         <div class="checkbox">
-                            <label><input type="checkbox" id="productSellTypeCheckbox" name="productSellTypeCheckbox" checked> {{ @root.__ "Product allow bid" }}</label>
+                            <input type="checkbox" id="productSellTypeCheckbox" name="productSellTypeCheckbox" checked>
+                                <span>{{ @root.__ "Product allow bid" }}</span>
                         </div>
                     </div>
-                    <div id="sellNFTFormWrapper">
-                        <div class="form-group">
-                            <label for="productMinPrice" class="control-label">{{ @root.__ "Product min price" }} ({{config.peerplaysAssetSymbol}}) *</label>
-                            <input type="number" id="productMinPrice" class="form-control" min="0" step="any" value="0" required/>
+                    <div id="sellNFTFormWrapper" class="pt-3">
+                        <div class="row form-group cus-input-style-chnage">
+                            <div class="col-4 pr-0 pl-0 label-box-style">
+                                 <label for="productMinPrice" class="control-label">{{ @root.__ "Product min price" }} ({{config.peerplaysAssetSymbol}})</label>
+                            </div>
+                            <div class="col-8 pr-0 pl-0">
+                                  <input type="number" id="productMinPrice" class="form-control" min="0" step="any" value="0" required/>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="productMaxPrice" class="control-label">{{ @root.__ "Product max price" }} ({{config.peerplaysAssetSymbol}}) *</label>
-                            <input type="number" id="productMaxPrice" class="form-control" min="0" step="any" value="0" required/>
+                        <div class="row form-group cus-input-style-chnage pt-2">
+                            <div class="col-4 pr-0 pl-0 label-box-style">
+                                <label for="productMaxPrice" class="control-label">{{ @root.__ "Product max price" }} ({{config.peerplaysAssetSymbol}}) *</label>
+                            </div>
+                            <div class="col-8 pr-0 pl-0">
+                                <input type="number" id="productMaxPrice" class="form-control" min="0" step="any" value="0" required/>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="saleEnd" class="control-label">{{ @root.__ "Sale end" }} *</label>
-                            <input id="saleEnd" readonly />
-                        </div>
+                          <div class="row form-group  pt-4">
+                              <div class="col-4 pl-0 pr-0 cus-input-style-chnage-child">
+                                  <label for="saleEnd" class="control-label">{{ @root.__ "Sale end" }} *</label>
+                              </div>
+                              <div class="col-5 pl-0 pr-0 date-picker-stylechnage">
+                                  <input id="saleEnd" readonly />
+                              </div>
+                          </div>
                         <div id="sellingFee"></div>
+                        <div class="sell-button-center pt-4">
+                            <button type="button" id="buttonSell" class="sell-button-style">Sell</button>
+                        </div>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
+            {{!-- <div class="modal-footer">
                 <button type="button" class="btn btn-primary mr-auto" data-dismiss="modal">Close</button>
-                <button type="button" id="buttonSell" class="btn btn-success">Sell</button>
-            </div>
+               
+            </div> --}}
         </div>
     </div>
 </div>
