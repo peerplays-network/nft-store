@@ -34,6 +34,7 @@ const {
 } = require('../lib/menu');
 const countryList = getCountryList();
 const PeerplaysService = require('../services/PeerplaysService');
+const { escapeRegex } = require('../helpers/commonHelpers');
 const peerplaysService = new PeerplaysService();
 
 const getAllBidOffers = async (start = 0) => {
@@ -1140,12 +1141,12 @@ router.get('/search/:searchTerm?/:pageNum?', (req, res) => {
     if(req.params.pageNum){
         pageNum = req.params.pageNum;
     }
-
+    const searchTermRegex = new RegExp(escapeRegex(searchTerm), 'gi');
     Promise.all([
         paginateProducts(true, db, pageNum, {
             $or: [
-                { productTitle: { $regex: searchTerm, $options: 'i' } },
-                { productDescription: { $regex: searchTerm, $options: 'i' } }
+                { productTitle: searchTermRegex },
+                { productDescription: searchTermRegex }
             ],
             productPublished: true
         }, getSort(), req),
