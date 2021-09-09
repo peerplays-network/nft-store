@@ -45,7 +45,6 @@ router.get('/customer/setup', async (req, res) => {
 // insert a customer
 router.post('/customer/create', async (req, res) => {
     const db = req.app.db;
-
     // eslint-disable-next-line eqeqeq
     if(req.body.password != req.body.confirmpassword){
         res.status(400).json({
@@ -636,7 +635,6 @@ router.get('/customer/login', async (req, res, next) => {
 // login the customer and check the password
 router.post('/customer/login_action', async (req, res) => {
     const db = req.app.db;
-
     // check if email or password empty
     if(req.body.loginEmail === '' || req.body.loginPassword === ''){
         res.status(400).json({
@@ -655,6 +653,7 @@ router.post('/customer/login_action', async (req, res) => {
     // we have a customer under that email so we compare the password
     bcrypt.compare(req.body.loginPassword, customer.password)
     .then(async (result) => {
+        console.log('result', result);
         if(!result){
             // password is not correct
             res.status(400).json({
