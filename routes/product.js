@@ -67,11 +67,17 @@ const getSellOffers = async (start = 0, k = 0) => {
         params.push(...result[i].item_ids);
     }
 
-    const nfts = await peerplaysService.getBlockchainData({
-        api: 'database',
-        method: 'get_objects',
-        'params[0][]': params
-    });
+    const nfts = [];
+    try{
+        const _nfts = await peerplaysService.getBlockchainData({
+            api: 'database',
+            method: 'get_objects',
+            'params[0][]': params
+        });
+        nfts.push(..._nfts);
+    }catch(ex){
+        console.error(ex);
+    }
 
     if(nfts){
         for(let i = 0; i < result.length; i++){
