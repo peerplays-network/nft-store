@@ -98,7 +98,7 @@ $(document).ready(function (){
                  $('#loder').hide();
                 $('#customer-form').css('opacity', '1');
                 $('#createCustomer').css('opacity', '1');
-                showNotification(msg.responseJSON[0].message || msg.responseJSON.message, 'danger');
+                showNotification(msg.responseJSON.message || msg.responseJSON.message, 'danger');
             });
         }
     });
