@@ -1,11 +1,74 @@
+<div class="company-logo">
+    <a href="/">
+    <h1 class="mt-4">PEER<span class="text-blue font-normal">PLAYS</span><br/>
+    <span class="text-blue">NFT STORE</span></h1>
+    </a>
+</div>
+
 <div class="col-md-10 offset-md-1 col-sm-12 account-main">
-    <nav aria-label="breadcrumb">
+    {{!-- <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page"><a href="/customer/account">Account</a></li>
         </ol>
-    </nav>
-    <div class="row">
+    </nav> --}}
+    <div class="row pt-3">
+        <div class="col-md-12">
+            <div class="row justify-content-center">
+                <div class="col-lg-7 col-md-12 col-sm-12">
+                    <div class="customer-box">
+                        <div class="title-box">
+                            <h5 class="">{{ @root.__ "Customer details" }}</h5>
+                        </div>
+                        <div class="child-box-align">
+                            {{#unless @root.session.customerPresent}}
+                                <div class="row">
+                                    <div class="col-sm-12 bottom-marg-15">
+                                        <p>{{ @root.__ "Existing customer" }}</p>
+                                        <div class="form-group">
+                                            <input type="email" class="form-control" id="customerLoginEmail" name="loginEmail"
+                                                minlength="5" placeholder="Email address" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="password" class="form-control" id="customerLoginPassword"
+                                                name="loginPassword" minlength="5" placeholder="Password" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <a href="/customer/forgotten"
+                                                class="btn btn-primary float-left">{{ @root.__ "Forgotten" }}</a>
+                                        </div>
+                                        <div class="form-group">
+                                            <button id="customerLogin" class="btn btn-primary float-right"
+                                                type="submit">Login</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            {{/unless}}
+                        </div>
+                        <div class="account-details">
+                            <div class="details-style">
+                                <p>Peerplays Account name:</p> 
+                                <span>{{user.peerplaysAccountName}}</span>
+                            </div>
+                            <div class="details-style">
+                                <p>Email:</p>
+                                <span> {{user.email}}</span>
+                            </div>
+                            <div class="details-style">
+                                <p>Peerplays ID:</p>
+                                <span> {{user.peerplaysAccountId}}</span>
+                            </div>
+                             {{!-- <div class="justify-content-between">
+                                    <button id="btnAddFunds" class="btn btn-primary" type="button">Add Funds</button>
+                                    <button id="btnWithdrawFunds" class="btn btn-secondary" data-balance={{balance}} data-fees={{transferFees}} type="button">Withdraw Funds</button>
+                            </div> --}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{!-- <div class="row">
         <div class="col-12 col-md-5 bottom-pad-15">
             <div class="card top-marg-15">
                 <div class="card-body customer-details-login">
@@ -52,7 +115,33 @@
                 </div>
             </div>
         </div>
-     
+    </div> --}}
+    <div class="row pt-4 mb-5">
+        <div class="col-md-12">
+            <div class="row justify-content-center">
+                <div class="col-lg-7 col-md-12 col-sm-12">
+                    <div class="customer-box">
+                       <div class="title-box">
+                           <h5>Balance</h5>
+                       </div>
+                       <div class="account-details">
+                           <div class="details-style">
+                               <p>Balance:</p>
+                               <span>{{balance}}</span>
+                           </div>
+                           <div class="modal-button-alignment pt-3">
+                                <div class="flex-mobile justify-content-between">
+                                    <button id="btnAddFunds" class="add-fun-button same-button-style" type="button">Add Funds</button>
+                                    <button id="btnWithdrawFunds" class="same-button-style withdraw-button" data-balance={{balance}} data-fees={{transferFees}} type="button">Withdraw Funds</button>
+                                </div>
+                           </div>
+                       </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-7" hidden>
             <div class="col-12 bottom-pad-15 no-pad-right">
                 <div class="card top-marg-15">
@@ -132,7 +221,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+    </div>
     </div>
 </div>
 <div class="spinner-border text-primary" style="position:fixed;top:60%;left:50%" id="loder" role="status">
