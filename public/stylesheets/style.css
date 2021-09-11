@@ -860,100 +860,80 @@ a {
 .space-remove .nav-item {
   padding: 0rem 1rem !important;
 }
-.modal-cus-design .modal-content {
-  border-radius: 12px;
+
+.customer-box {
+  width: 100%;
+  background-color: #fff;
+  box-shadow: 0 3px 15px 2px #0000001a;
+  border: 1px solid #d1d1d1;
+  border-radius: 6px;
 }
-.modal-cus-design .modal-content .modal-header {
-  border-bottom: 1px solid #bababa;
+.title-box h5 {
+  color: #757575;
+  font-size: 25px;
+  margin: 0;
+  text-transform: capitalize;
 }
-.modal-cus-design .modal-content .modal-header h5 {
+ .title-box{
+  padding: 25px 25px 15px 25px;
+  border-bottom: 1px solid #d1d1d1;
+}
+.account-details {
+  padding: 25px;
+}
+.details-style p {
+  font-size: 16px;
+  color: #131313;
   font-weight: 600;
-  font-size: 23px;
+  margin-bottom: 0;
 }
-.checkbox span {
-  color: #707070;
+.details-style span {
+  font-size: 14px;
+  color: #131313;
+}
+.details-style {
+  margin-bottom: 20px;
+}
+.modal-button-alignment .add-fun-button {
+  background-color: #75ae4a;
+}
+.modal-button-alignment .same-button-style {
+  min-width: 140px;
+  border-radius: 999px;
+  color: #fff;
   font-size: 16px;
   font-weight: 600;
-  padding-left: .5rem;
+  border: none;
+  height: 50px;
 }
-.checkbox {
-  display: flex;
-  align-items: center;
-}
-.checkbox input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  margin: 0;
-  padding: 0;
-}
-.cus-input-style-chnage .form-control {
-  height: 40px;
-  background-color: #f5f5f5;
-  border-radius: 4px;
-  border-radius: 0px 4px 4px 0px;
-  box-shadow: none;
-  border: 1px solid #bfbfbf;
-}
-.cus-input-style-chnage .form-control:focus {
-  border: 1px solid #bfbfbf;
-}
-.cus-input-style-chnage .label-box-style {
-  height: 40px;
-  border: 1px solid #bfbfbf;
-  border-right: 0;
-  border-radius: 4px 0px 0px 4px;
-  display: flex;
-  align-items: center;
-}
-.cus-input-style-chnage .label-box-style label {
-  color: #707070;
-  padding-left: 10px;
-  margin-bottom: 0;
-  font-weight: 600;
-  font-size: 14px;
-}
-.cus-input-style-chnage-child label {
-  height: 40px;
-  display: flex;
-  align-items: center;
-}
-.date-picker-stylechnage .form-control {
-  background-color: #f5f5f5;
-  border-radius: 4px !important;
-  box-shadow: none;
-  height: 40px;
-  border: 1px solid #bfbfbf;
-}
-.date-picker-stylechnage span button {
-  display: none;
-}
-#sellingFee {
-  text-align: left;
-  color: #707070;
-  font-size: 14px;
-  font-weight: 600;
-}
-.sell-button-center .sell-button-style {
-  padding: 8px 15px;
+
+.modal-button-alignment .withdraw-button {
   background-color: #3d9ad4;
-  font-size: 18px;
-  color: #fff;
-  font-weight: 600;
-  min-width: 130px;
-  border: 1px solid transparent;
-  height: 45px;
-  border-radius: 999px;
+  margin-left: 1.25rem;
 }
-.sell-button-center {
-  display: flex;
-  justify-content: center;
+.company-logo {
+  position: absolute;
+  top: .5rem;
+  left: 1rem;
 }
-.sell-button-center button:focus {
-  outline: none;
+.company-logo h1 {
+  font-size: 25px;
+  color: #084AC2;
+  user-select: none;
+  cursor: pointer;
 }
-.modal-cus-design {
-  height: calc(100vh - 61px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
+@media (min-width:0px) and (max-width:767px) {
+  .company-logo {
+    display: none;
+  }
+  .s-layout{
+    width: auto;
+  }
+  .flex-mobile{
+    display: flex;
+  }
+}
+.company-logo a:hover {
+  text-decoration: none;
 }
