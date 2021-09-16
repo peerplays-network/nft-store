@@ -142,7 +142,14 @@ router.get('/admin/login', async (req, res) => {
 // login the user and check the password
 router.post('/admin/login_action', async (req, res) => {
     const db = req.app.db;
-
+   if(!req.body.email){
+    res.status(400).json({ message: 'Enter Email.' });
+    return;
+   }
+   if(!req.body.password){
+    res.status(400).json({ message: 'Enter password.' });
+    return;
+   }
     const user = await db.users.findOne({ userEmail: mongoSanitize(req.body.email) });
     if(!user || user === null){
         res.status(400).json({ message: 'A user with that email does not exist.' });
