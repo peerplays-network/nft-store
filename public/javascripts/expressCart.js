@@ -6,10 +6,19 @@ $(document).ready(function (){
         $('#loder').show();
         $('.main').css('opacity', '0.5');
         $('.index-main').css('opacity', '0.5');
+        setTimeout(function(){
+            $('#loder').hide();
+            $('.main').css('opacity', '1');
+            $('.index-main').css('opacity', '1');
+        }, 3000);
      });
      $('li a').click(function(){
-        $('#loder').show();
+         $('#loder').show();
         $('.account-main').css('opacity', '0.5');
+        setTimeout(function(){
+            $('#loder').hide();
+            $('.account-main').css('opacity', '1');
+        }, 3000);
      });
     if($(window).width() < 768){
         $('.menu-side').on('click', function(e){
@@ -447,9 +456,9 @@ $(document).ready(function (){
             })
             .fail(function(msg){
                 $('#loder').hide();
-                $('#login-form').css('opacity','1')
-                $(".form-control").toggleClass("error-message");
-                $(".error-message-box").css('display','block')
+                $('#login-form').css('opacity', '1');
+                $('.form-control').toggleClass('error-message');
+                $('.error-message-box').css('display', 'block');
                 // showNotification(msg.responseJSON.message, 'danger');
             });
         }
@@ -810,10 +819,10 @@ $(document).ready(function (){
 
         if(amountToAdd < minAmount){
             showNotification('Add more funds', 'danger');
-        } else if( amountToAdd == 0){
-            showNotification('Amount is required', 'danger'); 
-        } else {
-            window.location.replace(`/checkout/payment/${(amountToAdd/Math.pow(10, precision)).toFixed(precision)}?pageUrl=${window.location.pathname}`);
+        }else if(amountToAdd == 0){
+            showNotification('Amount is required', 'danger');
+        }else{
+            window.location.replace(`/checkout/payment/${(amountToAdd / Math.pow(10, precision)).toFixed(precision)}?pageUrl=${window.location.pathname}`);
         }
     });
 
