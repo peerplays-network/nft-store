@@ -356,7 +356,16 @@ router.get('/confirm-email', async (req, res, next) => {
     try{
         peerIdUser = await peerplaysService.confirmEmail(token);
     }catch(ex){
-        return res.status(400).json({ message: `PeerID Sign-up error: ${ex.message}` });
+        return res.render('confirm-email-error', {
+            title: 'Confirm Email Error',
+            config: req.app.config,
+            session: req.session,
+            language: req.cookies.locale || config.defaultLocale,
+            message: clearSessionValue(req.session, 'message'),
+            messageType: clearSessionValue(req.session, 'messageType'),
+            helpers: req.handlebars.helpers,
+            showFooter: 'showFooter'
+        });
     }
 
     const customer = db.customers.findOne({ email: peerIdUser.result.email });
