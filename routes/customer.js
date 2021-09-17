@@ -53,6 +53,13 @@ router.post('/customer/create', async (req, res) => {
         return;
     }
 
+    if(req.body.password == ''){
+        res.status(400).json({
+            message: 'Enter Password.'
+        });
+        return;
+    }
+
     if(req.body.password && !req.body.password.match(/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])[a-zA-Z0-9!@#\\$%\\^&\\*]+$/)){
         res.status(400).json({
             message: 'Password should contain an alphabet, a number and a special character (!@#$%^&*)'
