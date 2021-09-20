@@ -458,8 +458,9 @@ $(document).ready(function (){
                 $('#loder').hide();
                 $('#login-form').css('opacity', '1');
                 $('.form-control').toggleClass('error-message');
+                 $('.error_msg').html(msg.responseJSON.message);
                 $('.error-message-box').css('display', 'block');
-                // showNotification(msg.responseJSON.message, 'danger');
+                // showNotification(msg.responseJSON.message, 'danger')
             });
         }
         e.preventDefault();
