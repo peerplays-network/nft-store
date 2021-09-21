@@ -44,6 +44,17 @@ $(document).ready(function (){
          $(target).find('form').trigger('reset');
     });
 
+    $('#sidebarClick').on('click', function(e){
+        console.log('side bar click')
+        $('#opacitynone').toggleClass('sidebar-opacity-show')
+        $('#sidenavbar').toggleClass('s-sidebar__nav-show')
+        $('#logoutblock').toggleClass('sidebar-opacity-none')
+        $('#logoutblock').toggleClass('sidebar-opacity-show')
+        $('#searchicon').toggleClass('sidebar-opacity-none')
+        $('#searchicon').toggleClass('sidebar-opacity-show')
+        
+    })
+
     $('#userSetupForm').validator().on('submit', function(e){
         if(!e.isDefaultPrevented()){
             e.preventDefault();

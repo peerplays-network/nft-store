@@ -149,23 +149,23 @@
         <i class="fa fa-bars"></i>
     </a>
 
-    <nav class="s-sidebar__nav">
+    <nav class="s-sidebar__nav" id="sidenavbar">
         <div class="sidebar-sticky">
         <ul class="nav flex-column">
             {{#ifCond session.isAdmin '===' true}}
             <li class="nav-item">
                 <a href="/admin"><img class="sidebar-brand" src="/images/logo-admin.png"></a>
-                <a href="#" data-toggle="modal" data-target="#globalSearchModal" class="sidebar-search text-muted">{{{feather 'search'}}}</a>
+                <a href="#" data-toggle="modal" data-target="#globalSearchModal"  class="sidebar-search text-muted">{{{feather 'search'}}}</a>
             </li>
             {{else}}
             <li class="nav-item logo-search-align">
                 {{!-- <a href="/"><img class="sidebar-brand" src="/images/logo-admin.png"></a> --}}
-                    <i class="fas fa-bars"></i>
+                    <i class="fas fa-bars" id="sidebarClick"></i>
                     <h1>
                         PEER<span class="text-blue font-normal">PLAYS</span><br/>
                         <span class="text-blue">NFT STORE</span>
                     </h1>
-                    <a href="#" data-toggle="modal" data-target="#globalSearchModal" class="sidebar-search text-muted">{{{feather 'search'}}}</a>
+                    <a href="#" data-toggle="modal" data-target="#globalSearchModal" id="searchicon" class="sidebar-search text-muted sidebar-opacity-none">{{{feather 'search'}}}</a>
             </li>
             {{/ifCond}}
             {{#ifCond session.isAdmin '===' true}}
@@ -176,6 +176,7 @@
                 </a>
             </li>
             {{else}}
+            <div class="sidebar-opacity-none" id="opacitynone">
             <li class="nav-item dashboard-border">
                 <a class="nav-link" href="/">
                     {{!-- {{{feather 'bar-chart'}}} &nbsp; --}}
@@ -286,7 +287,7 @@
             </li>
         </ul>
         {{else}}
-        <ul class="nav flex-column">
+        <ul class="nav flex-column sidebar-opacity-none" id="logoutblock">
             <li class="nav-item logout-button-bottom">
                 <a class="nav-link" href="/customer/logout">
                     {{{feather 'log-out'}}} &nbsp;
@@ -295,6 +296,7 @@
             </li>
         </ul>
         {{/ifCond}}
+        </div>
     </div>
     </nav>
     </div>
