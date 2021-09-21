@@ -719,8 +719,8 @@ a {
   transition: all .3s ease-in;
   width: 17em;
   height: 100%;
-  background: #fff;
-  box-shadow: 0 3px 15px 2px #0000001a;
+  /* background: #fff;
+  box-shadow: 0 3px 15px 2px #0000001a; */
 }
 
 .s-sidebar__nav:hover,
@@ -939,4 +939,29 @@ a {
 }
 .company-logo a:hover {
   text-decoration: none;
+}
+
+.sidebar-opacity-none {
+  opacity: 0;
+  transition: .3s;
+}
+.s-sidebar__nav {
+  background-color: transparent;
+  box-shadow: none;
+}
+/* .s-sidebar__nav:hover .sidebar-opacity-none {
+  opacity: 1;
+  transition: .3s;
+} */
+.s-sidebar__nav-show {
+  background: #fff;
+  transition: .3s;
+box-shadow: 0 3px 15px 2px #0000001a;
+}
+/* background: #fff;
+box-shadow: 0 3px 15px 2px #0000001a; */
+
+.sidebar-opacity-show {
+  opacity: 1;
+  transition: .3s;
 }
