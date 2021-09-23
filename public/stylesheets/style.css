@@ -965,3 +965,23 @@ box-shadow: 0 3px 15px 2px #0000001a; */
   opacity: 1;
   transition: .3s;
 }
+
+.header-text-style h5 {
+  color:#757575;
+}
+.footer-top-align {
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.footer-top-align button {
+  background-color: #3d9ad4;
+  border: none;
+  border-radius: 999px;
+  height: 45px;
+  min-width: 140px;
+}
+.footer-top-align button:hover {
+  background-color: #3D9AD4;
+}
