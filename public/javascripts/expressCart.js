@@ -45,15 +45,14 @@ $(document).ready(function (){
     });
 
     $('#sidebarClick').on('click', function(e){
-        console.log('side bar click')
-        $('#opacitynone').toggleClass('sidebar-opacity-show')
-        $('#sidenavbar').toggleClass('s-sidebar__nav-show')
-        $('#logoutblock').toggleClass('sidebar-opacity-none')
-        $('#logoutblock').toggleClass('sidebar-opacity-show')
-        $('#searchicon').toggleClass('sidebar-opacity-none')
-        $('#searchicon').toggleClass('sidebar-opacity-show')
-        
-    })
+        console.log('side bar click');
+        $('#opacitynone').toggleClass('sidebar-opacity-show');
+        $('#sidenavbar').toggleClass('s-sidebar__nav-show');
+        $('#logoutblock').toggleClass('sidebar-opacity-none');
+        $('#logoutblock').toggleClass('sidebar-opacity-show');
+        $('#searchicon').toggleClass('sidebar-opacity-none');
+        $('#searchicon').toggleClass('sidebar-opacity-show');
+    });
 
     $('#userSetupForm').validator().on('submit', function(e){
         if(!e.isDefaultPrevented()){
@@ -468,8 +467,19 @@ $(document).ready(function (){
             .fail(function(msg){
                 $('#loder').hide();
                 $('#login-form').css('opacity', '1');
-                $('.form-control').toggleClass('error-message');
-                 $('.error_msg').html(msg.responseJSON.message);
+                if(msg.responseJSON.message === 'Please provide email and password.'){
+                    $('#password').toggleClass('error-message');
+                    $('#email').toggleClass('error-message');
+                    $('.error_msg').html(msg.responseJSON.message);
+                }
+                if(msg.responseJSON.message === 'Please Enter password.'){
+                    $('#password').toggleClass('error-message');
+                    $('.error_msg').html(msg.responseJSON.message);
+                }
+                if(msg.responseJSON.message === 'Please Enter email.'){
+                    $('#email').toggleClass('error-message');
+                    $('.error_msg').html(msg.responseJSON.message);
+                }
                 $('.error-message-box').css('display', 'block');
                 // showNotification(msg.responseJSON.message, 'danger')
             });

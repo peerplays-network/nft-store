@@ -643,9 +643,21 @@ router.get('/customer/login', async (req, res, next) => {
 router.post('/customer/login_action', async (req, res) => {
     const db = req.app.db;
     // check if email or password empty
-    if(req.body.loginEmail === '' || req.body.loginPassword === ''){
+    if(req.body.loginEmail === '' && req.body.loginPassword === ''){
         res.status(400).json({
             message: 'Please provide email and password.'
+        });
+        return;
+    }
+    if(req.body.loginEmail === ''){
+        res.status(400).json({
+            message: 'Please Enter email.'
+        });
+        return;
+    }
+    if(req.body.loginPassword === ''){
+        res.status(400).json({
+            message: 'Please Enter password.'
         });
         return;
     }
