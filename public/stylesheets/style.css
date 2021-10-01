@@ -813,6 +813,7 @@ a {
   justify-content: space-between;
   align-items: center;
   padding: .5rem 32px;
+  cursor: pointer;
 }
 .nav-item {
   padding: .5rem 32px !important;
