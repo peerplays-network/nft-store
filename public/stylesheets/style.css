@@ -901,6 +901,12 @@ a {
 .modal-button-alignment .add-fun-button {
   background-color: #75ae4a;
 }
+button:focus{
+  outline: none !important;
+}
+.modal-button-alignment .add-fun-button:hover {
+  background-color: #426627;
+}
 .modal-button-alignment .same-button-style {
   min-width: 140px;
   border-radius: 999px;
@@ -914,6 +920,15 @@ a {
 .modal-button-alignment .withdraw-button {
   background-color: #3d9ad4;
   margin-left: 1.25rem;
+}
+
+.modal-button-alignment .withdraw-button:hover {
+  background-color: #236087;
+  margin-left: 1.25rem;
+}
+
+.footer-top-align button:hover{
+  background-color: #236087 !important;
 }
 .company-logo {
   position: absolute;
@@ -977,7 +992,16 @@ box-shadow: 0 3px 15px 2px #0000001a; */
   align-items: center;
   justify-content: center;
 }
-.footer-top-align button {
+
+.footer-top-align .btn-success {
+  background-color: #75ae4a;
+  border: none;
+  border-radius: 999px;
+  height: 45px;
+  min-width: 140px;
+}
+
+.footer-top-align  button  {
   background-color: #3d9ad4;
   border: none;
   border-radius: 999px;
@@ -986,4 +1010,19 @@ box-shadow: 0 3px 15px 2px #0000001a; */
 }
 .footer-top-align button:hover {
   background-color: #3D9AD4;
+}
+
+.footer-top-align .btn-success:hover {
+  background-color: #426627 !important;
+}
+
+#btnModalWithdrawFunds{
+  background-color: #3d9ad4;
+  border: none;
+  border-radius: 999px;
+  height: 45px;
+  min-width: 140px;
+}
+#btnModalWithdrawFunds:hover{
+  background-color: #236087 !important;
 }
