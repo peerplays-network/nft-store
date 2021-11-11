@@ -48,7 +48,7 @@
     "feather-icons": "^4.25.0",
     "glob": "^7.1.5",
     "got": "^10.6.0",
-    "gulp-less": "^4.0.1",
+    "gulp-less": "^5.0.0",
     "helmet": "^3.21.2",
     "html-entities": "^1.2.0",
     "i18n": "^0.8.4",
