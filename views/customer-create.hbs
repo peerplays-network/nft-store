@@ -14,59 +14,7 @@
                 <input type="text" class="form-control" name="email" id="email" required>
             </div>
         </div>
-        <div class="col-sm-12 customer-form">
-            <div class="bottom-space">
-            <label class="control-form-label">{{ @root.__ "First name" }} *</label>
-                <input type="text" class="form-control" name="firstName" id="firstName" required>
-            </div>
-        </div>
-        <div class="col-sm-12 customer-form">
-            <div class="bottom-space">
-            <label class="control-form-label">{{ @root.__ "Last name" }} *</label>
-                <input type="text" class="form-control" name="lastName" id="lastName" required>
-            </div>
-        </div>
-        <div class="col-sm-12 customer-form">
-            <div class="bottom-space">
-            <label class="control-form-label">{{ @root.__ "Address 1" }} *</label>   
-                <input type="text" class="form-control" name="address1" id="address1" required>
-            </div>
-        </div>
-        <div class="col-sm-12 customer-form">
-            <div class="bottom-space">
-            <label class="control-form-label">{{ @root.__ "Address 2" }}</label>
-                <input type="text" class="form-control" name="address2" id="address2">
-            </div>
-        </div>
-        <div class="col-sm-8 customer-form">
-            <div class="bottom-space">
-            <label class="control-form-label">{{ @root.__ "Country" }} *</label>
-                <select class="form-control" id="country" name="country" required>
-                    <option value="" disabled selected>Select Country</option>
-                    {{#each countryList}}
-                    <option {{selectState this @root.result.country}} value="{{this}}">{{this}}</option>
-                    {{/each}}
-                </select>
-            </div>
-        </div>
-        <div class="col-sm-8 customer-form">
-            <div class="bottom-space">
-            <label class="control-form-label">{{ @root.__ "State" }} *</label>
-                <input type="text" class="form-control" name="state" id="state" required>
-            </div>
-        </div>
-        <div class="col-sm-8 customer-form">
-            <div class="bottom-space">
-            <label class="control-form-label">{{ @root.__ "Postcode" }} *</label>
-                <input type="text" class="form-control" name="postcode" id="postcode" required>
-            </div>
-        </div>
-        <div class="col-sm-8 customer-form">
-            <div class="bottom-space">
-            <label class="control-form-label">{{ @root.__ "Phone number" }} *</label>
-                <input type="text" class="form-control" name="phone" id="phone" required>
-            </div>
-        </div>
+        
         <div class="col-sm-8 customer-form">
             <div class="bottom-space">
             <label class="control-form-label">{{ @root.__ "Password" }} *</label>

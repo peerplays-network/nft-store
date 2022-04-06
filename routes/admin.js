@@ -62,12 +62,16 @@ const getAllOfferHistory = async (start = 0) => {
   for(let i = 0; i < result.length; i++){
       params.push(...result[i].item_ids);
   }
+  
+  let nfts;
 
-  const nfts = await peerplaysService.getBlockchainData({
-      api: 'database',
-      method: 'get_objects',
-      'params[0][]': params
-  });
+  if(params.length > 0){
+    nfts = await peerplaysService.getBlockchainData({
+        api: 'database',
+        method: 'get_objects',
+        'params[0][]': params
+    });
+  }
 
   if(nfts){
       for(let i = 0; i < result.length; i++){
@@ -330,13 +334,13 @@ router.get('/admin/dashboard', csrfProtection, restrict, async (req, res) => {
     const allProductsInDB = await db.products.find({}).toArray();
     const nftMetadataIds = allProductsInDB.map(({nftMetadataID}) => nftMetadataID);
 
-    const metadatas = await peerplaysService.getBlockchainData({
-        api: 'database',
-        method: 'get_objects',
-        'params[0][]': nftMetadataIds
-    });
-
     if(nftMetadataIds && nftMetadataIds.length > 0) {
+        const metadatas = await peerplaysService.getBlockchainData({
+            api: 'database',
+            method: 'get_objects',
+            'params[0][]': nftMetadataIds
+        });
+    
         const offerHistories = await getAllOfferHistory();
 
         if(offerHistories && offerHistories.length > 0) {

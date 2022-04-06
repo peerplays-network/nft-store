@@ -7,35 +7,28 @@
             "format": "emailAddress"
         },
         "firstName": {
-            "type": "string",
-            "isNotEmpty": true
+            "type": "string"
         },
         "lastName": {
-            "type": "string",
-            "isNotEmpty": true
+            "type": "string"
         },
         "address1": {
-            "type": "string",
-            "isNotEmpty": true
+            "type": "string"
         },
         "address2": {
             "type": "string"
         },
         "country": {
-            "type": "string",
-            "isNotEmpty": true
+            "type": "string"
         },
         "state": {
-            "type": "string",
-            "isNotEmpty": true
+            "type": "string"
         },
         "postcode": {
-            "type": "string",
-            "isNotEmpty": true
+            "type": "string"
         },
         "phone": {
-            "type": "string",
-            "isNotEmpty": true
+            "type": "string"
         },
         "password": {
             "type": "string",
@@ -59,13 +52,6 @@
     },
     "required": [
         "email",
-        "firstName",
-        "lastName",
-        "address1",
-        "country",
-        "state",
-        "postcode",
-        "phone",
         "password"
     ]
 }
